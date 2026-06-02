@@ -1,0 +1,155 @@
+<section
+  #navbarWrapper
+  class="flex flex-col items-stretch justify-start fixed w-[95%] md:w-[60%] h-[12vh] mt-5 mx-auto top-0 inset-x-0 bottom-auto z-10 overflow-hidden transition-none"
+>
+  <!-- Navbar Container -->
+  <div
+    class="bg-secondary flex items-center justify-between flex-none h-[12vh] rounded-2xl mx-0 px-3.5 py-3.5 overflow-hidden"
+  >
+    <!-- Logo -->
+    <div class="w-14 ml-2.5">
+      <img src="navbar/MW LOGO.svg" alt="" loading="lazy" class="object-cover" />
+    </div>
+    <!-- Menu Button -->
+    <a
+      (click)="toggleMenu()"
+      class="flex items-center justify-center gap-1.5 p-2.5 cursor-pointer hover:bg-[rgba(255,255,255,0.1)] rounded-lg md:order-first"
+    >
+      <div class="relative w-7 h-7 flex items-center justify-center">
+        <div #menuIcon class="absolute inset-0 w-7 flex items-center justify-center">
+          <img src="navbar/menu-two-lines.svg" alt="" loading="lazy" class="object-cover" />
+        </div>
+        <div
+          #closeIcon
+          class="absolute flex items-center justify-center inset-0 w-7 opacity-0 scale-75 -rotate-90"
+        >
+          <img src="navbar/close.svg" alt="" loading="lazy" class="object-cover" />
+        </div>
+      </div>
+
+      <div class="uppercase text-white text-2xl tracking-[-1px] order-first md:order-0">Menu</div>
+    </a>
+    <!-- Login Button -->
+    <a
+      #loginBtn
+      (mouseenter)="onHover()"
+      (mouseleave)="onLeave()"
+      class="bg-accent-red text-white uppercase text-[1.15rem] font-medium mr-2.5 px-6 py-2.5 rounded-md cursor-pointer hidden md:block overflow-hidden"
+    >
+      <div
+        class="relative w-16 h-4 flex items-center justify-center transform-3d perspective-normal"
+      >
+        <span #textDefault class="absolute block backface-hidden whitespace-nowrap"> Log in </span>
+
+        <span #textHover class="absolute block backface-hidden whitespace-nowrap"> Log in </span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Navbar Content -->
+  <div class="bg-secondary flex flex-col flex-1 rounded-2xl mt-2.5 overflow-hidden">
+    <!-- Grid Container -->
+    <div class="grid grid-cols-1 flex-1 md:grid-cols-3 gap-4 p-6">
+      <!-- First Grid Item -->
+      <div class="row-span-1 md:col-span-2 md:row-span-2">
+        <!-- Gallery Container -->
+        <div class="relative flex items-center justify-start w-full h-full isolate">
+          <!-- Text Column -->
+          <div class="w-full flex items-stretch justify-center">
+            <!-- Text List -->
+            <div class="title-list flex flex-col w-full px-4 lg:px-10">
+              <!-- Text Items -->
+              @for (link of navLinks; track link.label; let isLast = $last) {
+                <app-divider />
+                <a
+                  [routerLink]="link.path"
+                  class="title-item cursor-pointer py-4 md:py-5 transition-opacity duration-100"
+                  (mouseenter)="setImageRevealActiveIndex($index)"
+                >
+                  <div class="text-white uppercase text-2xl md:text-3xl font-semibold block">
+                    {{ link.label }}
+                  </div>
+                </a>
+
+                @if (isLast) {
+                  <app-divider />
+                }
+              }
+            </div>
+          </div>
+          <!-- Image Column -->
+          <div
+            #imageContainer
+            class="absolute flex items-center justify-center inset-y-0 right-[10%] left-auto lg:right-[15%]"
+          >
+            <!-- Image List -->
+            <div class="relative w-40 h-60 md:w-48 md:h-68 lg:w-58 lg:h-80">
+              @for (link of navLinks; track link.image) {
+                <!-- Image Item -->
+                <div
+                  class="image-item absolute inset-0 opacity-0 transition-opacity duration-100"
+                  [class.is-active]="activeImageRevealIndex() === $index || $index === 0"
+                >
+                  <img
+                    [src]="link.image"
+                    [alt]="link.label + ' background image'"
+                    loading="lazy"
+                    class="object-cover w-full h-full"
+                  />
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second Grid Item -->
+      <div class="flex md:justify-end md:row-span-2 z-50 lg:pr-8">
+        <!-- Second Grid Container -->
+        <div
+          class="bg-accent-red p-4 flex md:flex-col items-end md:items-start w-full h-full xl:w-[75%] md:h-[80%] my-auto rounded-xl"
+        >
+          <!-- Services Item -->
+          <a
+            class="group services-item relative flex flex-col justify-between items-start w-[50%] sm:w-[30%] md:w-full h-full p-5 rounded-xl text-white uppercase cursor-pointer overflow-hidden"
+          >
+            <div class="services-overlay rounded-xl"></div>
+
+            <h3 class="text-[16px] md:text-3xl font-semibold block z-10">Our Services</h3>
+
+            <p class="z-10 text-[8px] font-medium flex items-center gap-1">
+              <span>Learn more</span>
+              <span
+                class="inline-block transition-transform duration-300 ease-out transform group-hover:translate-x-1"
+              >
+                &rarr;
+              </span>
+            </p>
+          </a>
+          <!-- Social Media Links -->
+          <div class="flex flex-col h-[75%] md:h-auto ml-4 mb-1 md:m-0 md:ml-1 md:mt-2">
+            <!-- Login Button -->
+            <a
+              class="bg-secondary text-white text-center uppercase text-[0.6rem] font-medium tracking-[-0.2px] p-2 rounded-md cursor-pointer my-auto md:hidden"
+            >
+              Log in
+            </a>
+            <div class="text-white text-[8px] uppercase tracking-tight font-semibold">Social</div>
+            <!-- Social Media Icons -->
+            <div class="flex items-center gap-2">
+              <a href="#" class="text-white hover:text-accent-red transition-colors w-6 md:w-5">
+                <img src="navbar/facebook.png" alt="Facebook" loading="lazy" />
+              </a>
+              <a href="#" class="text-white hover:text-accent-red transition-colors w-6 md:w-5">
+                <img src="navbar/x.png" alt="Twitter" loading="lazy" />
+              </a>
+              <a href="#" class="text-white hover:text-accent-red transition-colors w-6 md:w-5">
+                <img src="navbar/linkedin.png" alt="LinkedIn" loading="lazy" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
