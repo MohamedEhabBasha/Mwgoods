@@ -1,0 +1,55 @@
+<div class="absolute top-0 left-0 w-full h-full z-1 overflow-hidden pointer-events-none">
+  <canvas #threeCanvas class="w-full h-full block"></canvas>
+</div>
+<main class="relative bg-transparent w-full h-screen overflow-hidden">
+  <!-- Typography -->
+  <section class="absolute flex flex-col bottom-[3%] left-1/2 -translate-x-1/2 w-full">
+    <!-- Sub Header -->
+    <div
+      class="px-6 md:px-16 flex flex-col md:flex-row justify-between items-center xl:items-end w-full mb-6 md:mb-12"
+    >
+      <p
+        #targetParagraph
+        [ngClass]="`
+          max-w-full md:max-w-100  xl:max-w-115 text-left normal-case 
+          font-normal tracking-normal text-stone-800
+          text-[1rem] lg:text-[1.25rem] leading-snug my-4 lg:my-0
+        `"
+      >
+        A curated ecosystem bridging elite commerce with a real-time social network. Launch your
+        storefront, broadcast your process, and own your audience.
+      </p>
+
+      <button
+        #targetBtn
+        [ngClass]="`
+          px-6 py-3 md:px-8 md:py-4 rounded-full border border-stone-700
+          bg-stone-900 hover:bg-stone-100 text-stone-100 hover:text-stone-950
+          text-xs lg:text-sm tracking-widest font-medium uppercase
+           pointer-events-auto
+        `"
+      >
+        Get Started
+      </button>
+    </div>
+    <!-- Header -->
+    <h1
+      #mainHeroStructure
+      [ngClass]="'order-first lg:order-last py-2 px-6 md:px-16 text-4xl md:text-5xl lg:text-7xl xl:text-[6.75rem] 
+    font-bold leading-none uppercase tracking-tighter border-t border-gray-300'"
+    >
+      <div #targetHeading class="flex justify-between items-center w-full">
+        <span>Turn Your</span>
+        <span>Products</span>
+      </div>
+
+      <div #targetSubtitle class="text-center w-full mt-2 md:mt-4 text-[3.5xl] xl:text-[5.5rem]">
+        <span>
+          Into a
+          <span class="text-accent-red">Trusted</span>
+          Business
+        </span>
+      </div>
+    </h1>
+  </section>
+</main>

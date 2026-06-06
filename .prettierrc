@@ -1,6 +1,8 @@
 {
   "printWidth": 100,
   "singleQuote": true,
+  "htmlWhitespaceSensitivity": "ignore",
+  "bracketSameLine": false,
   "overrides": [
     {
       "files": "*.html",
