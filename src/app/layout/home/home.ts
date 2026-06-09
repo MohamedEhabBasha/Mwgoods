@@ -1,117 +1,47 @@
-import {
-  AfterViewInit,
-  Component,
-  DestroyRef,
-  ElementRef,
-  HostListener,
-  inject,
-  viewChild,
-} from '@angular/core';
-import { SceneManager } from './threejs-hero-scene/scene-manager';
-import { NgClass } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, viewChild } from '@angular/core';
 import { gsap } from 'gsap';
-import { SplitText } from 'gsap/SplitText';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { HomeIntro } from './home-intro/home-intro';
+import { HomeHero } from './home-hero/home-hero';
 
-gsap.registerPlugin(SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-home',
-  imports: [NgClass],
+  imports: [HomeIntro, HomeHero],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements AfterViewInit {
-  private canvasSignal = viewChild.required<ElementRef<HTMLCanvasElement>>('threeCanvas');
-  private sceneManager!: SceneManager;
+  private scrollContainer = viewChild.required<ElementRef>('scrollContainer');
 
-  private targetHeading = viewChild.required<ElementRef<HTMLElement>>('targetHeading');
-  private targetSubtitle = viewChild.required<ElementRef<HTMLElement>>('targetSubtitle');
-  private targetParagraph = viewChild.required<ElementRef<HTMLElement>>('targetParagraph');
-  private targetBtn = viewChild.required<ElementRef<HTMLElement>>('targetBtn');
-
-  private destroyRef = inject(DestroyRef);
+  /* MAIN SECTIONS */
+  // Hero Section
+  private heroSection = viewChild.required<HomeHero>(HomeHero);
+  // Intro Section
+  private introSection = viewChild.required<HomeIntro>(HomeIntro);
 
   ngAfterViewInit(): void {
-    const canvas = this.canvasSignal().nativeElement;
-    this.sceneManager = new SceneManager(canvas);
+    const scrollContainer = this.scrollContainer().nativeElement;
 
-    this.sceneManager.initialize();
-
-    this.setupCleanup();
-
-    this.triggerSplitTextAnimation();
-  }
-
-  private setupCleanup(): void {
-    this.destroyRef.onDestroy(() => {
-      this.sceneManager.setupCleanup();
-    });
-  }
-
-  private triggerSplitTextAnimation(): void {
-    // 1. Instantiate the SplitText engines on our raw copy
-    const headingSplit = new SplitText(this.targetHeading().nativeElement, {
-      type: 'words',
-      wordsClass: 'inline-block translate-y-[110%]', // Generates the clean clip mask automatically
+    // 1. Create the Master Timeline
+    const masterTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: scrollContainer,
+        start: 'top top',
+        end: '+=150%',
+        scrub: 1.5,
+        /* snap: 0.5, */
+        pin: true,
+        pinSpacing: true,
+        invalidateOnRefresh: true,
+      },
     });
 
-    const subtitleSplit = new SplitText(this.targetSubtitle().nativeElement, {
-      type: 'lines',
-      linesClass: 'inline-block translate-y-[110%]',
-    });
+    // 2. Add the hero section animation to the master timeline
+    //masterTl.add(this.heroSection().createHeroAnimationTimeline());
 
-    const paragraphSplit = new SplitText(this.targetParagraph().nativeElement, {
-      type: 'lines',
-      linesClass: 'inline-block',
-    });
-
-    // Quick structural CSS fix: force parent wrapper blocks to hide the overflow text cleanly
-    const wrappers = [this.targetHeading(), this.targetSubtitle(), this.targetParagraph()];
-    wrappers.forEach((wrap) => {
-      wrap.nativeElement.style.overflow = 'hidden';
-    });
-
-    // 2. Build the cohesive master timeline
-    const tl = gsap.timeline({
-      defaults: { ease: 'power4.out', duration: 1.4 },
-    });
-
-    // Step 1: Split main headlines glide up out of thin air
-    tl.to(headingSplit.words, {
-      y: '0%',
-      //stagger: 0.1,
-    })
-
-      // Step 2: Subtitle cascades up right underneath
-      .to(
-        subtitleSplit.lines,
-        {
-          y: '0%',
-          stagger: 0.05,
-        },
-        '<',
-      )
-
-      // Step 3: Meta-paragraph breaks down into lines and glides up
-      .fromTo(
-        paragraphSplit.lines,
-        {
-          yPercent: -400,
-        },
-        {
-          yPercent: 0,
-          stagger: 0.05,
-          duration: 1.0,
-        },
-        '-=0.9',
-      )
-
-      // Step 4: The anchor button snaps cleanly into layout framing
-      .fromTo(
-        this.targetBtn().nativeElement,
-        { yPercent: -100, opacity: 0 },
-        { yPercent: 0, duration: 1.0, opacity: 1 },
-        '<',
-      );
+    // 3. Add the intro section animation to the master timeline
+    masterTl.add(this.introSection().createIntroAnimationTimeline());
   }
 }

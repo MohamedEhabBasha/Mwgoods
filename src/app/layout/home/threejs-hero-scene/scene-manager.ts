@@ -105,14 +105,14 @@ export class SceneManager {
 
     if (width < 768) {
       // 📱 Mobile Viewports: Shrink the vase so it doesn't bleed over small headers
-      scaleFactor = 1.8;
+      scaleFactor = 1.3;
       this.vaseMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
       // Optional: Push the camera back or adjust target height on mobile if needed
       this.camera.position.set(0, 4, 14);
       this.vaseMesh.position.y += 3; // Slightly lower on mobile to fit better with smaller headers
     } else if (width >= 768 && width < 1024) {
       // 📑 Tablet / Small Laptop Viewports: Medium Scale
-      scaleFactor = 2.2;
+      scaleFactor = 1.8;
       this.vaseMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
       this.camera.position.set(0, 4, 12);
       this.vaseMesh.position.y += 3.5;
