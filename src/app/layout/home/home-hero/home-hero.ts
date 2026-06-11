@@ -1,9 +1,8 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, inject, viewChild } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { SceneManager } from '../threejs-hero-scene/scene-manager';
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
-import { PixiWeb } from "../../../shared/components/pixi-web/pixi-web";
+import { PixiWeb } from '../../../shared/components/pixi-web/pixi-web';
 
 gsap.registerPlugin(SplitText);
 
@@ -14,31 +13,13 @@ gsap.registerPlugin(SplitText);
   styleUrl: './home-hero.css',
 })
 export class HomeHero implements AfterViewInit {
-  private canvasSignal = viewChild.required<ElementRef<HTMLCanvasElement>>('threeCanvas');
-  private sceneManager!: SceneManager;
-
   private targetHeading = viewChild.required<ElementRef<HTMLElement>>('targetHeading');
   private targetSubtitle = viewChild.required<ElementRef<HTMLElement>>('targetSubtitle');
   private targetParagraph = viewChild.required<ElementRef<HTMLElement>>('targetParagraph');
   private targetBtn = viewChild.required<ElementRef<HTMLElement>>('targetBtn');
 
-  private destroyRef = inject(DestroyRef);
-
   ngAfterViewInit(): void {
-    // Implementation for after view initialization
-    const canvas = this.canvasSignal().nativeElement;
-    this.sceneManager = new SceneManager(canvas);
-
-    this.sceneManager.initialize();
-
-    this.setupCleanup();
-
     this.createHeroAnimationTimeline();
-  }
-  private setupCleanup(): void {
-    this.destroyRef.onDestroy(() => {
-      this.sceneManager.setupCleanup();
-    });
   }
 
   public createHeroAnimationTimeline(): gsap.core.Timeline {

@@ -8,7 +8,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-home-intro',
-  imports: [NgClass, /* PixiWeb */],
+  imports: [NgClass /* PixiWeb */],
   templateUrl: './home-intro.html',
   styleUrl: './home-intro.css',
 })
@@ -18,9 +18,13 @@ export class HomeIntro implements AfterViewInit {
   private centerColumn = viewChild.required<ElementRef<HTMLElement>>('centerColumn');
   private leftColumn = viewChild.required<ElementRef<HTMLElement>>('leftColumn');
   //private pixiGrid = viewChild.required<PixiWeb>(PixiWeb);
-  private targetLeftImg = viewChild.required<ElementRef<HTMLImageElement>>('targetLeftImg');
-  private targetRightImg = viewChild.required<ElementRef<HTMLImageElement>>('targetRightImg');
-  private targetCenterText = viewChild.required<ElementRef<HTMLParagraphElement>>('targetCenterText');
+  //private targetLeftImg = viewChild.required<ElementRef<HTMLImageElement>>('targetLeftImg');
+  //private targetRightImg = viewChild.required<ElementRef<HTMLImageElement>>('targetRightImg');
+  private targetCenterText =
+    viewChild.required<ElementRef<HTMLParagraphElement>>('targetCenterText');
+
+  private storylineSvg = viewChild.required<ElementRef<HTMLElement>>('storylineSvg');
+  private storylinePath = viewChild.required<ElementRef<SVGPathElement>>('storylinePath');
 
   ngAfterViewInit(): void {
     // Implementation for after view initialization
@@ -44,11 +48,23 @@ export class HomeIntro implements AfterViewInit {
     const right = this.rightColumn().nativeElement;
     //const pixiGrid = this.pixiGrid().gridCanvas().nativeElement;
 
+    const svgContainer = this.storylineSvg().nativeElement;
+    const rawPath = this.storylinePath().nativeElement;
+
+    // 2. Compute the exact vector perimeter length on load
+    const totalPathLength = rawPath.getTotalLength();
+
     // 1. Initial State Setup to avoid flashes
     gsap.set([mainBg], { yPercent: 100 });
     //gsap.set(pixiGrid, { opacity: 0 });
     gsap.set([left, right], { clipPath: 'inset(100% 0% 0% 0%)' });
     gsap.set(center, { yPercent: 100 });
+
+    gsap.set(rawPath, {
+      strokeDasharray: totalPathLength,
+      strokeDashoffset: totalPathLength,
+    });
+    gsap.set(svgContainer, { opacity: 0 });
 
     // 2. Animate the Middle Column coming from bottom to top
     tl.to(mainBg, { yPercent: 0, ease: 'none' })
@@ -63,42 +79,31 @@ export class HomeIntro implements AfterViewInit {
         {
           clipPath: 'inset(0% 0% 0% 0%)',
           duration: 1,
-          stagger: 0.1
+          stagger: 0.1,
         },
         '-=1',
       ) // small delay overlap
-      .fromTo(
-        this.targetLeftImg().nativeElement,
+      // 5. ✨ BUTTERY LINE DRAW REVEAL
+      // This targets your new high-width stroke and unrolls it from 0% to 100% visibility
+      .to(
+        svgContainer,
         {
-          rotateZ: 30,
-          opacity: 0,
-          duration: 1.2,
-        },
-        {
-          rotateZ: 0,
           opacity: 1,
-          ease: 'elastic.out(1, 0.75)',
-          duration: 1.2,
+          duration: 0.3,
         },
+        '-=0.7', // Start drawing precisely while columns expand open
       )
-      .to(mainBg, {background: '#fff'}, '<')
-      //.to(pixiGrid, { opacity: 1, ease: 'none' }, '-=0.9')
-      // 4. Reveal Right Column
-      .fromTo(
-        this.targetRightImg().nativeElement,
+      .to(
+        rawPath,
         {
-          xPercent: -20,
-          opacity: 0,
+          strokeDashoffset: 0, // Uncoils the path line cleanly from head to tail!
+          duration: 1.8,
+          ease: 'power2.inOut',
         },
-        {
-          xPercent: 0,
-          opacity: 1,
-          ease: 'power2.out',
-          duration: 1.2
-        }
+        '<', // Matches execution timing frame with container opacity
       )
-      
-      //.to([left, center, right], { backgroundColor: 'transparent', ease: 'power2.out' }); // Sync the grid rise with the main background
+      .to(mainBg, { background: '#fff' });
+    //.to([left, center, right], { backgroundColor: 'transparent', ease: 'power2.out' }); // Sync the grid rise with the main background
 
     return tl;
   }

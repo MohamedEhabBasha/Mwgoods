@@ -6,8 +6,14 @@ export class SceneManager {
   private camera!: THREE.PerspectiveCamera;
   private scene!: THREE.Scene;
   private clock = new THREE.Timer();
-  private vaseMesh: THREE.Group | null = null;
+  public vaseMesh: THREE.Group | null = null;
+  private onReadyCallback?: (mesh: THREE.Group) => void;
   private animationFrameId!: number;
+
+  // ─── TRAIL PROPERTIES ───
+  private trailLine!: THREE.Line;
+  private maxTrailPoints = 60; // Higher number = longer line trail
+  private trailPoints: THREE.Vector3[] = [];
 
   constructor(private canvas: HTMLCanvasElement) {}
 
@@ -46,6 +52,7 @@ export class SceneManager {
     // Listen to resize events directly in the manager to update scales instantly
     window.addEventListener('resize', this.onWindowResize);
   }
+
   private loadModel(): void {
     const loader = new GLTFLoader();
 
@@ -66,10 +73,25 @@ export class SceneManager {
         this.adjustModelScale();
 
         this.scene.add(this.vaseMesh);
+
+        // ✨ Fire the ready hook to alert the main home component
+        if (this.onReadyCallback) {
+          this.onReadyCallback(this.vaseMesh);
+        }
       },
       undefined,
       (error) => console.error('Error loading GLB model:', error),
     );
+  }
+  public getCamera() {
+    return this.camera;
+  }
+  public onModelLoaded(callback: (mesh: THREE.Group) => void): void {
+    this.onReadyCallback = callback;
+    // If the model somehow finished loading before the listener attached, fire it instantly
+    if (this.vaseMesh) {
+      callback(this.vaseMesh);
+    }
   }
   private onWindowResize = (): void => {
     const width = window.innerWidth;
@@ -116,15 +138,12 @@ export class SceneManager {
       this.vaseMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
       this.camera.position.set(0, 4, 12);
       this.vaseMesh.position.y += 3.5;
-    }
-
-    else if(width >= 1024 && width < 1280) {
+    } else if (width >= 1024 && width < 1280) {
       scaleFactor = 2.4;
       this.vaseMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
       this.camera.position.set(0, 6, 12);
       this.vaseMesh.position.y += 2.5;
-    }
-     else {
+    } else {
       // 🖥️ Desktop Wide Viewports: Full Production Scale
       scaleFactor = 3;
       this.vaseMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);

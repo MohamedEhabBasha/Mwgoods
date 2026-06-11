@@ -2,47 +2,75 @@
   #mainIntroStructure
   class="absolute inset-0 bg-transparent grid grid-cols-1 md:grid-cols-3 min-h-screen w-full"
 >
-  <!--   <app-pixi-web
-    class="pointer-events-none"
-    [squareSize]="350"
-    [thickness]="0.8"
-    backgroundColor="#fff"
-  ></app-pixi-web> -->
+  <div
+    #storylineSvg
+    class="absolute pointer-events-none w-full h-full items-center justify-center z-1 opacity-0 border-4 hidden xl:flex"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      xml:space="preserve"
+      width="2200"
+      height="625.772"
+      class="absolute left-[0%] bottom-[-5%] xl:scale-[80%] opacity-5 overflow-visible"
+    >
+      <path
+        #storylinePath
+        fill="none"
+        stroke-miterlimit="10"
+        stroke-width="60"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="stroke-accent-red"
+        d="M4.387 210.328s-67.309 321.097 601.97 394.288 956.294-84.996 496.562-197.144S615.248 190.26 799.395 91.097s324.024-135.272 447.348-1.082"
+      />
+    </svg>
+  </div>
   <div
     #leftColumn
     class="relative bg-white text-white flex items-end justify-center p-6 md:items-center overflow-hidden"
   >
     <div
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-neutral-300 pointer-events-none"
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px hidden lg:block bg-neutral-300 pointer-events-none"
     ></div>
 
-    <img
-      #targetLeftImg
-      src="home\kill.png"
-      alt="Kill the Standard Storefront"
-      class="absolute bottom-[24%] w-35 h-auto object-cover hidden lg:block xl:w-30 xl:bottom-[27%]"
-    />
-
     <h2
-      [ngClass]="'text-accent-red text-4xl lg:text-5xl xl:text-7xl font-bold uppercase font-OpenSans tracking-tighter 
-    mt-10 md:mt-0 xl:ml-16 z-20'"
+      [ngClass]="'flex items-center text-accent-red text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold uppercase font-OpenSans tracking-tighter mt-10 md:mt-0 xl:ml-16 z-20'"
     >
       Kill
     </h2>
+    <p
+      class="absolute bottom-3.5 uppercase text-[#1c1c1e] text-[0.5rem] tracking-[0.2rem] font-OpenSans font-extrabold hidden md:block"
+    >
+      <span
+        class="paragraph-square inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e] mr-1"
+      ></span>
+      About
+    </p>
   </div>
 
-  <div #centerColumn class="relative bg-white text-white flex items-center justify-center border border-neutral-300">
-    <p #targetCenterText class="px-6 py-10 text-lg md:text-xl font-light text-zinc-400 border-y border-neutral-300">
+  <div
+    #centerColumn
+    class="relative bg-white text-white flex items-center justify-center md:border border-neutral-300"
+  >
+    <p
+      #targetCenterText
+      class="px-6 py-10 text-lg md:text-xl font-light text-neutral-500 md:border-y border-neutral-300"
+    >
+      <span
+        class="paragraph-square inline-block w-[0.55em] h-[0.55em] bg-neutral-500 mr-2 mb-0.5 shrink-0"
+      ></span>
       Traditional e-commerce is dead quiet. We turned it into a live arena. Broadcast your build
       process, drop rare assets in real-time, and own your audience equity without the middleman
       taxing your vision.
     </p>
-    <img
-      #targetRightImg
-      src="home\head-intro.png"
-      alt="Kill the Standard Storefront"
-      class="absolute right-[1%] bottom-[17%] w-40 h-auto object-cover hidden lg:block xl:right-[3%] xl:bottom-[21%]"
-    />
+    <p
+      class="absolute bottom-3.5 uppercase text-[#1c1c1e] text-[0.5rem] tracking-[0.2rem] font-OpenSans font-extrabold hidden md:block"
+    >
+      <span
+        class="paragraph-square inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e] mr-1"
+      ></span>
+      mw goods
+    </p>
   </div>
 
   <div
@@ -50,7 +78,7 @@
     class="relative bg-white text-white flex flex-col items-center justify-center p-6 md:justify-end overflow-visible"
   >
     <div
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-neutral-300 pointer-events-none z-0"
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px hidden lg:block bg-neutral-300 pointer-events-none z-0"
     ></div>
     <h2
       class="text-4xl lg:text-5xl xl:text-6xl font-bold font-OpenSans text-[#333] uppercase text-center md:text-left tracking-[0.1rem]"
