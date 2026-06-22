@@ -1,0 +1,65 @@
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+  <!-- Side note annotation floating above the middle slot -->
+  <div
+    class="absolute top-[8%] left-1/2 -translate-x-1/2 z-20 pointer-events-none select-none flex flex-col items-center -rotate-2"
+  >
+    <!-- The note card -->
+    <div
+      class="relative bg-white border border-black/10 shadow-[2px_3px_0px_rgba(0,0,0,0.12)] px-4 py-3 rounded-sm w-max max-w-60"
+    >
+      <!-- tiny red dot accent, consistent with your existing style -->
+      <p
+        class="uppercase text-[#1c1c1e] text-[0.6rem] tracking-[0.18rem] font-OpenSans font-extrabold leading-relaxed"
+      >
+        <span class="inline-block w-[0.35rem] h-[0.35rem] bg-accent-red rounded-full"></span>
+        Turn your ambition
+        <br />
+        into a
+        <span class="text-accent-red">dream career.</span>
+      </p>
+    </div>
+
+    <!-- Hand-drawn curved arrow pointing down toward the images -->
+    <svg
+      class="w-10 h-14 mt-1 rotate-6"
+      viewBox="0 0 40 56"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <!-- curved shaft: starts top-center, curves right, ends lower-left -->
+      <path
+        d="M20 2 C28 10, 32 24, 22 44"
+        stroke="#1c1c1e"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        fill="none"
+      />
+      <!-- arrowhead: two short strokes fanning out from the tip -->
+      <polygon points="22,50 17,40 28,41" fill="#1c1c1e" />
+    </svg>
+  </div>
+
+  <!-- your existing conveyor slots -->
+  <div class="flex items-center justify-center gap-10 md:gap-16 w-full max-w-[90vw] mx-auto">
+    @for (ratio of slotRatios; track $index) {
+      <div
+        class="relative overflow-hidden rounded-2xl shrink-0 shadow-2xl"
+        [style.width.px]="windowWidth(ratio)"
+        [style.height.px]="windowHeight(ratio)"
+      >
+        <div #conveyorStrip class="flex h-full w-max will-change-transform">
+          @for (img of strip(); track trackByImg($index, img)) {
+            <div class="relative h-full shrink-0" [style.width.px]="frameWidth">
+              <img
+                [src]="img.src"
+                [alt]="img.alt"
+                class="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

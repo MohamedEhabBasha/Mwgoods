@@ -1,7 +1,43 @@
 <div #webglCanvasContainer class="fixed inset-0 w-full h-full md:z-10 pointer-events-none">
   <canvas #webglCanvas class="w-full h-full block bg-transparent"></canvas>
 </div>
-<main #scrollContainer class="relative bg-transparent w-full min-h-screen overflow-hidden">
-  <app-home-hero></app-home-hero>
-  <app-home-intro></app-home-intro>
+
+<main #mainContainer>
+  <section
+    #scrollContainer__one
+    class="relative bg-transparent w-full min-h-screen overflow-hidden"
+  >
+    <app-home-hero></app-home-hero>
+    <app-home-intro></app-home-intro>
+  </section>
+  <!-- PROCESS_SECTION -->
+  <section #processSectionScrollContainer>
+    <!-- white Space -->
+    <div class="relative block w-full clear-both">
+      <div
+        class="absolute bottom-0 left-0 w-full h-40 bg-linear-to-b from-transparent to-slate-900 z-10 pointer-events-none"
+      ></div>
+      <div class="relative block w-full h-[20vh] bg-white z-50"></div>
+    </div>
+    <app-hp-header></app-hp-header>
+    <app-hp-sliding-images></app-hp-sliding-images>
+    <!-- white Space -->
+    <div class="relative block w-full clear-both">
+      <div
+        class="absolute top-0 left-0 w-full h-40 bg-linear-to-t from-transparent to-slate-900 z-20 pointer-events-none"
+      ></div>
+      <div class="relative block w-full h-[20vh] bg-white z-50"></div>
+    </div>
+    <div class="relative block w-full h-[20vh] bg-white z-9"></div>
+    <app-hp-steps-showcase></app-hp-steps-showcase>
+    <div class="relative block w-full h-[20vh] bg-primary z-9"></div>
+    <!-- space -->
+    <div class="relative block w-full clear-both">
+      <div
+        class="absolute bottom-0 left-0 w-full h-22 bg-linear-to-b from-transparent to-slate-900 z-10 pointer-events-none"
+      ></div>
+      <div class="relative block w-full h-[10vh] bg-primary z-50"></div>
+    </div>
+    <app-hp-chain-bullets></app-hp-chain-bullets>
+  </section>
 </main>

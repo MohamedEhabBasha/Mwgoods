@@ -1,0 +1,49 @@
+<section
+  class="bg-primary relative flex flex-col justify-start items-center min-h-screen w-full pt-10 z-30"
+>
+  <div
+    #headerContainer
+    class="flex flex-col items-center justify-center text-center w-full max-w-5xl mx-auto pt-12 md:pt-0 gap-6 md:gap-8 overflow-hidden"
+  >
+    <p
+      class="uppercase text-[#333] text-[0.6rem] tracking-[0.25rem] font-OpenSans font-extrabold flex items-center gap-2"
+    >
+      <span
+        class="paragraph-square inline-block w-1.5 h-1.5 bg-accent-red border border-[#1c1c1e]"
+      ></span>
+      Why Sell With Us
+    </p>
+
+    <div
+      class="flex flex-col w-full uppercase font-OpenSans font-extrabold text-5xl md:text-7xl lg:text-8xl tracking-tighter text-[#333] leading-[0.85] select-none overflow-hidden"
+    >
+      <div class="overflow-hidden w-full">
+        <h2 #productsHeading class="block text-center md:text-left will-change-transform">
+          Your Products.
+        </h2>
+      </div>
+
+      <div class="overflow-hidden w-full">
+        <h3
+          #empireHeading
+          class="block text-center md:text-right text-[#333] mt-2 md:mt-0 will-change-transform"
+        >
+          Your
+          <span class="text-accent-red">Empire</span>.
+        </h3>
+      </div>
+    </div>
+
+    <p
+      #subtitleWordsContainer
+      class="text-sm md:text-2xl tracking-wide text-neutral-500 font-OpenSans font-semibold max-w-md md:max-w-xl px-4 mt-60 flex items-center justify-center gap-2 flex-wrap overflow-hidden"
+    >
+      <span
+        #squareMarker
+        class="paragraph-square inline-block w-1.5 h-1.5 bg-neutral-500 border border-[#1c1c1e] shrink-0"
+      ></span>
+      Join thousands of sellers turning passion into profit — starting today.
+    </p>
+  </div>
+  <canvas #canvas></canvas>
+</section>

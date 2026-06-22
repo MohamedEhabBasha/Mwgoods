@@ -1,0 +1,10 @@
+/* Keeps the text layout perfectly spaced while splitting words */
+.word-wrapper {
+  vertical-align: bottom;
+  margin-right: 0.35rem; /* Simulates natural word spacing */
+}
+
+/* Optimizes browser hardware acceleration during quick slide animations */
+.will-change-transform {
+  will-change: transform, opacity;
+}

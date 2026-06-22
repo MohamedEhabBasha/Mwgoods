@@ -1,0 +1,59 @@
+.first .step-bg {
+  background-image: url('https://cdn.pixabay.com/photo/2016/10/10/06/45/building-1727807_1280.jpg');
+}
+.second .step-bg {
+  background-image: url('https://cdn.pixabay.com/photo/2016/11/22/21/47/architecture-1850732_1280.jpg');
+}
+.third .step-bg {
+  background-image: url('https://cdn.pixabay.com/photo/2016/01/27/15/25/space-1164579_1280.png');
+}
+/* .hide-bottom-right-square {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 35%, 35% 35%, 35% 100%, 0% 100%);
+} */
+.hide-bottom-right-square {
+  clip-path: polygon(
+    0% 0%,
+    /* Top-Left */ 100% 0%,
+    /* Top-Right */ 100% 40%,
+    /* Mid-Right edge */ 40% 40%,
+    /* Inner Corner intersection point (Perfect Square anchor) */ 40% 100%,
+    /* Mid-Bottom edge */ 0% 100% /* Bottom-Left */
+  );
+}
+.hide-top-left-square {
+  clip-path: polygon(
+    100% 100%,
+    /* Bottom-Right */ 0% 100%,
+    /* Bottom-Left */ 0% 60%,
+    /* Mid-Left edge -> Perfectly matches the level of the left image's cut! */ 60% 60%,
+    /* Inner Corner Anchor */ 60% 0%,
+    /* Mid-Top edge */ 100% 0% /* Top-Right */
+  );
+}
+.hide-bottom-left-square {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 60% 100%, 60% 40%, 0 40%);
+}
+.hide-top-right-square {
+  clip-path: polygon(0 0, 40% 0, 40% 60%, 100% 60%, 100% 100%, 0 100%);
+}
+.step-label div {
+    backface-visibility: hidden;
+}
+.step-label, .counter-label, .desc-label {
+  transform-style: preserve-3d;
+}
+/* This is the secret property from the CodePen that makes characters hide when flipped away */
+.char {
+  display: inline-block;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.desc-line {
+  display: block;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+.step-outer, .step-inner {
+  overflow: hidden !important;
+}

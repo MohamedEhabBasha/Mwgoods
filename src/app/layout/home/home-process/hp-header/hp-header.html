@@ -1,0 +1,41 @@
+<section
+  id="trigger-section"
+  class="relative flex flex-col justify-center min-h-[50vh] bg-white overflow-hidden px-8 py-40 z-50"
+>
+  <div
+    #storylineSvg
+    class="absolute pointer-events-none w-full h-full items-center justify-center z-0 hidden xl:flex overflow-visible"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      xml:space="preserve"
+      width="1436.481"
+      height="544.809"
+      class="absolute top-[8%] xl:scale-x-90 scale-y-42 overflow-visible"
+    >
+      <path
+        #storylinePath
+        fill="none"
+        stroke="#231f20"
+        stroke-miterlimit="10"
+        stroke-width="3"
+        d="M1436.421 529.958S10.211 615.809 11.549 360.037c.322-61.52 91.077-67.959 707.214-87.633h-1.044c616.137-19.674 706.892-26.113 707.214-87.633C1426.27-71 .06 14.851.06 14.851"
+      />
+    </svg>
+  </div>
+  <h2
+    class="w-full max-w-5xl mx-auto flex flex-col uppercase font-OpenSans font-extrabold text-6xl md:text-8xl lg:text-9xl tracking-tighter text-secondary leading-[0.8] select-none"
+  >
+    <span id="animate-how" class="relative inline-block text-left">
+      <div id="howCover" class="absolute inset-0 w-full h-[105%] bg-white z-1"></div>
+      HOW ?
+    </span>
+
+    <span id="animate-to" class="relative inline-block text-center my-0.5 z-2 md:my-0">TO</span>
+
+    <span id="animate-start" class="relative inline-block text-right text-accent-red">
+      <div id="startCover" class="absolute inset-0 w-[101%] h-[105%] bg-white z-1"></div>
+      START
+    </span>
+  </h2>
+</section>

@@ -1,0 +1,185 @@
+<section #stepsSection class="bg-linear-to-b from-white to-primary pt-0">
+  <!-- Middle Images -->
+  <div
+    class="relative w-full min-h-screen flex flex-col justify-center items-center overflow-hidden"
+  >
+    @for (section of steps_list; track $index) {
+      <div
+        #stepSectionLeft
+        [class]="
+          'absolute left-[15%] lg:left-[32%] top-[25%] md:top-[2%] w-[50%] lg:w-[24%] aspect-square' +
+          ' ' +
+          section.class
+        "
+      >
+        <div class="step-outer w-full h-full overflow-x-hidden">
+          <div class="step-inner w-full h-full overflow-x-hidden">
+            @if ($index === 0) {
+              <video
+                #stepBgLeft
+                autoplay
+                [muted]="true"
+                loop
+                playsinline
+                class="step-bg absolute top-0 w-full h-full object-cover hide-bottom-right-square rounded-4xl"
+              >
+                <source src="home\discover video.webm" type="video/webm" />
+              </video>
+            } @else {
+              <div
+                #stepBgLeft
+                class="step-bg absolute top-0 w-full h-full bg-cover bg-center hide-bottom-right-square rounded-4xl"
+              ></div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+    @for (section of steps_list; track $index) {
+      <div
+        #stepSectionTopRight
+        [class]="
+          'absolute right-[15%] lg:right-[18%] top-[25%] md:top-[2%] w-[50%] lg:w-[24%] aspect-square ' +
+          section.class
+        "
+      >
+        <div class="step-outer w-full h-full overflow-x-hidden">
+          <div class="step-inner w-full h-full overflow-x-hidden">
+            <div
+              class="step-bg absolute top-0 w-full h-full bg-cover bg-center hide-bottom-left-square rounded-4xl"
+            ></div>
+          </div>
+        </div>
+      </div>
+    }
+    @for (section of steps_list; track $index) {
+      <div
+        #stepSectionBottomLeft
+        [class]="
+          'absolute left-[15%] lg:left-[18%] bottom-[25%] md:bottom-[18%] w-[50%] lg:w-[24%] aspect-square ' +
+          section.class
+        "
+      >
+        <div class="step-outer w-full h-full overflow-x-hidden">
+          <div class="step-inner w-full h-full overflow-x-hidden">
+            <div
+              class="step-bg absolute top-0 w-full h-full bg-cover bg-center hide-top-right-square rounded-4xl"
+            ></div>
+          </div>
+        </div>
+      </div>
+    }
+    @for (section of steps_list; track $index) {
+      <div
+        #stepSectionRight
+        [class]="
+          'absolute right-[15%] lg:right-[32%] bottom-[25%] md:bottom-[18%] w-[50%] lg:w-[24%] aspect-square' +
+          ' ' +
+          section.class
+        "
+      >
+        <div class="step-outer w-full h-full overflow-x-hidden">
+          <div class="step-inner w-full h-full overflow-x-hidden">
+            @if ($index === 0) {
+              <video
+                #stepBgRight
+                autoplay
+                [muted]="true"
+                loop
+                playsinline
+                class="step-bg absolute top-0 w-full h-full object-cover hide-top-left-square rounded-4xl"
+              >
+                <source src="home\discover video.webm" type="video/webm" />
+              </video>
+            } @else {
+              <div
+                #stepBgRight
+                class="step-bg absolute top-0 w-full h-full bg-cover bg-center hide-top-left-square rounded-4xl"
+              ></div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <div
+      class="flex items-center justify-center gap-2 shadow-2xl rounded-2xl px-5 h-10 min-w-40 border-2 border-white md:mt-15"
+    >
+      <span class="paragraph-square block w-1.5 h-1.5 bg-secondary shrink-0"></span>
+
+      <div class="grid relative w-full h-full justify-items-center items-center">
+        <h3
+          class="step-label col-start-1 row-start-1 block whitespace-nowrap text-secondary uppercase font-Roboto font-bold text-[1rem] tracking-tight text-center"
+        >
+          Discover
+        </h3>
+
+        <h3
+          class="step-label col-start-1 row-start-1 block whitespace-nowrap text-secondary uppercase font-Roboto font-bold text-[1rem] tracking-tight text-center"
+        >
+          Community
+        </h3>
+
+        <h3
+          class="step-label col-start-1 row-start-1 block whitespace-nowrap text-secondary uppercase font-Roboto font-bold text-[1rem] tracking-tight text-center"
+        >
+          Selling
+        </h3>
+      </div>
+    </div>
+    <div
+      class="absolute left-[15%] lg:left-[15%] top-[18%] md:top-[10%] flex items-center justify-center gap-2 shadow-2xl rounded-3xl px-5 h-30 w-40 border-2 border-white z-30"
+    >
+      <span class="paragraph-square block w-1.5 h-1.5 bg-secondary shrink-0"></span>
+
+      <div class="grid relative w-full h-full justify-items-center items-center">
+        <h3
+          class="counter-label col-start-1 row-start-1 block whitespace-nowrap text-secondary uppercase font-Roboto font-bold text-[1.5rem] tracking-tight text-center"
+        >
+          Step 1
+        </h3>
+
+        <h3
+          class="counter-label col-start-1 row-start-1 block whitespace-nowrap text-secondary uppercase font-Roboto font-bold text-[1.5rem] tracking-tight text-center"
+        >
+          Step 2
+        </h3>
+
+        <h3
+          class="counter-label col-start-1 row-start-1 block whitespace-nowrap text-secondary uppercase font-Roboto font-bold text-[1.5rem] tracking-tight text-center"
+        >
+          Step 3
+        </h3>
+      </div>
+    </div>
+    <div
+      class="absolute flex items-start justify-start bottom-9 w-full max-w-2xl px-6 py-3 text-center z-40 shadow-xl rounded-3xl border-2 border-white"
+    >
+      <span
+        class="paragraph-square block w-1.5 h-1.5 bg-secondary shrink-0 mt-[0.6rem] mr-3"
+      ></span>
+      <div class="grid relative w-full h-full justify-items-center items-center overflow-hidden">
+        <p
+          class="desc-label col-start-1 row-start-1 block text-secondary font-Roboto text-base md:text-[0.875rem] leading-relaxed tracking-normal text-center"
+        >
+          Explore products alongside the people behind them. Browse categories, view seller
+          profiles, and see how products are discussed within the community.
+        </p>
+
+        <p
+          class="desc-label col-start-1 row-start-1 block text-secondary font-Roboto text-base md:text-[0.875rem] leading-relaxed tracking-normal text-center"
+        >
+          Ask questions, join discussions, share experiences, and give feedback before and after
+          purchasing. Every product lives within a conversation — not just a rating.
+        </p>
+
+        <p
+          class="desc-label col-start-1 row-start-1 block text-secondary font-Roboto text-base md:text-[0.875rem] leading-relaxed tracking-normal text-center"
+        >
+          Buy with clarity or sell with credibility. Build reputation, improve products through
+          feedback, and grow within a trusted ecosystem.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

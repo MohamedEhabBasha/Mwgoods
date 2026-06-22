@@ -1,0 +1,11 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Clear subpixel visual bugs during high-frequency translation loops */
+div {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
