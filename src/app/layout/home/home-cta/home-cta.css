@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Base context settings needed for pure GPU hardware-accelerated 3D depth */
+.perspective-stage {
+  perspective: 1000px;
+}
+
+.d-word-element {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}

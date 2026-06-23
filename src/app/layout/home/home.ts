@@ -8,14 +8,23 @@ import * as THREE from 'three';
 import { ThreejsSceneService } from '../../core/services/threejs-scene';
 import { HPHeader } from './home-process/hp-header/hp-header';
 import { HPStepsShowcase } from './home-process/hp-steps-showcase/hp-steps-showcase';
-import { HpChainBullets } from "./home-process/hp-chain-bullets/hp-chain-bullets";
-import { HpSlidingImages } from "./home-process/hp-sliding-images/hp-sliding-images";
+import { HpChainBullets } from './home-process/hp-chain-bullets/hp-chain-bullets';
+import { HpSlidingImages } from './home-process/hp-sliding-images/hp-sliding-images';
+import { HomeCta } from './home-cta/home-cta';
 
 gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-home',
-  imports: [HomeIntro, HomeHero, HPHeader, HPStepsShowcase, HpChainBullets, HpSlidingImages],
+  imports: [
+    HomeIntro,
+    HomeHero,
+    HPHeader,
+    HPStepsShowcase,
+    HpChainBullets,
+    HpSlidingImages,
+    HomeCta,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -34,6 +43,7 @@ export class Home implements AfterViewInit {
   private processSectionScrollContainer = viewChild.required<HTMLElement>(
     'processSectionScrollContainer',
   );
+  private ctaSection = viewChild.required<HomeCta>(HomeCta);
 
   private sceneManager!: SceneManager;
 
@@ -50,6 +60,12 @@ export class Home implements AfterViewInit {
     masterTl.add(this.animate_heroIntro_sections());
 
     this.animate_processSection();
+
+    this.ctaSection().scrollAnimation();
+
+    // 2. CRITICAL SAFETY NET: Force ScrollTrigger to scan the fully built DOM
+    // and finalize all pinning coordinates across the entire document.
+    ScrollTrigger.refresh();
   }
 
   private animate_heroIntro_sections() {

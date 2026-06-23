@@ -10,7 +10,6 @@
   --color-secondary: #333333;
   --color-accent-red: #d32f2f;
 }
-
 body {
   font-family: var(--font-Roboto);
   background-color: var(--color-primary);

@@ -92,7 +92,6 @@ export class HpSlidingImages {
         start: 'top 20%', // begins as soon as the section enters view
         end: 'bottom 80%', // finishes exactly when the section gets pinned
         scrub: 1,
-        markers: true,
       },
     });
 
