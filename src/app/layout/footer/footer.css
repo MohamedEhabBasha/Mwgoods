@@ -1,0 +1,12 @@
+#footer-img {
+  height: 100%;
+  width: calc(100% + 4px); /* Makes the SVG slightly wider than the container */
+  margin-left: -2px; /* Pulls the left 2px of stroke off-screen */
+  margin-right: -2px;
+  display: block;
+  overflow: visible;
+}
+
+#center {
+  visibility: hidden;
+}

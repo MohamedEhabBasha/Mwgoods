@@ -86,7 +86,7 @@ export class Home implements AfterViewInit {
 
     scrollContanierOne__Tl.add(this.introSection().createIntroAnimationTimeline());
 
-    if (window.innerWidth >= 768) {
+    if (window.innerWidth >= 1024) {
       // 3. Listen to the shared service stream safely
       this.canvasService.modelLoaded$.subscribe((vase: THREE.Group) => {
         scrollContanierOne__Tl
@@ -95,8 +95,22 @@ export class Home implements AfterViewInit {
             { x: 0, y: -1, z: 0, duration: 0.8, ease: 'power1.inOut', delay: 1 },
             0,
           )
-          .to(vase.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 0.8, ease: 'power1.inOut' }, '<')
+          .to(
+            vase.scale,
+            { x: 1.5, y: 1.5, z: 1.5, duration: 0.8, ease: 'power1.inOut' },
+            '<',
+          )
           .to(vase.rotation, { x: -Math.PI / 8, duration: 0.8, ease: 'power1.inOut' }, '<');
+      });
+    } else {
+      this.canvasService.modelLoaded$.subscribe((vase: THREE.Group) => {
+        scrollContanierOne__Tl.to(vase.scale, {
+          x: 0,
+          y: 0,
+          z: 0,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        });
       });
     }
 

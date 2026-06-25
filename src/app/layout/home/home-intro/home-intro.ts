@@ -34,7 +34,7 @@ export class HomeIntro implements AfterViewInit {
    * Main orchestrator method called by the parent Master Timeline
    */
   public createIntroAnimationTimeline(): gsap.core.Timeline {
-    return window.innerWidth <= 768 ? this.createMobileTimeline() : this.createDesktopTimeline();
+    return window.innerWidth <= 1024 ? this.createMobileTimeline() : this.createDesktopTimeline();
   }
   /**
    * Desktop Timeline: Center slides up first, followed by Left and Right architectural drops

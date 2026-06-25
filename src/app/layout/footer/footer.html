@@ -1,0 +1,82 @@
+<div class="footer pt-30 relative overflow-hidden z-50 h-screen">
+  <div class="absolute top-[-20%] bg-secondary w-full h-20 md:h-100 -z-1"></div>
+  <svg
+    preserveAspectRatio="none"
+    id="footer-img"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 2278 683"
+  >
+    <path
+      class="footer-svg"
+      id="bouncy-path"
+      fill="#333"
+      d="M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z"
+    />
+
+    <path
+      class="footer-svg-stroke"
+      id="bouncy-path-stroke"
+      fill="none"
+      stroke="#fff"
+      stroke-width="1"
+      d="M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3"
+    />
+  </svg>
+  <div
+    class="absolute top-0 left-0 w-full pt-40 px-6 md:px-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 z-10"
+  >
+    <nav class="flex flex-wrap items-center gap-x-6 gap-y-2">
+      <a
+        href="#"
+        class="group inline-flex items-center uppercase text-white text-[0.65rem] md:text-[0.75rem] tracking-[0.2rem] font-OpenSans font-extrabold transition-opacity hover:opacity-80"
+      >
+        <span
+          class="paragraph-square inline-block w-[0.2rem] h-[0.2rem] bg-accent-red border border-white mr-1.5 transition-transform group-hover:scale-125"
+        ></span>
+        home
+      </a>
+      <a
+        href="#"
+        class="group inline-flex items-center uppercase text-white text-[0.65rem] md:text-[0.75rem] tracking-[0.2rem] font-OpenSans font-extrabold transition-opacity hover:opacity-80"
+      >
+        <span
+          class="paragraph-square inline-block w-[0.2rem] h-[0.2rem] bg-accent-red border border-white mr-1.5 transition-transform group-hover:scale-125"
+        ></span>
+        about
+      </a>
+      <a
+        href="#"
+        class="group inline-flex items-center uppercase text-white text-[0.65rem] md:text-[0.75rem] tracking-[0.2rem] font-OpenSans font-extrabold transition-opacity hover:opacity-80"
+      >
+        <span
+          class="paragraph-square inline-block w-[0.2rem] h-[0.2rem] bg-accent-red border border-white mr-1.5 transition-transform group-hover:scale-125"
+        ></span>
+        community
+      </a>
+      <a
+        href="#"
+        class="group inline-flex items-center uppercase text-white text-[0.65rem] md:text-[0.75rem] tracking-[0.2rem] font-OpenSans font-extrabold transition-opacity hover:opacity-80"
+      >
+        <span
+          class="paragraph-square inline-block w-[0.2rem] h-[0.2rem] bg-accent-red border border-white mr-1.5 transition-transform group-hover:scale-125"
+        ></span>
+        sell
+      </a>
+    </nav>
+
+    <p
+      class="uppercase text-white text-[0.65rem] md:text-[0.75rem] tracking-[0.2rem] font-OpenSans font-extrabold opacity-60"
+    >
+      © 2026 all rights reserved
+    </p>
+  </div>
+<!--   <div class="absolute bottom-10 w-full text-center select-none pointer-events-none z-10">
+    <h1
+      class="text-white font-black tracking-widest text-[11vw] leading-[0.8] font-sans opacity-95"
+    >
+      MWGOODS
+    </h1>
+  </div> -->
+  <!-- ADD inside the .footer div, before the existing content, alongside existing absolute divs -->
+  <canvas #matterCanvas class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
+</div>

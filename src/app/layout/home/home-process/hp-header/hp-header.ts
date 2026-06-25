@@ -36,7 +36,7 @@ export class HPHeader {
       strokeDashoffset: -totalPathLength,
     });
     gsap.set(svgContainer, { opacity: 0 });
-    gsap.set([letterO, letterT], {opacity: 0, scale: 0.5});
+    gsap.set([letterO, letterT], { opacity: 0, scale: 0.5 });
 
     const cachedModel = this.canvasService.getModel();
     if (!cachedModel) {
@@ -84,13 +84,18 @@ export class HPHeader {
       onEnter: () => {
         const enterTl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-        if (window.innerWidth >= 768) {
-          enterTl.to(vase.position, { x: 0, y: 4.5, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
-          .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power2.inOut'}, '<');
+        if (window.innerWidth >= 1024 && window.innerWidth <= 1296) {
+          enterTl
+            .to(vase.position, { x: 0, y: 4, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
+            .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power2.inOut' }, '<');
+        } else if (window.innerWidth > 1296) {
+          enterTl
+            .to(vase.position, { x: 0, y: 4.5, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
+            .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power2.inOut' }, '<');
         }
 
-        const firstDuration:number = 0.6;
-        const secondDuration:number = 0.8;
+        const firstDuration: number = 0.6;
+        const secondDuration: number = 0.8;
 
         enterTl
           .to(splitHow.chars, { yPercent: 100, stagger: 0.05, duration: firstDuration }, 0)
@@ -98,7 +103,12 @@ export class HPHeader {
           .to(splitStart.chars, { yPercent: -100, stagger: 0.05, duration: firstDuration }, '<')
           .to(letterO, { yPercent: -100, duration: firstDuration, opacity: 1, scale: 1 }, '<')
           .to(['#howCover', '#startCover'], { opacity: 0, duration: 0 })
-          .to(splitHow.chars, { yPercent: 0, duration: secondDuration, ease: 'power4.inOut', stagger: 0.02 })
+          .to(splitHow.chars, {
+            yPercent: 0,
+            duration: secondDuration,
+            ease: 'power4.inOut',
+            stagger: 0.02,
+          })
           .to(letterT, { yPercent: 0, duration: secondDuration, ease: 'power4.inOut' }, '<')
           .to(
             splitStart.chars,
@@ -123,12 +133,12 @@ export class HPHeader {
           rawPath,
         ]);
 
-        gsap.set([letterO, letterT], {opacity: 0, scale: 0.5});
+        gsap.set([letterO, letterT], { opacity: 0, scale: 0.5 });
 
         const exitTl = gsap.timeline({ defaults: { ease: 'power1.inOut' } });
 
         // Return the 3D object to its home position in a swift 0.4 seconds
-        if (window.innerWidth >= 768) {
+        if (window.innerWidth >= 1024) {
           exitTl.to(vase.position, { x: 0, y: -1, z: 0, duration: 0.4 }, 0);
         }
 

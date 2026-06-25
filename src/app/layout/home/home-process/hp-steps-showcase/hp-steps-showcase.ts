@@ -19,9 +19,9 @@ export class HPStepsShowcase {
   private step_sectionsBottomLeft = viewChildren<ElementRef<HTMLElement>>('stepSectionBottomLeft');
 
   steps_list = [
-    { text: 'DISCOVER', class: 'first' },
-    { text: 'COMMUNITY', class: 'second' },
-    { text: 'SELLING', class: 'third' },
+    { text: 'DISCOVER', class: 'first', videoURL: 'home/discover video.webm' },
+    { text: 'COMMUNITY', class: 'second', videoURL: 'home/community video.webm' },
+    { text: 'SELLING', class: 'third', videoURL: 'home/selling video.webm' },
   ];
 
   public animateStepsSection(): gsap.core.Timeline {

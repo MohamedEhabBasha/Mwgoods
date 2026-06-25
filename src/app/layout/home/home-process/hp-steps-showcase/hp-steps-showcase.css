@@ -1,11 +1,11 @@
 .first .step-bg {
-  background-image: url('https://cdn.pixabay.com/photo/2016/10/10/06/45/building-1727807_1280.jpg');
+  background-image: url('https://images.unsplash.com/vector-1761233874559-b370fb2bd08b?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 }
 .second .step-bg {
-  background-image: url('https://cdn.pixabay.com/photo/2016/11/22/21/47/architecture-1850732_1280.jpg');
+  background-image: url('https://images.unsplash.com/vector-1757394158143-e5f18aa61cf8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 }
 .third .step-bg {
-  background-image: url('https://cdn.pixabay.com/photo/2016/01/27/15/25/space-1164579_1280.png');
+  background-image: url('https://images.unsplash.com/vector-1780582579260-7ec2fa99d5c1?q=80&w=1025&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 }
 /* .hide-bottom-right-square {
   clip-path: polygon(0% 0%, 100% 0%, 100% 35%, 35% 35%, 35% 100%, 0% 100%);
