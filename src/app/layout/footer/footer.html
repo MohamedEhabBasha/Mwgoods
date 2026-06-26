@@ -1,5 +1,5 @@
-<div class="footer pt-30 relative overflow-hidden z-50 h-screen">
-  <div class="absolute top-[-20%] bg-secondary w-full h-20 md:h-100 -z-1"></div>
+<div class="footer pt-30 relative overflow-hidden z-50 h-[60vh] lg:h-screen">
+  <div class="absolute top-0 lg:top[-10%] bg-secondary w-full h-80 md:h-100 -z-1"></div>
   <svg
     preserveAspectRatio="none"
     id="footer-img"
@@ -70,13 +70,13 @@
       © 2026 all rights reserved
     </p>
   </div>
-<!--   <div class="absolute bottom-10 w-full text-center select-none pointer-events-none z-10">
+  <div class="absolute bottom-10 w-full text-center select-none pointer-events-none z-10 lg:hidden">
     <h1
       class="text-white font-black tracking-widest text-[11vw] leading-[0.8] font-sans opacity-95"
     >
       MWGOODS
     </h1>
-  </div> -->
+  </div>
   <!-- ADD inside the .footer div, before the existing content, alongside existing absolute divs -->
-  <canvas #matterCanvas class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
+  <canvas #matterCanvas class="absolute inset-0 w-full h-full pointer-events-none z-20 hidden lg:block"></canvas>
 </div>

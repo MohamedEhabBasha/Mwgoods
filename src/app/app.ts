@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, /* Navbar */],
+  imports: [RouterOutlet, Footer, Navbar],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
