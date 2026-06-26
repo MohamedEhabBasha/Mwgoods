@@ -84,25 +84,27 @@ export class HPHeader {
       onEnter: () => {
         const enterTl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-        if (window.innerWidth >= 1024 && window.innerWidth <= 1296) {
+        if (window.innerWidth >= 1024 && window.innerWidth < 1280) {
           enterTl
             .to(vase.position, { x: 0, y: 4, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
-            .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power2.inOut' }, '<');
-        } else if (window.innerWidth > 1296) {
+            .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power2.inOut' }, '<')
+            .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');
+        } else if (window.innerWidth >= 1280) {
           enterTl
             .to(vase.position, { x: 0, y: 4.5, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
             .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power2.inOut' }, '<');
+          console.log(' > 1280');
         }
 
-        const firstDuration: number = 0.6;
-        const secondDuration: number = 0.8;
+        const firstDuration: number = 0.4;
+        const secondDuration: number = 0.6;
 
         enterTl
           .to(splitHow.chars, { yPercent: 100, stagger: 0.05, duration: firstDuration }, 0)
           .to(letterT, { yPercent: 100, duration: firstDuration, opacity: 1, scale: 1 }, '<')
           .to(splitStart.chars, { yPercent: -100, stagger: 0.05, duration: firstDuration }, '<')
           .to(letterO, { yPercent: -100, duration: firstDuration, opacity: 1, scale: 1 }, '<')
-          .to(['#howCover', '#startCover'], { opacity: 0, duration: 0 })
+          .to(['#howCover', '#startCover'], { opacity: 0, duration: 0 }, )
           .to(splitHow.chars, {
             yPercent: 0,
             duration: secondDuration,
@@ -121,10 +123,13 @@ export class HPHeader {
       },
 
       // ⚡ WHEN SCROLLING BACK UP: Collapse everything simultaneously and FAST
+      // ⚡ WHEN SCROLLING BACK UP: Collapse everything simultaneously and FAST
       onLeaveBack: () => {
-        // Clear out running forward animations to avoid conflicts
+        // 1. CLEAR out running forward animations (added canvasContainer here!)
         gsap.killTweensOf([
+          this.canvasService.canvasContainer,
           vase.position,
+          vase.scale,
           splitHow.chars,
           splitStart.chars,
           letterT,
@@ -138,8 +143,14 @@ export class HPHeader {
         const exitTl = gsap.timeline({ defaults: { ease: 'power1.inOut' } });
 
         // Return the 3D object to its home position in a swift 0.4 seconds
-        if (window.innerWidth >= 1024) {
-          exitTl.to(vase.position, { x: 0, y: -1, z: 0, duration: 0.4 }, 0);
+        if (window.innerWidth >= 1024 && window.innerWidth < 1280) {
+          exitTl
+            .to(vase.position, { x: 0, y: 2.5, z: 0, duration: 0.4 }, 0)
+            // Use gsap.set inside the timeline or force zIndex to 0 immediately
+            .set(this.canvasService.canvasContainer, { zIndex: 0 }, 0)
+            .to(vase.scale, { x: 2.4, y: 2.4, z: 2.4, duration: 0.8, ease: 'power2.inOut' }, '<');
+        } else if (window.innerWidth >= 1280) {
+          exitTl.to(vase.position, { x: 0, y: -1, z: 0, duration: 0 }, 0);
         }
 
         // Reset text variables and hide the SVG container all at once

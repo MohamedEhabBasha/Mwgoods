@@ -134,6 +134,8 @@ export class HPStepsShowcase {
         start: 'top top',
         end: '+=250%',
         pin: true,
+        anticipatePin: 1,
+        pinSpacing: true,   
         scrub: 1,
         onLeaveBack: () => {
           // Safe global reset when returning to the Hero section

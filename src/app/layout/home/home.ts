@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, ElementRef, inject, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  OnInit,
+  Renderer2,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HomeIntro } from './home-intro/home-intro';
@@ -28,10 +38,14 @@ gsap.registerPlugin(ScrollTrigger);
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements AfterViewInit {
+export class Home implements AfterViewInit, OnInit {
+  private renderer = inject(Renderer2);
+  
   private canvasService = inject(ThreejsSceneService);
+
   private scrollContainer__one = viewChild.required<ElementRef>('scrollContainer__one');
   private webglCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('webglCanvas');
+  private webglCanvasContainer = viewChild.required<ElementRef<HTMLElement>>('webglCanvasContainer');
 
   /* MAIN SECTIONS */
   private heroSection = viewChild.required<HomeHero>(HomeHero);
@@ -45,12 +59,19 @@ export class Home implements AfterViewInit {
   );
   private ctaSection = viewChild.required<HomeCta>(HomeCta);
 
-  private sceneManager!: SceneManager;
+  public screenWidth = signal<number>(0);
 
+  ngOnInit(): void {
+    this.screenWidth.set(window.innerWidth);
+  }
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.screenWidth.set(window.innerWidth);
+  }
   ngAfterViewInit(): void {
     const canvasElement = this.webglCanvas().nativeElement;
 
-    this.canvasService.initialize(canvasElement);
+    this.canvasService.initialize(canvasElement, this.webglCanvasContainer().nativeElement);
 
     // 1. Create the Master Timeline
     const masterTl = gsap.timeline({});
@@ -80,13 +101,15 @@ export class Home implements AfterViewInit {
         /* snap: 0.5, */
         pin: true,
         pinSpacing: true,
+        anticipatePin: 1,
         invalidateOnRefresh: true,
       },
     });
 
-    scrollContanierOne__Tl.add(this.introSection().createIntroAnimationTimeline());
-
-    if (window.innerWidth >= 1024) {
+    if (window.innerWidth >= 1024 && window.innerWidth < 1280) {
+      //scrollContanierOne__Tl.to(this.webglCanvasContainer().nativeElement, {zIndex: 10});
+    } else if (window.innerWidth >= 1280) {
+      //this.renderer.setStyle(this.webglCanvasContainer().nativeElement, 'z-index', '10');
       // 3. Listen to the shared service stream safely
       this.canvasService.modelLoaded$.subscribe((vase: THREE.Group) => {
         scrollContanierOne__Tl
@@ -95,24 +118,13 @@ export class Home implements AfterViewInit {
             { x: 0, y: -1, z: 0, duration: 0.8, ease: 'power1.inOut', delay: 1 },
             0,
           )
-          .to(
-            vase.scale,
-            { x: 1.5, y: 1.5, z: 1.5, duration: 0.8, ease: 'power1.inOut' },
-            '<',
-          )
-          .to(vase.rotation, { x: -Math.PI / 8, duration: 0.8, ease: 'power1.inOut' }, '<');
-      });
-    } else {
-      this.canvasService.modelLoaded$.subscribe((vase: THREE.Group) => {
-        scrollContanierOne__Tl.to(vase.scale, {
-          x: 0,
-          y: 0,
-          z: 0,
-          duration: 0.8,
-          ease: 'power1.inOut',
-        });
+          .to(vase.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 0.8, ease: 'power1.inOut' }, '<')
+          .to(vase.rotation, { x: -Math.PI / 8, duration: 0.8, ease: 'power1.inOut' }, '<')
+          .to(this.canvasService.canvasContainer, {zIndex: 10}, '<');
       });
     }
+
+    scrollContanierOne__Tl.add(this.introSection().createIntroAnimationTimeline());
 
     return scrollContanierOne__Tl;
   }

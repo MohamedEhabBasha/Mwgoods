@@ -137,6 +137,7 @@ export class HpSlidingImages {
         pin: true,
         pinSpacing: true,
         invalidateOnRefresh: true,
+        anticipatePin: 1,
       },
     });
 

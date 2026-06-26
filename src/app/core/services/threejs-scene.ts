@@ -9,6 +9,7 @@ import { Subject, BehaviorSubject, filter, take } from 'rxjs';
 export class ThreejsSceneService implements OnDestroy{
   private sceneManager!: SceneManager;
   private isInitialized$ = new BehaviorSubject<boolean>(false);
+  public canvasContainer!: HTMLElement;
 
   // Expose an observable hook so child layouts know precisely when the asset is ready
   public modelLoaded$ = new Subject<THREE.Group>();
@@ -17,8 +18,10 @@ export class ThreejsSceneService implements OnDestroy{
   /**
    * Called ONCE by the parent Home element to mount the canvas element
    */
-  public initialize(canvasElement: HTMLCanvasElement): void {
+  public initialize(canvasElement: HTMLCanvasElement, canvasContainer: HTMLElement): void {
     if (this.isInitialized$.value) return;
+
+    this.canvasContainer = canvasContainer;
 
     this.sceneManager = new SceneManager(canvasElement);
     this.sceneManager.initialize();

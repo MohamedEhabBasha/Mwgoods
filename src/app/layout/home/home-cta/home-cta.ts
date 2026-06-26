@@ -62,6 +62,8 @@ export class HomeCta implements OnDestroy {
         start: 'top top',
         end: '+=200%',
         pin: true,
+        anticipatePin: 1,
+        pinSpacing: true,
         scrub: 1,
         invalidateOnRefresh: true,
       },

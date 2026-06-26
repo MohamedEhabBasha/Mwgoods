@@ -1,7 +1,7 @@
-<div #webglCanvasContainer class="fixed inset-0 w-full h-full lg:z-10 pointer-events-none">
+<div #webglCanvasContainer class="fixed inset-0 w-full h-full lg:z-0 pointer-events-none">
   <canvas #webglCanvas class="w-full h-full block bg-transparent"></canvas>
 </div>
-
+<p class="fixed text-2xl text-black z-100 left-10 top-10">{{screenWidth()}}</p>
 <main #mainContainer>
   <section
     #scrollContainer__one
