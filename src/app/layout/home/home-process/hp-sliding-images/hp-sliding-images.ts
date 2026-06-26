@@ -5,6 +5,9 @@ import {
   afterNextRender,
   PLATFORM_ID,
   inject,
+  signal,
+  OnInit,
+  HostListener,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
@@ -20,8 +23,9 @@ gsap.registerPlugin(ScrollTrigger);
   templateUrl: './hp-sliding-images.html',
   styleUrl: './hp-sliding-images.css',
 })
-export class HpSlidingImages {
+export class HpSlidingImages implements OnInit {
   private platformId = inject(PLATFORM_ID);
+  public screenWidth = signal<number>(0);
 
   private pinnedSection = viewChild<ElementRef<HTMLDivElement>>('pinnedSection');
   private topLeftGroup = viewChild<ElementRef<SVGGElement>>('topLeftGroup');
@@ -31,6 +35,13 @@ export class HpSlidingImages {
   private topRightOverlay = viewChild<ElementRef<HTMLDivElement>>('topRightOverlay');
   private bottomOverlay = viewChild<ElementRef<HTMLDivElement>>('bottomOverlay');
 
+  ngOnInit(): void {
+    this.screenWidth.set(window.innerWidth);
+  }
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.screenWidth.set(window.innerWidth);
+  }
   public initScrollAnimation() {
     const triggerEl = this.pinnedSection()?.nativeElement;
     const topLeft = this.topLeftGroup()?.nativeElement;
@@ -143,12 +154,14 @@ export class HpSlidingImages {
 
     const offset: number = 45;
 
+    let topRightOffset:number = 0
+
     scrollTl
       .to(topLeft, { xPercent: -offset, yPercent: -offset, ease: 'power2.inOut' }, 0)
       .to(topRight, { xPercent: offset - 10, yPercent: -offset, ease: 'power2.inOut' }, '<')
       .to(bottom, { yPercent: offset - 10, ease: 'power2.inOut' }, '<')
-      .to(topLeftOverlay, { xPercent: '+=5', yPercent: '-=45', ease: 'power2.inOut' }, '<')
-      .to(topRightOverlay, { xPercent: 0, yPercent: '-=45', ease: 'power2.inOut' }, '<')
+      .to(topLeftOverlay, { xPercent: '+=2', yPercent: '-=45', ease: 'power2.inOut' }, '<')
+      .to(topRightOverlay, { xPercent: `+=${topRightOffset}`, yPercent: '-=45', ease: 'power2.inOut' }, '<')
       .to(bottomOverlay, { yPercent: '+=20', ease: 'power2.inOut' }, '<')
       // images shrink away right as the curtain starts opening
       .to(images, { scale: 0, opacity: 0, ease: 'power2.in', duration: 0.3 }, 0)
