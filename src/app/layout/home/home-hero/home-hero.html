@@ -11,11 +11,11 @@
         [ngClass]="`
           max-w-full md:max-w-100  xl:max-w-120 text-center md:text-left normal-case 
           font-normal tracking-normal text-stone-800
-          text-[1rem] lg:text-[1.25rem] leading-snug my-4 lg:my-0
+          text-[1rem] lg:text-[1.25rem] leading-tight my-4 lg:my-0
         `"
       >
         <span
-          class="paragraph-square inline-block w-[0.55em] h-[0.55em] bg-stone-900 mr-2 mb-0.5 shrink-0"
+          class="paragraph-square inline-block w-2 h-2 bg-stone-900 mr-2 mb-0.5 shrink-0"
         ></span>
 
         <span>
@@ -23,18 +23,9 @@
           storefront, broadcast your process, and own your audience.
         </span>
       </p>
-
-      <button
-        #targetBtn
-        [ngClass]="`
-          px-6 py-3 md:px-8 md:py-4 rounded-full border border-stone-700
-          bg-stone-900 hover:bg-stone-100 text-stone-100 hover:text-stone-950
-          text-xs lg:text-sm tracking-widest font-medium uppercase
-           pointer-events-auto
-        `"
-      >
-        Get Started
-      </button>
+      <div #targetBtn class="xl:mr-26 pointer-events-auto">
+        <app-orbital-button [text]="'Join'"></app-orbital-button>
+      </div>
     </div>
     <!-- Header -->
     <h1

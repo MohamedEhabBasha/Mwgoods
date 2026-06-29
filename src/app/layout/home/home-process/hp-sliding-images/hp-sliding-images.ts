@@ -102,14 +102,15 @@ export class HpSlidingImages implements OnInit {
         trigger: triggerEl,
         start: 'top 20%', // begins as soon as the section enters view
         end: 'bottom 80%', // finishes exactly when the section gets pinned
-        scrub: 1,
+        scrub: 1.5,
+        //markers: true
       },
     });
 
     introTl
-      .to(topLeftOverlay.querySelector('p'), { xPercent: 0, opacity: 1, ease: 'power2.inOut' }, 0)
-      .to(topRightOverlay.querySelector('p'), { xPercent: 0, opacity: 1, ease: 'power2.inOut' })
-      .to(bottomOverlay.querySelector('p'), { yPercent: 0, opacity: 1, ease: 'power2.inOut' });
+      .to(topLeftOverlay.querySelector('p'), { xPercent: 0, opacity: 1, ease: 'power2.inOut' , duration: 1.5 }, 0)
+      .to(topRightOverlay.querySelector('p'), { xPercent: 0, opacity: 1, ease: 'power2.inOut', duration: 1.5 })
+      .to(bottomOverlay.querySelector('p'), { yPercent: 0, opacity: 1, ease: 'power2.inOut'  , duration: 1.5});
 
     // ---- TIMELINE 2: non-scrubbed image entrance, direction-aware ----
     // This is the piece that needs to NOT scrub but still reverse cleanly
@@ -143,7 +144,7 @@ export class HpSlidingImages implements OnInit {
       scrollTrigger: {
         trigger: triggerEl,
         start: 'top top',
-        end: '+=150%',
+        end: '+=250%',
         scrub: 1,
         pin: true,
         pinSpacing: true,

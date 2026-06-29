@@ -38,7 +38,6 @@ export class Footer implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.initMatterFooter();
-    this.footerAnimation();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -150,7 +149,7 @@ export class Footer implements AfterViewInit, OnDestroy {
 
     Render.run(this.render);
     this.runner = Runner.create();
-    Runner.run(this.runner, this.engine);
+    //Runner.run(this.runner, this.engine);
     this.isInitialised = true;
 
     this.buildArcFloor(world, W, H);
@@ -268,6 +267,7 @@ export class Footer implements AfterViewInit, OnDestroy {
       this.triggerInstance.kill();
     }
 
+    // ── Existing morph trigger (start/end untouched) ──────────────────────
     this.triggerInstance = ScrollTrigger.create({
       trigger: '.footer',
       start: 'top bottom',
@@ -286,11 +286,6 @@ export class Footer implements AfterViewInit, OnDestroy {
             overwrite: 'auto',
           },
         );
-
-        if (!this.hasDropped) {
-          this.hasDropped = true;
-          this.dropChain();
-        }
       },
       onLeave: () => {
         gsap.to(['#bouncy-path', '#bouncy-path-stroke'], {
@@ -309,12 +304,29 @@ export class Footer implements AfterViewInit, OnDestroy {
         });
       },
     });
+
+    // ── Drop chain trigger — fires when footer is actually visible ────────
+    ScrollTrigger.create({
+      trigger: '.footer',
+      start: 'top center',
+      once: true,
+      //markers: true,
+      onEnter: () => {
+        if (!this.hasDropped) {
+          this.hasDropped = true;
+          this.dropChain();
+        }
+      },
+    });
   }
 
   private dropChain(): void {
     const squares: Matter.Body[] = (this as any)._squares;
     const links: Matter.Body[] = (this as any)._links;
     if (!squares || !links) return;
+
+    console.log('FIRED')
+    Matter.Runner.run(this.runner, this.engine);
 
     const canvas = this.canvasRef.nativeElement;
     const W = canvas.width;

@@ -7,28 +7,32 @@
 .third .step-bg {
   background-image: url('https://images.unsplash.com/vector-1780582579260-7ec2fa99d5c1?q=80&w=1025&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 }
-/* .hide-bottom-right-square {
-  clip-path: polygon(0% 0%, 100% 0%, 100% 35%, 35% 35%, 35% 100%, 0% 100%);
-} */
-.hide-bottom-right-square {
-  clip-path: polygon(
-    0% 0%,
-    /* Top-Left */ 100% 0%,
-    /* Top-Right */ 100% 40%,
-    /* Mid-Right edge */ 40% 40%,
-    /* Inner Corner intersection point (Perfect Square anchor) */ 40% 100%,
-    /* Mid-Bottom edge */ 0% 100% /* Bottom-Left */
-  );
+.step-bg {
+  image-rendering: -webkit-optimize-contrast;
 }
-.hide-top-left-square {
-  clip-path: polygon(
-    100% 100%,
-    /* Bottom-Right */ 0% 100%,
-    /* Bottom-Left */ 0% 60%,
-    /* Mid-Left edge -> Perfectly matches the level of the left image's cut! */ 60% 60%,
-    /* Inner Corner Anchor */ 60% 0%,
-    /* Mid-Top edge */ 100% 0% /* Top-Right */
-  );
+.step-outer,
+.step-inner,
+.step-bg {
+  /* Forces GPU layer composition */
+  transform: translate3d(0, 0, 0);
+  will-change: transform, clip-path;
+  
+  /* Disables subpixel anti-aliasing artifacts on clips */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+@media (max-width: 768px) {
+  .hide-bottom-right-square-mobile {
+    clip-path: polygon(
+      0% 0%, 100% 0%, 100% 40%, 40% 40%, 40% 100%, 0% 100%
+    );
+  }
+  
+  .hide-top-left-square-mobile {
+    clip-path: polygon(
+      100% 100%, 0% 100%, 0% 60%, 60% 60%, 60% 0%, 100% 0%
+    );
+  }
 }
 .hide-bottom-left-square {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 60% 100%, 60% 40%, 0 40%);

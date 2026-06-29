@@ -2,11 +2,12 @@ import { Component, ElementRef, viewChild, viewChildren } from '@angular/core';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
+import { OrbitalButton } from '../../../../shared/components/orbital-button/orbital-button';
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
 @Component({
   selector: 'app-hp-steps-showcase',
-  imports: [],
+  imports: [OrbitalButton],
   templateUrl: './hp-steps-showcase.html',
   styleUrl: './hp-steps-showcase.css',
 })
@@ -25,6 +26,7 @@ export class HPStepsShowcase {
   ];
 
   public animateStepsSection(): gsap.core.Timeline {
+    // 1. DOM Element Retrieval via Angular Signals
     const stepsSection = this.steps_section()?.nativeElement;
     const leftSections = this.step_sectionsLeft().map((s) => s.nativeElement);
     const rightSections = this.step_sectionsRight().map((s) => s.nativeElement);
@@ -38,13 +40,15 @@ export class HPStepsShowcase {
       ...bottomLeftSections,
     ];
 
+    // 2. Query Text and Isolated Button Wrapper Components
     const labelElements = gsap.utils.toArray<HTMLElement>('.step-label');
     const counterElements = gsap.utils.toArray<HTMLElement>('.counter-label');
     const descElements = gsap.utils.toArray<HTMLElement>('.desc-label');
+    const orbitalBtnWrappers = gsap.utils.toArray<HTMLElement>('.step-btn-wrapper'); // 🌟 Target Wrapper Divs
 
+    // 3D Depth Configurations
     const depth = -12;
-    const originOffset = `50% 50% ${depth}`;
-
+    const originOffset = `50% 50% ${depth}px`;
     const descDepth = -20;
     const descOriginOffset = `50% 50% ${descDepth}px`;
 
@@ -60,6 +64,13 @@ export class HPStepsShowcase {
       autoAlpha: 1,
     });
 
+    // Apply subpixel rendering fix to background images
+    gsap.set('.step-bg', {
+      transformOrigin: 'center center',
+      scale: 1.015,
+      force3D: true,
+    });
+
     // Set initial masking offsets for every loop list individually
     leftSections.forEach((_, idx) => {
       const lOuter = leftSections[idx].querySelector('.step-outer');
@@ -72,22 +83,18 @@ export class HPStepsShowcase {
       const blInner = bottomLeftSections[idx].querySelector('.step-inner');
 
       if (idx === 0) {
-        // First frame is completely unmasked across the board
         gsap.set([lOuter, lInner, rOuter, rInner, trOuter, trInner, blOuter, blInner], {
           xPercent: 0,
         });
       } else {
-        // Standard Flow (Left & Right loops): Slide right-to-left
         gsap.set([lOuter, rOuter], { xPercent: 100 });
         gsap.set([lInner, rInner], { xPercent: -100 });
-
-        // Opposite Flow (Top Right & Bottom Left loops): Slide left-to-right
         gsap.set([trOuter, blOuter], { xPercent: -100 });
         gsap.set([trInner, blInner], { xPercent: 100 });
       }
     });
 
-    // 2. Split characters once globally (DO NOT REVERT LATER)
+    // Split Text Initialization
     const labelChars = Array.from(labelElements).map(
       (label) => new SplitText(label, { type: 'chars', charsClass: 'char' }),
     );
@@ -121,30 +128,34 @@ export class HPStepsShowcase {
       });
     });
 
-    // Add this right where you initialize your layout states (Step 1 in your TS file)
-    gsap.set('.step-bg', {
-      transformOrigin: 'center center',
-      scale: 1.01, // 🌟 Forces a tiny bleed margin to mask subpixel rounding gaps
-      force3D: true, // 🌟 Keeps elements locked into GPU rendering mode
-    });
+    // 🌟 Initialize separate clip paths for button wrappers
+    gsap.set(orbitalBtnWrappers, { clipPath: 'inset(100% 0% 0% 0%)' });
+    gsap.set(orbitalBtnWrappers[0], { clipPath: 'inset(0% 0% 0% 0%)' });
 
+    // Main Timeline Configuration
     const stepsTl = gsap.timeline({
       scrollTrigger: {
         trigger: stepsSection,
         start: 'top top',
-        end: '+=250%',
+        end: '+=320%',
         pin: true,
         anticipatePin: 1,
-        pinSpacing: true,   
+        pinSpacing: true,
         scrub: 1,
         onLeaveBack: () => {
-          // Safe global reset when returning to the Hero section
+          // Safe global resets when scrolling completely back up
           labelChars.forEach((label, idx) => {
             gsap.killTweensOf(label.chars);
             gsap.set(label.chars, { rotationX: idx === 0 ? 0 : -90 });
           });
           counterChars.forEach((c, idx) => gsap.set(c.chars, { rotationX: idx === 0 ? 0 : -90 }));
           descLines.forEach((d, idx) => gsap.set(d.lines, { rotationX: idx === 0 ? 0 : -90 }));
+
+          // 🌟 Reset the button wrapper clips safely on scroll exit
+          orbitalBtnWrappers.forEach((btn, idx) => {
+            gsap.killTweensOf(btn);
+            gsap.set(btn, { clipPath: idx === 0 ? 'inset(0% 0% 0% 0%)' : 'inset(100% 0% 0% 0%)' });
+          });
         },
       },
       defaults: { ease: 'none' },
@@ -154,7 +165,6 @@ export class HPStepsShowcase {
     leftSections.forEach((section, index) => {
       if (index === 0) return;
 
-      // Isolate targeted components dynamically from their index anchors
       const lO = leftSections[index].querySelector('.step-outer');
       const lI = leftSections[index].querySelector('.step-inner');
       const rO = rightSections[index].querySelector('.step-outer');
@@ -164,7 +174,6 @@ export class HPStepsShowcase {
       const blO = bottomLeftSections[index].querySelector('.step-outer');
       const blI = bottomLeftSections[index].querySelector('.step-inner');
 
-      // Fade-in the container blocks
       stepsTl.to(
         [
           leftSections[index],
@@ -175,39 +184,36 @@ export class HPStepsShowcase {
         { autoAlpha: 1, duration: 0.1 },
       );
 
-      // Execute synchronized sliding animations
+      // Image transitions stay scrubbed to keep scrolling interactive
       stepsTl
-        // Left and Right Loops (Slide right-to-left)
         .fromTo(lO, { xPercent: 100 }, { xPercent: 0 }, index)
         .fromTo(lI, { xPercent: -100 }, { xPercent: 0 }, index)
         .fromTo(rO, { xPercent: 100 }, { xPercent: 0 }, index)
         .fromTo(rI, { xPercent: -100 }, { xPercent: 0 }, index)
-
-        // Top Right Loop (Slides left-to-right)
         .fromTo(trO, { xPercent: -100 }, { xPercent: 0 }, index)
         .fromTo(trI, { xPercent: 100 }, { xPercent: 0 }, index)
         .fromTo(blO, { xPercent: -100 }, { xPercent: 0 }, index)
         .fromTo(blI, { xPercent: 100 }, { xPercent: 0 }, index);
 
-      // 3. THE 3D SCROLL CYLINDER LOOP
+      // 🌟 3. THE TRIGGERED FLIP TIMELINE (NOT SCRUBBED)
       stepsTl.add(() => {
         const isScrollingDown = stepsTl.scrollTrigger?.direction === 1;
 
-        // Identify active elements based on scroll direction
         const activeIdx = isScrollingDown ? index - 1 : index;
         const targetIdx = isScrollingDown ? index : index - 1;
 
         const splitOut = labelChars[activeIdx];
         const splitIn = labelChars[targetIdx];
-
         const countOut = counterChars[activeIdx];
         const countIn = counterChars[targetIdx];
-
-        // 🌟 Extract paragraph layout active line nodes
         const linesOut = descLines[activeIdx];
         const linesIn = descLines[targetIdx];
 
-        // Kill running tweens to prevent scroll clipping overrides
+        // Isolate button wrappers for current snap tick
+        const btnWrapperOut = orbitalBtnWrappers[activeIdx];
+        const btnWrapperIn = orbitalBtnWrappers[targetIdx];
+
+        // Clear running animations on text and wrappers to preserve sync states
         gsap.killTweensOf([
           ...splitOut.chars,
           ...splitIn.chars,
@@ -215,34 +221,42 @@ export class HPStepsShowcase {
           ...countIn.chars,
           ...linesOut.lines,
           ...linesIn.lines,
+          btnWrapperOut,
+          btnWrapperIn,
         ]);
 
         const flipTl = gsap.timeline();
 
         if (isScrollingDown) {
           flipTl
-            // Spin character components
+            // Spin 3D elements
             .to([splitOut.chars, countOut.chars], {
               rotationX: 90,
               transformOrigin: originOffset,
-              stagger: 0.03,
+              stagger: 0.02,
               duration: 0.35,
               ease: 'none',
             })
-            // 🌟 Spin outgoing description lines
             .to(
               linesOut.lines,
               {
                 rotationX: 90,
                 transformOrigin: descOriginOffset,
-                stagger: 0.05,
+                stagger: 0.02,
                 duration: 0.4,
                 ease: 'none',
               },
               0,
             )
 
-            // Spin incoming character components
+            // 🌟 Snap-Wipe Outgoing Button Wrapper UP
+            .to(
+              btnWrapperOut,
+              { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.35, ease: 'power1.inOut' },
+              0,
+            )
+
+            // Bring in incoming elements
             .fromTo(
               [splitIn.chars, countIn.chars],
               { rotationX: -90 },
@@ -255,21 +269,29 @@ export class HPStepsShowcase {
               },
               '<0.12',
             )
-            // 🌟 Spin incoming description lines
             .fromTo(
               linesIn.lines,
               { rotationX: -90 },
               {
                 rotationX: 0,
                 transformOrigin: descOriginOffset,
-                stagger: 0.05,
+                stagger: 0.02,
                 duration: 0.4,
                 ease: 'none',
               },
               '<0.05',
+            )
+
+            // 🌟 Snap-Wipe Incoming Button Wrapper UP from bottom
+            .fromTo(
+              btnWrapperIn,
+              { clipPath: 'inset(100% 0% 0% 0%)' },
+              { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.35, ease: 'power1.inOut' },
+              '<0.05',
             );
         } else {
           flipTl
+            // Spin 3D elements in reverse
             .to([splitOut.chars, countOut.chars], {
               rotationX: -90,
               transformOrigin: originOffset,
@@ -289,6 +311,14 @@ export class HPStepsShowcase {
               0,
             )
 
+            // 🌟 Snap-Wipe Outgoing Button Wrapper DOWN
+            .to(
+              btnWrapperOut,
+              { clipPath: 'inset(100% 0% 0% 0%)', duration: 0.35, ease: 'power1.inOut' },
+              0,
+            )
+
+            // Bring back previous elements
             .fromTo(
               [splitIn.chars, countIn.chars],
               { rotationX: 90 },
@@ -312,10 +342,20 @@ export class HPStepsShowcase {
                 ease: 'none',
               },
               '<0.05',
+            )
+
+            // 🌟 Snap-Wipe Incoming Button Wrapper DOWN from top
+            .fromTo(
+              btnWrapperIn,
+              { clipPath: 'inset(0% 0% 100% 0%)' },
+              { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.35, ease: 'power1.inOut' },
+              '<0.05',
             );
         }
       }, index - 0.2);
     });
+
+    stepsTl.to({}, { duration: 0.5 });
 
     return stepsTl;
   }

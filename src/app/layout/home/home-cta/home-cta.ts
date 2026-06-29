@@ -8,11 +8,12 @@ import {
 } from '@angular/core';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { OrbitalButton } from "../../../shared/components/orbital-button/orbital-button";
 
 @Component({
   selector: 'app-home-cta',
   standalone: true,
-  imports: [],
+  imports: [OrbitalButton],
   templateUrl: './home-cta.html',
   styleUrl: './home-cta.css',
 })
@@ -24,30 +25,52 @@ export class HomeCta implements OnDestroy {
   @ViewChildren('leftImg') leftImgElements!: QueryList<ElementRef<HTMLDivElement>>;
   @ViewChildren('rightImg') rightImgElements!: QueryList<ElementRef<HTMLDivElement>>;
 
-  images = [
+  left_images = [
     {
-      src: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-      alt: 'Collaborative team meeting',
+      src: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      alt: 'success stories',
     },
     {
-      src: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80',
-      alt: 'Design workshop session',
+      src: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      alt: 'success stories',
     },
     {
-      src: 'https://cdn.pixabay.com/photo/2016/10/10/06/45/building-1727807_1280.jpg',
-      alt: 'Modern creative workspace',
+      src: 'https://cdn.pixabay.com/photo/2021/07/05/09/35/man-6388639_1280.jpg',
+      alt: 'success stories',
     },
     {
-      src: 'https://cdn.pixabay.com/photo/2016/11/22/21/47/architecture-1850732_1280.jpg',
-      alt: 'Data analytics presentation',
+      src: 'https://images.pexels.com/photos/36645466/pexels-photo-36645466.jpeg',
+      alt: 'success stories',
     },
     {
-      src: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80',
-      alt: 'Team celebrating success',
+      src: 'https://cdn.pixabay.com/photo/2016/11/21/12/42/beard-1845166_1280.jpg',
+      alt: 'success stories',
+    },
+  ];
+  right_images = [
+    {
+      src: 'https://images.unsplash.com/vector-1738293681271-4a36c9ae10c6?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      alt: 'logo',
+    },
+    {
+      src: 'https://images.unsplash.com/vector-1740203810200-39892b06a0ae?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      alt: 'logo',
+    },
+    {
+      src: 'https://images.unsplash.com/vector-1762611332940-5c5faac572a2?q=80&w=713&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      alt: 'logo',
+    },
+    {
+      src: 'https://cdn.pixabay.com/photo/2024/01/25/06/56/ai-generated-8531085_1280.png',
+      alt: 'logo',
+    },
+    {
+      src: 'https://images.unsplash.com/vector-1777830637918-1cfefd19c84c?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      alt: 'logo',
     },
   ];
 
-  radius = 120;
+  radius = 150;
   imgRadius = 400; // Large radius pushes half of the circle off-screen left and right
   progress = { value: 0 };
   private scrollTimeline!: gsap.core.Timeline;
@@ -60,7 +83,7 @@ export class HomeCta implements OnDestroy {
       scrollTrigger: {
         trigger: this.carousel.nativeElement,
         start: 'top top',
-        end: '+=200%',
+        end: '+=250%',
         pin: true,
         anticipatePin: 1,
         pinSpacing: true,
@@ -68,6 +91,8 @@ export class HomeCta implements OnDestroy {
         invalidateOnRefresh: true,
       },
     });
+
+    this.scrollTimeline.to({}, { duration: 0.1 });
 
     this.scrollTimeline.to(this.progress, {
       value: 1,
@@ -81,6 +106,8 @@ export class HomeCta implements OnDestroy {
         }
       },
     });
+
+    this.scrollTimeline.to({}, { duration: 0.3 });
 
     // Initial positioning sweeps
     this.animate();

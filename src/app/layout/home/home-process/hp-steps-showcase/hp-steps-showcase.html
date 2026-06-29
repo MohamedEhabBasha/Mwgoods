@@ -1,4 +1,4 @@
-<section #stepsSection class="bg-linear-to-b from-white to-primary pt-0">
+<section #stepsSection class="bg-primary pt-0">
   <!-- Middle Images -->
   <div
     class="relative w-full min-h-screen flex flex-col justify-center items-center overflow-hidden"
@@ -12,8 +12,8 @@
           section.class
         "
       >
-        <div class="step-outer w-full h-full overflow-x-hidden">
-          <div class="step-inner w-full h-full overflow-x-hidden">
+        <div class="step-outer w-full h-full overflow-hidden relative will-change-transform">
+          <div class="step-inner w-full h-full overflow-hidden relative will-change-transform">
             @if (true) {
               <video
                 #stepBgLeft
@@ -21,16 +21,20 @@
                 [muted]="true"
                 loop
                 playsinline
-                class="step-bg absolute top-0 w-full h-full object-cover hide-bottom-right-square rounded-4xl"
+                class="step-bg hide-bottom-right-square-mobile absolute top-0 w-full h-full object-cover rounded-4xl"
               >
                 <source [src]="section.videoURL" type="video/webm" />
               </video>
             } @else {
               <div
                 #stepBgLeft
-                class="step-bg absolute top-0 w-full h-full bg-cover bg-center hide-bottom-right-square rounded-4xl"
+                class="step-bg hide-bottom-right-square-mobile absolute top-0 w-full h-full bg-cover bg-center rounded-4xl"
               ></div>
             }
+
+            <div
+              class="hidden md:block absolute bottom-0 right-0 w-[60%] h-[60%] bg-primary z-1 pointer-events-none"
+            ></div>
           </div>
         </div>
       </div>
@@ -78,25 +82,29 @@
           section.class
         "
       >
-        <div class="step-outer w-full h-full overflow-x-hidden">
-          <div class="step-inner w-full h-full overflow-x-hidden">
+        <div class="step-outer w-full h-full overflow-hidden relative will-change-transform">
+          <div class="step-inner w-full h-full overflow-hidden relative will-change-transform">
             <video
               #stepBgRight
               autoplay
               [muted]="true"
               loop
               playsinline
-              class="step-bg absolute top-0 w-full h-full object-cover hide-top-left-square rounded-4xl"
+              class="step-bg hide-top-left-square-mobile absolute top-0 w-full h-full object-cover rounded-4xl"
             >
               <source [src]="section.videoURL" type="video/webm" />
             </video>
+
+            <div
+              class="hidden md:block absolute top-0 left-0 w-[60%] h-[60%] bg-primary z-1 pointer-events-none"
+            ></div>
           </div>
         </div>
       </div>
     }
 
     <div
-      class="flex items-center justify-center gap-2 shadow-2xl rounded-2xl px-2 md:px-5 h-10 md:min-w-40 border-2 border-white md:mt-10 lg:mt-25 xl:mt-18"
+      class="flex items-center justify-center gap-2 shadow-2xl rounded-2xl px-2 md:px-5 h-10 md:min-w-40 border-2 border-white md:mt-10 lg:mt-25 xl:mt-18 z-10"
     >
       <span class="paragraph-square block w-1.5 h-1.5 bg-secondary shrink-0"></span>
 
@@ -173,6 +181,23 @@
           feedback, and grow within a trusted ecosystem.
         </p>
       </div>
+    </div>
+    <div
+      class="step-btn-wrapper p-5 absolute bottom-40 md:bottom-35 left-[50%] translate-x-[-50%] lg:translate-0 lg:left-auto lg:right-10 xl:right-65 z-50"
+    >
+      <app-orbital-button text="Discover"></app-orbital-button>
+    </div>
+
+    <div
+      class="step-btn-wrapper p-5 absolute bottom-40 md:bottom-35 left-[50%] translate-x-[-50%] lg:translate-0 lg:left-auto lg:right-10 xl:right-65 z-50"
+    >
+      <app-orbital-button text="Connect"></app-orbital-button>
+    </div>
+
+    <div
+      class="step-btn-wrapper p-5 absolute bottom-40 md:bottom-35 left-[50%] translate-x-[-50%] lg:translate-0 lg:left-auto lg:right-10 xl:right-65 z-50"
+    >
+      <app-orbital-button text="Sell"></app-orbital-button>
     </div>
   </div>
 </section>

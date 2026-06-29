@@ -1,0 +1,18 @@
+:host {
+    display: inline-block;
+}
+/* Enable true 3D depth context inside the button container */
+.perspective-stage {
+  perspective: 400px;
+}
+
+/* Ensure child elements can move along the Z-axis safely */
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+/* Prevents flickering/artifacts when characters rotate to flat/reverse angles */
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}

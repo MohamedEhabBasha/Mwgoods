@@ -93,7 +93,6 @@ export class HPHeader {
           enterTl
             .to(vase.position, { x: 0, y: 4.5, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
             .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power2.inOut' }, '<');
-          console.log(' > 1280');
         }
 
         const firstDuration: number = 0.4;

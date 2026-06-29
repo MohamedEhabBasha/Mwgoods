@@ -202,7 +202,7 @@ export class PixiWeb implements AfterViewInit, OnDestroy {
         textNode.y = startY - 16; // Rest cleanly right above the grid baseline rule
       }
 
-      this.dynamicGraphics.addChild(textNode);
+      //this.dynamicGraphics.addChild(textNode);
       wordsRenderedCount++;
     }, 100);
   }

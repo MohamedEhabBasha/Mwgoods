@@ -3,12 +3,13 @@ import { NgClass } from '@angular/common';
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { PixiWeb } from '../../../shared/components/pixi-web/pixi-web';
+import { OrbitalButton } from "../../../shared/components/orbital-button/orbital-button";
 
 gsap.registerPlugin(SplitText);
 
 @Component({
   selector: 'app-home-hero',
-  imports: [NgClass, PixiWeb],
+  imports: [NgClass, PixiWeb, OrbitalButton],
   templateUrl: './home-hero.html',
   styleUrl: './home-hero.css',
 })
