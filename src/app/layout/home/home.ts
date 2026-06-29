@@ -5,7 +5,6 @@ import {
   HostListener,
   inject,
   OnInit,
-  Renderer2,
   signal,
   viewChild,
 } from '@angular/core';
@@ -13,7 +12,6 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HomeIntro } from './home-intro/home-intro';
 import { HomeHero } from './home-hero/home-hero';
-import { SceneManager } from './threejs-hero-scene/scene-manager';
 import * as THREE from 'three';
 import { ThreejsSceneService } from '../../core/services/threejs-scene';
 import { HPHeader } from './home-process/hp-header/hp-header';
@@ -21,6 +19,7 @@ import { HPStepsShowcase } from './home-process/hp-steps-showcase/hp-steps-showc
 import { HpChainBullets } from './home-process/hp-chain-bullets/hp-chain-bullets';
 import { HpSlidingImages } from './home-process/hp-sliding-images/hp-sliding-images';
 import { HomeCta } from './home-cta/home-cta';
+import { ScrollTriggerReadyService } from '../../core/services/scroll-trigger-ready';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -39,7 +38,7 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrl: './home.css',
 })
 export class Home implements AfterViewInit, OnInit {
-  private renderer = inject(Renderer2);
+  private readyService = inject(ScrollTriggerReadyService);
   
   private canvasService = inject(ThreejsSceneService);
 
@@ -84,9 +83,7 @@ export class Home implements AfterViewInit, OnInit {
 
     this.ctaSection().scrollAnimation();
 
-    // 2. CRITICAL SAFETY NET: Force ScrollTrigger to scan the fully built DOM
-    // and finalize all pinning coordinates across the entire document.
-    ScrollTrigger.refresh();
+    this.readyService.signal();
   }
 
   private animate_heroIntro_sections() {
