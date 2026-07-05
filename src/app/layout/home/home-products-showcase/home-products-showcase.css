@@ -1,0 +1,10 @@
+.curtain-svg-layer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .curtain-svg-layer {
+    visibility: visible;
+  }
+}

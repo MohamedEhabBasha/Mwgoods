@@ -42,14 +42,14 @@
 
   <!-- your existing conveyor slots -->
   <div class="flex items-center justify-center gap-10 md:gap-16 w-full max-w-[90vw] mx-auto">
-    @for (ratio of slotRatios; track $index) {
+    @for (slot of slots(); track $index) {
       <div
         class="relative overflow-hidden rounded-2xl shrink-0 shadow-2xl"
-        [style.width.px]="windowWidth(ratio)"
-        [style.height.px]="windowHeight(ratio)"
+        [style.width.px]="slot.width"
+        [style.height.px]="slot.height"
       >
         <div #conveyorStrip class="flex h-full w-max will-change-transform">
-          @for (img of strip(); track trackByImg($index, img)) {
+          @for (img of strip(); track img.src + '-' + $index) {
             <div class="relative h-full shrink-0" [style.width.px]="frameWidth">
               <img
                 [src]="img.src"

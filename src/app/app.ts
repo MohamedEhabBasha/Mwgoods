@@ -2,9 +2,9 @@ import { AfterViewInit, Component, inject, OnInit, signal, viewChild } from '@an
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Navbar } from './layout/navbar/navbar';
 import { Footer } from './layout/footer/footer';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { filter, skip, take } from 'rxjs';
 import { ScrollTriggerReadyService } from './core/services/scroll-trigger-ready';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +26,7 @@ export class App implements AfterViewInit, OnInit {
       )
       .subscribe(() => {
         this.footer().footerAnimation();
+        this.footer().initLinkScramble();
         ScrollTrigger.refresh();
       });
   }
@@ -42,17 +43,5 @@ export class App implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
-    /*     // A small operational frame macro-task delay ensures
-    // the active sub-routes inside <router-outlet> are fully drawn.
-    setTimeout(() => {
-      const footerInstance = this.footer();
-      if (footerInstance) {
-        // Run the trigger generation sequence
-        footerInstance.footerAnimation();
-
-        // Instantly force GSAP to sweep the real page height and fix its math
-        ScrollTrigger.refresh();
-      }
-    }, 150); */
   }
 }

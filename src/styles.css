@@ -10,6 +10,10 @@
   --color-secondary: #333333;
   --color-accent-red: #d32f2f;
 }
+html, body {
+  margin: 0;
+  padding: 0; 
+}
 html {
     overscroll-behavior: none;
 }

@@ -1,67 +1,89 @@
-<div #carousel class="relative w-full h-screen bg-secondary overflow-hidden z-20">
-  <div class="absolute inset-0 flex items-center justify-center perspective-stage">
-    <div class="absolute left-[-3%] top-0 h-full w-1/5 pointer-events-none overflow-visible">
-      @for (img of left_images; track $index) {
-        <div
-          #leftImg
-          class="absolute top-1/2 left-1/2 w-24 h-32 md:w-36 md:h-48 -ml-12 -mt-16 bg-cover bg-center rounded-lg shadow-xl border-4 border-accent-red will-change-transform"
-          [style.background-image]="'url(' + img.src"
-        ></div>
-      }
-    </div>
-
-    <svg
-      class="absolute left-[12%] top-1/2 -translate-y-1/2 w-1/4 text-accent-red opacity-80 z-50 pointer-events-none scale-x-[-1]"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M16.1795 3.26875C15.7889 2.87823 15.1558 2.87823 14.7652 3.26875L8.12078 9.91322C6.94952 11.0845 6.94916 12.9833 8.11996 14.155L14.6903 20.7304C15.0808 21.121 15.714 21.121 16.1045 20.7304C16.495 20.3399 16.495 19.7067 16.1045 19.3162L9.53246 12.7442C9.14194 12.3536 9.14194 11.7205 9.53246 11.33L16.1795 4.68297C16.57 4.29244 16.57 3.65928 16.1795 3.26875Z"
-        fill="currentColor"
-      />
-    </svg>
-
-    @for (word of ['JOIN', 'WORLD-CLASS', 'TOP', 'ACHIEVERS']; track $index) {
-      <div
-        #card
-        class="absolute top-1/2 left-1/2 w-full h-15 ml-[-50%] -mt-7.5 flex items-center justify-center pointer-events-none d-word-element"
-      >
-        <span
-          class="text-white font-serif text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none"
-        >
-          {{ word }}
-        </span>
+<div #scrollWrapper class="relative" style="height: 350svh">
+  <div
+    #carousel
+    class="sticky top-0 w-full overflow-hidden bg-secondary z-20"
+    style="height: 100svh"
+  >
+    <div class="absolute inset-0 flex items-center justify-center perspective-stage">
+      <div class="absolute left-[-3%] top-0 h-full w-1/5 pointer-events-none overflow-visible">
+        @for (img of left_images; track $index) {
+          <div
+            #leftImg
+            class="absolute top-1/2 left-1/2 w-24 h-32 md:w-36 md:h-48 -ml-12 -mt-16 rounded-lg shadow-xl border-4 border-accent-red will-change-transform"
+          >
+            <img
+              [src]="img.src"
+              [alt]="img.alt"
+              loading="lazy"
+              decoding="async"
+              class="w-full h-full object-cover rounded-lg"
+            />
+          </div>
+        }
       </div>
-    }
 
-    <svg
-      class="absolute right-[12%] top-1/2 -translate-y-1/2 w-1/4 text-accent-red opacity-80 z-50 pointer-events-none"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M16.1795 3.26875C15.7889 2.87823 15.1558 2.87823 14.7652 3.26875L8.12078 9.91322C6.94952 11.0845 6.94916 12.9833 8.11996 14.155L14.6903 20.7304C15.0808 21.121 15.714 21.121 16.1045 20.7304C16.495 20.3399 16.495 19.7067 16.1045 19.3162L9.53246 12.7442C9.14194 12.3536 9.14194 11.7205 9.53246 11.33L16.1795 4.68297C16.57 4.29244 16.57 3.65928 16.1795 3.26875Z"
-        fill="currentColor"
-      />
-    </svg>
+      <svg
+        class="absolute left-[12%] top-1/2 -translate-y-1/2 w-1/4 text-accent-red opacity-80 z-50 pointer-events-none scale-x-[-1]"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path
+          d="M16.1795 3.26875C15.7889 2.87823 15.1558 2.87823 14.7652 3.26875L8.12078 9.91322C6.94952 11.0845 6.94916 12.9833 8.11996 14.155L14.6903 20.7304C15.0808 21.121 15.714 21.121 16.1045 20.7304C16.495 20.3399 16.495 19.7067 16.1045 19.3162L9.53246 12.7442C9.14194 12.3536 9.14194 11.7205 9.53246 11.33L16.1795 4.68297C16.57 4.29244 16.57 3.65928 16.1795 3.26875Z"
+          fill="currentColor"
+        />
+      </svg>
 
-    <div class="absolute right-0 top-0 h-full w-1/5 pointer-events-none overflow-visible">
-      @for (img of right_images; track $index) {
+      @for (word of words; track $index) {
         <div
-          #rightImg
-          class="absolute top-1/2 left-1/2 w-24 h-32 md:w-36 md:h-48 -ml-12 -mt-16 bg-cover bg-center rounded-lg shadow-xl border-4 border-accent-red will-change-transform"
-          [style.background-image]="'url(' + img.src"
-        ></div>
+          #card
+          class="absolute top-1/2 left-1/2 w-full h-15 ml-[-50%] -mt-7.5 flex items-center justify-center pointer-events-none d-word-element"
+        >
+          <span
+            class="text-white font-serif text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none"
+          >
+            {{ word }}
+          </span>
+        </div>
       }
-    </div>
 
-    <div
-      #ctaButton
-      class="absolute bottom-[10%] left-1/2 -translate-x-1/2 opacity-0 pointer-events-none transform scale-95 z-50"
-    >
-      <app-orbital-button text="Register" color="#d32f2f"></app-orbital-button>
+      <svg
+        class="absolute right-[12%] top-1/2 -translate-y-1/2 w-1/4 text-accent-red opacity-80 z-50 pointer-events-none"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path
+          d="M16.1795 3.26875C15.7889 2.87823 15.1558 2.87823 14.7652 3.26875L8.12078 9.91322C6.94952 11.0845 6.94916 12.9833 8.11996 14.155L14.6903 20.7304C15.0808 21.121 15.714 21.121 16.1045 20.7304C16.495 20.3399 16.495 19.7067 16.1045 19.3162L9.53246 12.7442C9.14194 12.3536 9.14194 11.7205 9.53246 11.33L16.1795 4.68297C16.57 4.29244 16.57 3.65928 16.1795 3.26875Z"
+          fill="currentColor"
+        />
+      </svg>
+
+      <div class="absolute right-0 top-0 h-full w-1/5 pointer-events-none overflow-visible">
+        @for (img of right_images; track $index) {
+          <div
+            #rightImg
+            class="absolute top-1/2 left-1/2 w-24 h-32 md:w-36 md:h-48 -ml-12 -mt-16 rounded-lg shadow-xl border-4 border-accent-red will-change-transform"
+          >
+            <img
+              [src]="img.src"
+              [alt]="img.alt"
+              loading="lazy"
+              decoding="async"
+              class="w-full h-full object-cover rounded-lg"
+            />
+          </div>
+        }
+      </div>
+
+      <div
+        #ctaButton
+        class="absolute bottom-[10%] left-1/2 -translate-x-1/2 opacity-0 pointer-events-none transform scale-95 z-50"
+      >
+        <app-orbital-button text="Register" color="#d32f2f"></app-orbital-button>
+      </div>
     </div>
   </div>
 </div>

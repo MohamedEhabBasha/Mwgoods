@@ -1,14 +1,16 @@
 import {
   Component,
   ElementRef,
-  OnDestroy,
-  QueryList,
-  ViewChild,
-  ViewChildren,
+  viewChild,
+  viewChildren,
+  afterNextRender,
+  inject,
+  DestroyRef,
+  PLATFORM_ID,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { OrbitalButton } from "../../../shared/components/orbital-button/orbital-button";
+import { OrbitalButton } from '../../../shared/components/orbital-button/orbital-button';
 
 @Component({
   selector: 'app-home-cta',
@@ -17,169 +19,198 @@ import { OrbitalButton } from "../../../shared/components/orbital-button/orbital
   templateUrl: './home-cta.html',
   styleUrl: './home-cta.css',
 })
-export class HomeCta implements OnDestroy {
-  @ViewChild('carousel', { static: true }) carousel!: ElementRef<HTMLDivElement>;
-  @ViewChild('ctaButton') ctaButton!: ElementRef<HTMLDivElement>;
+export class HomeCta {
+  private platformId = inject(PLATFORM_ID);
+  private destroyRef = inject(DestroyRef);
 
-  @ViewChildren('card') cardElements!: QueryList<ElementRef<HTMLDivElement>>;
-  @ViewChildren('leftImg') leftImgElements!: QueryList<ElementRef<HTMLDivElement>>;
-  @ViewChildren('rightImg') rightImgElements!: QueryList<ElementRef<HTMLDivElement>>;
+  // ---- Template refs (signal-based) ----
+  private scrollWrapper = viewChild.required<ElementRef<HTMLDivElement>>('scrollWrapper');
+  private ctaButton = viewChild.required<ElementRef<HTMLDivElement>>('ctaButton');
+  private cardEls = viewChildren<ElementRef<HTMLDivElement>>('card');
+  private leftImgEls = viewChildren<ElementRef<HTMLDivElement>>('leftImg');
+  private rightImgEls = viewChildren<ElementRef<HTMLDivElement>>('rightImg');
 
-  left_images = [
+  // ---- Static data ----
+  readonly words = ['JOIN', 'WORLD-CLASS', 'TOP', 'ACHIEVERS'] as const;
+
+  readonly left_images = [
     {
-      src: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      alt: 'success stories',
+      src: 'home/cta/portrait-1.avif',
+      alt: 'seller',
     },
     {
-      src: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      alt: 'success stories',
+      src: 'home/cta/portrait-2.avif',
+      alt: 'seller',
     },
-    {
-      src: 'https://cdn.pixabay.com/photo/2021/07/05/09/35/man-6388639_1280.jpg',
-      alt: 'success stories',
-    },
-    {
-      src: 'https://images.pexels.com/photos/36645466/pexels-photo-36645466.jpeg',
-      alt: 'success stories',
-    },
-    {
-      src: 'https://cdn.pixabay.com/photo/2016/11/21/12/42/beard-1845166_1280.jpg',
-      alt: 'success stories',
-    },
+    { src: 'home/cta/portrait-3.avif', alt: 'seller' },
+    { src: 'home/cta/portrait-4.avif', alt: 'seller' },
+    { src: 'home/cta/portrait-5.avif', alt: 'seller' },
   ];
-  right_images = [
+
+  readonly right_images = [
     {
-      src: 'https://images.unsplash.com/vector-1738293681271-4a36c9ae10c6?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      src: 'home/cta/logo-1.avif',
       alt: 'logo',
     },
     {
-      src: 'https://images.unsplash.com/vector-1740203810200-39892b06a0ae?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      src: 'home/cta/logo-2.avif',
       alt: 'logo',
     },
     {
-      src: 'https://images.unsplash.com/vector-1762611332940-5c5faac572a2?q=80&w=713&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      src: 'home/cta/logo-3.avif',
       alt: 'logo',
     },
     {
-      src: 'https://cdn.pixabay.com/photo/2024/01/25/06/56/ai-generated-8531085_1280.png',
+      src: 'home/cta/logo-4.avif',
       alt: 'logo',
     },
     {
-      src: 'https://images.unsplash.com/vector-1777830637918-1cfefd19c84c?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      src: 'home/cta/logo-5.avif',
       alt: 'logo',
     },
   ];
 
-  radius = 150;
-  imgRadius = 400; // Large radius pushes half of the circle off-screen left and right
-  progress = { value: 0 };
-  private scrollTimeline!: gsap.core.Timeline;
+  // ---- Physics constants ----
+  readonly radius = 150;
+  readonly imgRadius = 400;
+
+  // ---- Mutable animation state ----
+  private progress = { value: 0 };
   private hasButtonAppeared = false;
+  private scrollTimeline?: gsap.core.Timeline;
 
-  public scrollAnimation() {
-    const totalWords = this.cardElements.length;
+  // ---- Cached element arrays (populated once before animation starts) ----
+  private cards: HTMLDivElement[] = [];
+  private leftImgs: HTMLDivElement[] = [];
+  private rightImgs: HTMLDivElement[] = [];
 
+  // ---- Cached derived constants (computed once, reused every tick) ----
+  private cardCount = 0;
+  private imgCount = 0;
+  private cardDivisor = 1; // cards.length - 1
+  private imgDivisor = 1; // total - 1
+  private halfImgRadius = 0;
+  private imgRadiusX = 0; // imgRadius * 0.4
+
+  constructor() {
+    afterNextRender(() => {
+      if (!isPlatformBrowser(this.platformId)) return;
+      this.cacheElements();
+      this.scrollAnimation();
+
+      this.destroyRef.onDestroy(() => {
+        this.scrollTimeline?.kill();
+      });
+    });
+  }
+
+  // Cache all DOM arrays and derived constants once — never inside the RAF loop
+  private cacheElements(): void {
+    this.cards = this.cardEls().map((r) => r.nativeElement);
+    this.leftImgs = this.leftImgEls().map((r) => r.nativeElement);
+    this.rightImgs = this.rightImgEls().map((r) => r.nativeElement);
+
+    this.cardCount = this.cards.length;
+    this.imgCount = this.leftImgs.length;
+    this.cardDivisor = Math.max(this.cardCount - 1, 1);
+    this.imgDivisor = Math.max(this.imgCount - 1, 1);
+    this.halfImgRadius = this.imgRadius * 0.5;
+    this.imgRadiusX = this.imgRadius * 0.4;
+  }
+
+  public scrollAnimation(): void {
     this.scrollTimeline = gsap.timeline({
       scrollTrigger: {
-        trigger: this.carousel.nativeElement,
+        trigger: this.scrollWrapper().nativeElement,
         start: 'top top',
-        end: '+=250%',
-        pin: true,
-        anticipatePin: 1,
-        pinSpacing: true,
+        end: 'bottom bottom',
+        pin: false,
+        pinSpacing: false,
         scrub: 1,
         invalidateOnRefresh: true,
       },
     });
 
-    this.scrollTimeline.to({}, { duration: 0.1 });
+    this.scrollTimeline
+      .to({}, { duration: 0.1 })
+      .to(this.progress, {
+        value: 1,
+        ease: 'none',
+        onUpdate: () => {
+          this.animateCards();
+          this.animateGallery();
+          if (this.progress.value >= 0.95 && !this.hasButtonAppeared) {
+            this.revealButton();
+          }
+        },
+      })
+      .to({}, { duration: 0.3 });
 
-    this.scrollTimeline.to(this.progress, {
-      value: 1,
-      ease: 'none',
-      onUpdate: () => {
-        this.animate();
-        this.animateSemicircleGallery(); // Sync image wheel rotation
-
-        if (this.progress.value >= 0.95 && !this.hasButtonAppeared) {
-          this.revealButtonPermanently();
-        }
-      },
-    });
-
-    this.scrollTimeline.to({}, { duration: 0.3 });
-
-    // Initial positioning sweeps
-    this.animate();
-    this.animateSemicircleGallery();
+    // Initial render pass
+    this.animateCards();
+    this.animateGallery();
   }
 
-  private animateSemicircleGallery() {
-    const leftImages = this.leftImgElements.toArray();
-    const rightImages = this.rightImgElements.toArray();
-    const total = leftImages.length;
+  private animateCards(): void {
+    const p = this.progress.value;
 
-    const processImageTrack = (el: HTMLDivElement, index: number, isLeft: boolean) => {
-      // Synchronize index spacing over progress steps
-      const theta = index / (total - 1) - this.progress.value;
+    for (let i = 0; i < this.cardCount; i++) {
+      const theta = i / this.cardDivisor - p;
+      const angle = theta * Math.PI * 1.5;
 
-      // Control how wide the vertical curve spans (Math.PI * 0.8 keeps it slightly flatter)
+      const sinA = Math.sin(angle);
+      const cosA = Math.cos(angle);
+
+      const y = sinA * this.radius;
+      const z = cosA * this.radius;
+      const rotX = -angle * (180 / Math.PI);
+
+      const el = this.cards[i];
+      el.style.transform = `translate3d(0px,${y}px,${z}px) rotateX(${rotX}deg)`;
+      el.style.zIndex = Math.round(z + this.radius).toString();
+
+      // mapRange inline: avoids function call overhead in tight loop
+      // input range: [-radius*0.5, radius] → output range: [0, 1]
+      const mapped = (z - -this.halfImgRadius) / (this.radius - -this.halfImgRadius);
+      el.style.opacity = Math.min(1, Math.max(0, mapped)).toString();
+    }
+  }
+
+  private animateGallery(): void {
+    const p = this.progress.value;
+
+    for (let i = 0; i < this.imgCount; i++) {
+      const theta = i / this.imgDivisor - p;
       const angle = theta * Math.PI * 0.8;
 
-      // Semicircle equations:
-      // Left side curves inward rightwards (+X), Right side curves inward leftwards (-X)
-      const xOffset = Math.cos(angle) * (this.imgRadius * 0.4);
-      const x = isLeft ? -100 + xOffset : 100 - xOffset;
-      const y = Math.sin(angle) * this.imgRadius;
+      const cosA = Math.cos(angle);
+      const sinA = Math.sin(angle);
 
-      // Add a clean mechanical wheel rotation tilt as images roll on the arc
-      const rotationZ = isLeft ? angle * (180 / Math.PI) * 0.3 : -angle * (180 / Math.PI) * 0.3;
+      const xOffset = cosA * this.imgRadiusX;
+      const y = sinA * this.imgRadius;
+      const fade = Math.min(1, Math.max(0, cosA * 1.5));
+      const rotDeg = angle * (180 / Math.PI) * 0.3;
 
-      el.style.transform = `translate3d(${x}px, ${y}px, 0px) rotateZ(${rotationZ}deg)`;
+      // Left — anti-clockwise (original behaviour)
+      const xL = -100 + xOffset;
+      this.leftImgs[i].style.transform = `translate3d(${xL}px,${y}px,0px) rotateZ(${-rotDeg}deg)`;
+      this.leftImgs[i].style.opacity = fade.toString();
 
-      // Handle soft opacity fading as images submerge back into viewport edges
-      const fadeBoundary = Math.cos(angle);
-      el.style.opacity = gsap.utils.clamp(0, 1, fadeBoundary * 1.5).toString();
-    };
-
-    leftImages.forEach((imgRef, i) => processImageTrack(imgRef.nativeElement, i, true));
-    rightImages.forEach((imgRef, i) => processImageTrack(imgRef.nativeElement, i, false));
+      // Right — clockwise: negate rotDeg AND negate xOffset direction
+      const xR = 100 - xOffset;
+      this.rightImgs[i].style.transform = `translate3d(${xR}px,${y}px,0px) rotateZ(${rotDeg}deg)`;
+      this.rightImgs[i].style.opacity = fade.toString();
+    }
   }
 
-  private revealButtonPermanently() {
+  private revealButton(): void {
     this.hasButtonAppeared = true;
-    gsap.to(this.ctaButton.nativeElement, {
+    gsap.to(this.ctaButton().nativeElement, {
       opacity: 1,
       scale: 1,
       pointerEvents: 'auto',
       duration: 0.6,
       ease: 'back.out(1.7)',
     });
-  }
-
-  private animate() {
-    const cards = this.cardElements.toArray();
-    cards.forEach((cardRef, index) => {
-      const el = cardRef.nativeElement;
-      const theta = index / (cards.length - 1) - this.progress.value;
-      const angle = theta * Math.PI * 1.5;
-
-      const y = Math.sin(angle) * this.radius;
-      const z = Math.cos(angle) * this.radius;
-      const rotationX = -angle * (180 / Math.PI);
-
-      el.style.transform = `translate3d(0px, ${y}px, ${z}px) rotateX(${rotationX}deg)`;
-
-      const zIndex = Math.round(z + this.radius);
-      el.style.zIndex = zIndex.toString();
-
-      const depthOpacity = gsap.utils.mapRange(-this.radius * 0.5, this.radius, 0, 1, z);
-      el.style.opacity = gsap.utils.clamp(0, 1, depthOpacity).toString();
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.scrollTimeline) this.scrollTimeline.kill();
-    ScrollTrigger.getAll().forEach((t) => t.kill());
   }
 }

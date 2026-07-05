@@ -1,19 +1,18 @@
-import { Component, ElementRef, viewChild, viewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, viewChild, viewChildren } from '@angular/core';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { OrbitalButton } from '../../../../shared/components/orbital-button/orbital-button';
-gsap.registerPlugin(SplitText, ScrollTrigger);
 
 @Component({
   selector: 'app-hp-steps-showcase',
   imports: [OrbitalButton],
   templateUrl: './hp-steps-showcase.html',
   styleUrl: './hp-steps-showcase.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HPStepsShowcase {
   // Separate Left and Right elements cleanly
-  private steps_section = viewChild<ElementRef<HTMLElement>>('stepsSection');
+  private steps_section = viewChild.required<ElementRef<HTMLElement>>('stepsSection');
   private step_sectionsLeft = viewChildren<ElementRef<HTMLElement>>('stepSectionLeft');
   private step_sectionsRight = viewChildren<ElementRef<HTMLElement>>('stepSectionRight');
   private step_sectionsTopRight = viewChildren<ElementRef<HTMLElement>>('stepSectionTopRight');
@@ -27,7 +26,7 @@ export class HPStepsShowcase {
 
   public animateStepsSection(): gsap.core.Timeline {
     // 1. DOM Element Retrieval via Angular Signals
-    const stepsSection = this.steps_section()?.nativeElement;
+    const stepsSection = this.steps_section().nativeElement;
     const leftSections = this.step_sectionsLeft().map((s) => s.nativeElement);
     const rightSections = this.step_sectionsRight().map((s) => s.nativeElement);
     const topRightSections = this.step_sectionsTopRight().map((s) => s.nativeElement);
@@ -40,11 +39,19 @@ export class HPStepsShowcase {
       ...bottomLeftSections,
     ];
 
+    // Corner panels and the "Discover" CTA are `hidden lg:block` in the template — below
+    // that breakpoint they're display:none, so skip animating them entirely instead of
+    // paying for scrub-linked transform writes nobody can see.
+    const isElementVisible = (el: Element | null | undefined): boolean =>
+      !!el && (el as HTMLElement).offsetParent !== null;
+    const showsCornerPanels = isElementVisible(topRightSections[0]);
+
     // 2. Query Text and Isolated Button Wrapper Components
     const labelElements = gsap.utils.toArray<HTMLElement>('.step-label');
     const counterElements = gsap.utils.toArray<HTMLElement>('.counter-label');
     const descElements = gsap.utils.toArray<HTMLElement>('.desc-label');
     const orbitalBtnWrappers = gsap.utils.toArray<HTMLElement>('.step-btn-wrapper'); // 🌟 Target Wrapper Divs
+    const showsDiscoverButton = isElementVisible(orbitalBtnWrappers[0]);
 
     // 3D Depth Configurations
     const depth = -12;
@@ -169,31 +176,32 @@ export class HPStepsShowcase {
       const lI = leftSections[index].querySelector('.step-inner');
       const rO = rightSections[index].querySelector('.step-outer');
       const rI = rightSections[index].querySelector('.step-inner');
-      const trO = topRightSections[index].querySelector('.step-outer');
-      const trI = topRightSections[index].querySelector('.step-inner');
-      const blO = bottomLeftSections[index].querySelector('.step-outer');
-      const blI = bottomLeftSections[index].querySelector('.step-inner');
 
-      stepsTl.to(
-        [
-          leftSections[index],
-          rightSections[index],
-          topRightSections[index],
-          bottomLeftSections[index],
-        ],
-        { autoAlpha: 1, duration: 0.1 },
-      );
+      const revealTargets = [leftSections[index], rightSections[index]];
+      if (showsCornerPanels) {
+        revealTargets.push(topRightSections[index], bottomLeftSections[index]);
+      }
+      stepsTl.to(revealTargets, { autoAlpha: 1, duration: 0.1 });
 
       // Image transitions stay scrubbed to keep scrolling interactive
       stepsTl
         .fromTo(lO, { xPercent: 100 }, { xPercent: 0 }, index)
         .fromTo(lI, { xPercent: -100 }, { xPercent: 0 }, index)
         .fromTo(rO, { xPercent: 100 }, { xPercent: 0 }, index)
-        .fromTo(rI, { xPercent: -100 }, { xPercent: 0 }, index)
-        .fromTo(trO, { xPercent: -100 }, { xPercent: 0 }, index)
-        .fromTo(trI, { xPercent: 100 }, { xPercent: 0 }, index)
-        .fromTo(blO, { xPercent: -100 }, { xPercent: 0 }, index)
-        .fromTo(blI, { xPercent: 100 }, { xPercent: 0 }, index);
+        .fromTo(rI, { xPercent: -100 }, { xPercent: 0 }, index);
+
+      if (showsCornerPanels) {
+        const trO = topRightSections[index].querySelector('.step-outer');
+        const trI = topRightSections[index].querySelector('.step-inner');
+        const blO = bottomLeftSections[index].querySelector('.step-outer');
+        const blI = bottomLeftSections[index].querySelector('.step-inner');
+
+        stepsTl
+          .fromTo(trO, { xPercent: -100 }, { xPercent: 0 }, index)
+          .fromTo(trI, { xPercent: 100 }, { xPercent: 0 }, index)
+          .fromTo(blO, { xPercent: -100 }, { xPercent: 0 }, index)
+          .fromTo(blI, { xPercent: 100 }, { xPercent: 0 }, index);
+      }
 
       // 🌟 3. THE TRIGGERED FLIP TIMELINE (NOT SCRUBBED)
       stepsTl.add(() => {
@@ -212,6 +220,9 @@ export class HPStepsShowcase {
         // Isolate button wrappers for current snap tick
         const btnWrapperOut = orbitalBtnWrappers[activeIdx];
         const btnWrapperIn = orbitalBtnWrappers[targetIdx];
+        // The "Discover" wrapper (index 0) is hidden below `lg` — skip animating it there
+        const animateBtnOut = showsDiscoverButton || activeIdx !== 0;
+        const animateBtnIn = showsDiscoverButton || targetIdx !== 0;
 
         // Clear running animations on text and wrappers to preserve sync states
         gsap.killTweensOf([
@@ -247,15 +258,18 @@ export class HPStepsShowcase {
                 ease: 'none',
               },
               0,
-            )
+            );
 
-            // 🌟 Snap-Wipe Outgoing Button Wrapper UP
-            .to(
+          // 🌟 Snap-Wipe Outgoing Button Wrapper UP
+          if (animateBtnOut) {
+            flipTl.to(
               btnWrapperOut,
               { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.35, ease: 'power1.inOut' },
               0,
-            )
+            );
+          }
 
+          flipTl
             // Bring in incoming elements
             .fromTo(
               [splitIn.chars, countIn.chars],
@@ -280,15 +294,17 @@ export class HPStepsShowcase {
                 ease: 'none',
               },
               '<0.05',
-            )
+            );
 
-            // 🌟 Snap-Wipe Incoming Button Wrapper UP from bottom
-            .fromTo(
+          // 🌟 Snap-Wipe Incoming Button Wrapper UP from bottom
+          if (animateBtnIn) {
+            flipTl.fromTo(
               btnWrapperIn,
               { clipPath: 'inset(100% 0% 0% 0%)' },
               { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.35, ease: 'power1.inOut' },
               '<0.05',
             );
+          }
         } else {
           flipTl
             // Spin 3D elements in reverse
@@ -309,15 +325,18 @@ export class HPStepsShowcase {
                 ease: 'none',
               },
               0,
-            )
+            );
 
-            // 🌟 Snap-Wipe Outgoing Button Wrapper DOWN
-            .to(
+          // 🌟 Snap-Wipe Outgoing Button Wrapper DOWN
+          if (animateBtnOut) {
+            flipTl.to(
               btnWrapperOut,
               { clipPath: 'inset(100% 0% 0% 0%)', duration: 0.35, ease: 'power1.inOut' },
               0,
-            )
+            );
+          }
 
+          flipTl
             // Bring back previous elements
             .fromTo(
               [splitIn.chars, countIn.chars],
@@ -342,15 +361,17 @@ export class HPStepsShowcase {
                 ease: 'none',
               },
               '<0.05',
-            )
+            );
 
-            // 🌟 Snap-Wipe Incoming Button Wrapper DOWN from top
-            .fromTo(
+          // 🌟 Snap-Wipe Incoming Button Wrapper DOWN from top
+          if (animateBtnIn) {
+            flipTl.fromTo(
               btnWrapperIn,
               { clipPath: 'inset(0% 0% 100% 0%)' },
               { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.35, ease: 'power1.inOut' },
               '<0.05',
             );
+          }
         }
       }, index - 0.2);
     });

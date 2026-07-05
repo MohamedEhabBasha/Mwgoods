@@ -1,0 +1,100 @@
+<div class="relative lg:h-[250svh]">
+  <div
+    #pinnedSection
+    class="lg:sticky lg:top-0 w-full overflow-hidden bg-primary z-50 h-svh"
+  >
+    <app-hp-conveyor-scroll
+      [images]="[
+        {
+          src: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?q=80&w=1167&auto=format&fit=crop',
+          alt: 'mouse - electronics',
+        },
+        {
+          src: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1099&auto=format&fit=crop',
+          alt: 'watch - accessories',
+        },
+        {
+          src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1170&auto=format&fit=crop',
+          alt: 'shoes - clothes',
+        },
+        {
+          src: 'https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?q=80&w=1122&auto=format&fit=crop',
+          alt: 'bike',
+        },
+        {
+          src: 'https://images.unsplash.com/photo-1514348871858-1d3c20902571?q=80&w=1074&auto=format&fit=crop',
+          alt: 'perfume',
+        },
+      ]"
+    ></app-hp-conveyor-scroll>
+
+    <div
+      class="hidden lg:block curtain-svg-layer absolute inset-0 w-full h-full z-20 pointer-events-none select-none"
+    >
+      <svg
+        class="w-full h-full"
+        viewBox="0 0 1519 609.215"
+        preserveAspectRatio="none"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        overflow="hidden"
+      >
+        <!-- TOP LEFT blob -->
+        <g #topLeftGroup>
+          <path
+            fill="#f4f6f9"
+            stroke="#333"
+            stroke-width="1"
+            stroke-miterlimit="10"
+            d="M.5 512.954s120.868-97.159 256.846-21.146c0 0 72.933 60.618 96.608 58.455 23.676-2.163 37.385-7.963 46.898-17.258s73.666-83.989 134.846-86.34c61.18-2.352 242.385 0 242.385 0s80.726-194.773-45.823-225.747-84.956-105.31-5.31-122.124c25.125-5.304 76.502-61.947-107.965-86.726 0 0-53.097-14.779-61.062-10.929S.5 1.14.5 1.14z"
+          />
+        </g>
+
+        <!-- TOP RIGHT blob -->
+        <g #topRightGroup>
+          <path
+            fill="#f4f6f9"
+            stroke="#333"
+            stroke-width="1"
+            stroke-miterlimit="10"
+            d="M1518.5 512.708s-157.251-116.834-278.824-6.204c-121.574 110.629-117.224 3.413-174.658-25.9-57.435-29.312-48.939-38.505-284.21-36.829 0 0 44.724-171.531-52.97-213.368s-138.553-54.616-26.549-125.664c0 0 90.65-29.837 1.186-70.802L570.314 4.179l948.186.5z"
+          />
+        </g>
+
+        <!-- BOTTOM wave -->
+        <g #bottomGroup>
+          <path
+            fill="#333"
+            d="M1518.5 508.529s-148.575-114.159-286.628 0-101.77-65.487-274.336-68.142-198.035 0-198.035 0-25.469-2.655-198.035 0-136.283 182.301-274.336 68.142-286.628 0-286.628 0v2000h3200V504.989"
+          />
+          <path
+            fill="none"
+            stroke="#d32f2f"
+            stroke-width="4"
+            stroke-miterlimit="10"
+            d="M1518.5 508.529s-148.575-114.159-286.628 0-101.77-65.487-274.336-68.142-198.035 0-198.035 0-25.469-2.655-198.035 0-136.283 182.301-274.336 68.142-286.628 0-286.628 0"
+          />
+        </g>
+      </svg>
+    </div>
+    <div #searchWord class="hidden lg:block absolute top-[17%] left-[10%] z-50">
+      <p
+        class="uppercase font-OpenSans font-extrabold text-accent-red text-3xl xl:text-[2.5rem] tracking-normal"
+      >
+        <span class="inline-block w-2 h-2 bg-accent-red border-2 border-accent-red mr-0.5"></span>
+        Search
+      </p>
+    </div>
+    <div #orderWord class="hidden lg:block absolute top-[17%] right-[10%] z-50">
+      <p
+        class="uppercase font-OpenSans font-extrabold text-accent-red text-3xl xl:text-[2.5rem] tracking-normal"
+      >
+        <span class="inline-block w-2 h-2 bg-accent-red border-2 border-accent-red mr-0.5"></span>
+        order
+      </p>
+    </div>
+    <div #enjoyWord class="hidden lg:block absolute bottom-[17%] left-1/2 -translate-x-1/2 z-50">
+      <app-square-label text="ENJOY the product" [size]="5" color="#fff" textColor="#fff" />
+    </div>
+  </div>
+</div>

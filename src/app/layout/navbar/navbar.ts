@@ -14,7 +14,7 @@ import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 // Register the free plugin
-gsap.registerPlugin(SplitText, ScrollTrigger);
+/* gsap.registerPlugin(SplitText, ScrollTrigger); */
 
 @Component({
   selector: 'app-navbar',

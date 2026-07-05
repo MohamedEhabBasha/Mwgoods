@@ -1,5 +1,5 @@
 <section
-  class="bg-primary relative flex flex-col justify-start items-center min-h-screen w-full pt-10 z-30"
+  class="bg-primary relative flex flex-col justify-start items-center min-h-screen w-full pt-10 z-30 border-b-0 border-secondary"
 >
   <div
     #headerContainer
@@ -8,9 +8,7 @@
     <p
       class="uppercase text-[#333] text-[0.6rem] tracking-[0.25rem] font-OpenSans font-extrabold flex items-center gap-2"
     >
-      <span
-        class="paragraph-square inline-block w-1.5 h-1.5 bg-accent-red border border-[#1c1c1e]"
-      ></span>
+      <span class="paragraph-square inline-block w-1.5 h-1.5 bg-accent-red border border-[#1c1c1e]"></span>
       Why Sell With Us
     </p>
 
@@ -22,14 +20,9 @@
           Your Products.
         </h2>
       </div>
-
       <div class="overflow-hidden w-full">
-        <h3
-          #empireHeading
-          class="block text-center md:text-right text-[#333] mt-2 md:mt-0 will-change-transform"
-        >
-          Your
-          <span class="text-accent-red">Empire.</span>
+        <h3 #empireHeading class="block text-center md:text-right text-[#333] mt-2 md:mt-0 will-change-transform">
+          Your <span class="text-accent-red">Empire.</span>
         </h3>
       </div>
     </div>
@@ -45,5 +38,6 @@
       Join thousands of sellers turning passion into profit — starting today.
     </p>
   </div>
+
   <canvas #canvas></canvas>
 </section>

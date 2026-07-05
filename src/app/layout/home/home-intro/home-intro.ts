@@ -1,80 +1,143 @@
-import { AfterViewInit, Component, ElementRef, viewChild } from '@angular/core';
-import { NgClass } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { PixiWeb } from '../../../shared/components/pixi-web/pixi-web';
-import { OrbitalButton } from "../../../shared/components/orbital-button/orbital-button";
 
-gsap.registerPlugin(ScrollTrigger);
+import { OrbitalButton } from '../../../shared/components/orbital-button/orbital-button';
 
 @Component({
   selector: 'app-home-intro',
-  imports: [NgClass /* PixiWeb */, OrbitalButton],
+  standalone: true,
+  imports: [
+    OrbitalButton,
+  ],
   templateUrl: './home-intro.html',
   styleUrl: './home-intro.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeIntro implements AfterViewInit {
-  private mainIntroStructure = viewChild.required<ElementRef<HTMLElement>>('mainIntroStructure');
-  private rightColumn = viewChild.required<ElementRef<HTMLElement>>('rightColumn');
-  private centerColumn = viewChild.required<ElementRef<HTMLElement>>('centerColumn');
-  private leftColumn = viewChild.required<ElementRef<HTMLElement>>('leftColumn');
-  //private pixiGrid = viewChild.required<PixiWeb>(PixiWeb);
-  //private targetLeftImg = viewChild.required<ElementRef<HTMLImageElement>>('targetLeftImg');
-  //private targetRightImg = viewChild.required<ElementRef<HTMLImageElement>>('targetRightImg');
-  private targetCenterText =
-    viewChild.required<ElementRef<HTMLParagraphElement>>('targetCenterText');
+export class HomeIntro {
+  private readonly destroyRef = inject(DestroyRef);
 
-  private storylineSvg = viewChild.required<ElementRef<HTMLElement>>('storylineSvg');
-  private storylinePath = viewChild.required<ElementRef<SVGPathElement>>('storylinePath');
+  private readonly mainIntroStructure =
+    viewChild.required<ElementRef<HTMLElement>>('mainIntroStructure');
 
-  ngAfterViewInit(): void {
-    // Implementation for after view initialization
+  private readonly leftColumn = viewChild.required<ElementRef<HTMLElement>>('leftColumn');
+
+  private readonly centerColumn = viewChild.required<ElementRef<HTMLElement>>('centerColumn');
+
+  private readonly rightColumn = viewChild.required<ElementRef<HTMLElement>>('rightColumn');
+
+  private readonly targetCenterVideo =
+    viewChild.required<ElementRef<HTMLVideoElement>>('targetCenterVideo');
+
+  private readonly storylineSvg = viewChild.required<ElementRef<HTMLElement>>('storylineSvg');
+
+  private readonly storylinePath = viewChild.required<ElementRef<SVGPathElement>>('storylinePath');
+
+  constructor() {
+    afterNextRender(() => {
+      this.destroyRef.onDestroy(() => {
+        gsap.killTweensOf('*');
+      });
+    });
   }
 
   /**
-   * Main orchestrator method called by the parent Master Timeline
+   * Called by the parent master timeline.
    */
   public createIntroAnimationTimeline(): gsap.core.Timeline {
     return window.innerWidth < 1280 ? this.createMobileTimeline() : this.createDesktopTimeline();
   }
+
   /**
-   * Desktop Timeline: Center slides up first, followed by Left and Right architectural drops
+   * Desktop Animation
    */
   private createDesktopTimeline(): gsap.core.Timeline {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.inOut' } });
+    const tl = gsap.timeline({
+      defaults: {
+        ease: 'power3.inOut',
+      },
+    });
 
-    const mainBg = this.mainIntroStructure().nativeElement;
-    const center = this.centerColumn().nativeElement;
+    const main = this.mainIntroStructure().nativeElement;
+
     const left = this.leftColumn().nativeElement;
+    const center = this.centerColumn().nativeElement;
     const right = this.rightColumn().nativeElement;
-    //const pixiGrid = this.pixiGrid().gridCanvas().nativeElement;
+
+    const video = this.targetCenterVideo().nativeElement;
 
     const svgContainer = this.storylineSvg().nativeElement;
-    const rawPath = this.storylinePath().nativeElement;
+    const path = this.storylinePath().nativeElement;
 
-    // 2. Compute the exact vector perimeter length on load
-    const totalPathLength = rawPath.getTotalLength();
+    const pathLength = path.getTotalLength();
 
-    // 1. Initial State Setup to avoid flashes
-    gsap.set([mainBg], { yPercent: 100 });
-    //gsap.set(pixiGrid, { opacity: 0 });
-    gsap.set([left, right], { clipPath: 'inset(100% 0% 0% 0%)' });
-    gsap.set(center, { yPercent: 100 });
+    const aboutParagraph = left.querySelector('p');
 
-    gsap.set(rawPath, {
-      strokeDasharray: totalPathLength,
-      strokeDashoffset: totalPathLength,
+    //
+    // Initial States
+    //
+
+    gsap.set(main, {
+      yPercent: 100,
     });
-    gsap.set(svgContainer, { opacity: 0 });
 
-    // 2. Animate the Middle Column coming from bottom to top
-    tl.to(mainBg, { yPercent: 0, ease: 'none' })
+    gsap.set(center, {
+      yPercent: 100,
+    });
+
+    gsap.set([left, right], {
+      clipPath: 'inset(100% 0% 0% 0%)',
+    });
+
+    gsap.set(video, {
+      scale: 1.15,
+      opacity: 0,
+    });
+
+    gsap.set([aboutParagraph], {
+      opacity: 0,
+      y: 30,
+    });
+
+    gsap.set(path, {
+      strokeDasharray: pathLength,
+      strokeDashoffset: pathLength,
+    });
+
+    gsap.set(svgContainer, {
+      opacity: 0,
+    });
+
+    //
+    // Timeline
+    //
+
+    tl.to(main, {
+      yPercent: 0,
+      ease: 'none',
+      duration: 1,
+    })
+
+      //
+      // Center Panel
+      //
+
       .to(center, {
         yPercent: 0,
         duration: 1.2,
       })
 
-      // 3. Reveal Left Column (using premium structural clip-path reveal)
+      //
+      // Side Panels
+      //
+
       .to(
         [left, right],
         {
@@ -83,46 +146,115 @@ export class HomeIntro implements AfterViewInit {
           stagger: 0.1,
         },
         '-=1',
-      ) // small delay overlap
-      // 5. ✨ BUTTERY LINE DRAW REVEAL
-      // This targets your new high-width stroke and unrolls it from 0% to 100% visibility
+      )
+
+      //
+      // Video Reveal
+      //
+
+      .to(
+        video,
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 1.4,
+          ease: 'power2.out',
+        },
+        '-=0.85',
+      )
+
+      //
+      // Story Line
+      //
+
       .to(
         svgContainer,
         {
           opacity: 1,
           duration: 0.3,
         },
-        '-=0.7', // Start drawing precisely while columns expand open
+        '-=0.8',
       )
-      .to(
-        rawPath,
+
+      //
+      // About Section
+      //
+
+      .fromTo(
+        aboutParagraph,
         {
-          strokeDashoffset: 0, // Uncoils the path line cleanly from head to tail!
+          y: 25,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+        },
+        '-=0.65',
+      )
+
+      .to(
+        path,
+        {
+          strokeDashoffset: 0,
           duration: 1.8,
           ease: 'power2.inOut',
         },
-        '<', // Matches execution timing frame with container opacity
+        '<',
       )
-      .to(mainBg, { background: '#fff' });
-    //.to([left, center, right], { backgroundColor: 'transparent', ease: 'power2.out' }); // Sync the grid rise with the main background
+
+      //
+      // Final Background
+      //
+
+      .to(
+        main,
+        {
+          backgroundColor: '#ffffff',
+          duration: 0.6,
+        },
+        '-=0.8',
+      )
+      .to({}, { duration: 1 });
 
     return tl;
   }
+
   /**
-   * Mobile Timeline: Retains your slide-up structure smoothly
+   * Mobile Animation
    */
   private createMobileTimeline(): gsap.core.Timeline {
-    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+    const tl = gsap.timeline({
+      defaults: {
+        ease: 'power2.out',
+      },
+    });
+
+    const main = this.mainIntroStructure().nativeElement;
+    const video = this.targetCenterVideo().nativeElement;
+
+    gsap.set(video, {
+      opacity: 0,
+      scale: 1.08,
+    });
 
     tl.fromTo(
-      this.mainIntroStructure().nativeElement,
+      main,
       {
         yPercent: 100,
       },
       {
         yPercent: 0,
-        duration: 1.5,
+        duration: 1.3,
       },
+    ).to(
+      video,
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 1,
+      },
+      '-=0.7',
     );
 
     return tl;

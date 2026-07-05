@@ -1,95 +1,108 @@
-import { AfterViewInit, Component, DestroyRef, ElementRef, inject, viewChild } from '@angular/core';
-import { NgClass } from '@angular/common';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { PixiWeb } from '../../../shared/components/pixi-web/pixi-web';
-import { OrbitalButton } from "../../../shared/components/orbital-button/orbital-button";
-
-gsap.registerPlugin(SplitText);
+import { SquareLabel } from '../../../shared/components/square-label/square-label';
 
 @Component({
   selector: 'app-home-hero',
-  imports: [NgClass, PixiWeb, OrbitalButton],
+  standalone: true,
+  imports: [PixiWeb, SquareLabel],
   templateUrl: './home-hero.html',
   styleUrl: './home-hero.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeHero implements AfterViewInit {
+export class HomeHero {
+  private readonly destroyRef = inject(DestroyRef);
+
+  // Structural Column References
+  private leftColumn = viewChild.required<ElementRef<HTMLElement>>('leftColumn');
+  private centerColumn = viewChild.required<ElementRef<HTMLElement>>('centerColumn');
+  private rightColumn = viewChild.required<ElementRef<HTMLElement>>('rightColumn');
+
+  // Decorative Line References
+  private leftDash = viewChild.required<ElementRef<HTMLElement>>('leftDash');
+  private rightDash = viewChild.required<ElementRef<HTMLElement>>('rightDash');
+
+  // Title Splitting References
   private targetHeading = viewChild.required<ElementRef<HTMLElement>>('targetHeading');
   private targetSubtitle = viewChild.required<ElementRef<HTMLElement>>('targetSubtitle');
-  private targetParagraph = viewChild.required<ElementRef<HTMLElement>>('targetParagraph');
-  private targetBtn = viewChild.required<ElementRef<HTMLElement>>('targetBtn');
 
-  ngAfterViewInit(): void {
-    this.createHeroAnimationTimeline();
+  private headingSplit?: SplitText;
+  private subtitleSplit?: SplitText;
+
+  constructor() {
+    afterNextRender({
+      write: () => {
+        const tl = this.createHeroAnimationTimeline();
+
+        this.destroyRef.onDestroy(() => {
+          tl.kill();
+          this.headingSplit?.revert();
+          this.subtitleSplit?.revert();
+        });
+      },
+    });
   }
 
   public createHeroAnimationTimeline(): gsap.core.Timeline {
-    // 1. Instantiate the SplitText engines on our raw copy
-    const headingSplit = new SplitText(this.targetHeading().nativeElement, {
-      type: 'words',
-      wordsClass: 'inline-block translate-y-[110%]', // Generates the clean clip mask automatically
+    this.headingSplit = new SplitText(this.targetHeading().nativeElement, {
+      type: 'words,chars',
     });
 
-    const subtitleSplit = new SplitText(this.targetSubtitle().nativeElement, {
-      type: 'lines',
-      linesClass: 'inline-block translate-y-[110%]',
+    this.subtitleSplit = new SplitText(this.targetSubtitle().nativeElement, {
+      type: 'words,lines',
     });
 
-    const paragraphSplit = new SplitText(this.targetParagraph().nativeElement, {
-      type: 'lines',
-      linesClass: 'inline-block',
-    });
-
-    // Quick structural CSS fix: force parent wrapper blocks to hide the overflow text cleanly
-    const wrappers = [this.targetHeading(), this.targetSubtitle(), this.targetParagraph()];
-    wrappers.forEach((wrap) => {
-      wrap.nativeElement.style.overflow = 'hidden';
-    });
-
-    // 2. Build the cohesive master timeline
     const tl = gsap.timeline({
-      defaults: { ease: 'power4.out', duration: 1.4 },
+      defaults: { ease: 'power4.inOut', duration: 1.6 },
     });
 
-    // Step 1: Split main headlines glide up out of thin air
-    tl.to(headingSplit.words, {
-      y: '0%',
-      //stagger: 0.1,
-    })
-
-      // Step 2: Subtitle cascades up right underneath
-      .to(
-        subtitleSplit.lines,
-        {
-          y: '0%',
-          stagger: 0.05,
-        },
-        '<',
-      )
-
-      // Step 3: Meta-paragraph breaks down into lines and glides up
+    // 1. Character roll-up
+    tl.fromTo(
+      this.headingSplit.chars,
+      { yPercent: 130, rotate: 3 },
+      { yPercent: 0, rotate: 0, stagger: 0.02 },
+    )
+      // 2. Headline cascade overlap
       .fromTo(
-        paragraphSplit.lines,
-        {
-          yPercent: -400,
-          opacity: 0,
-        },
-        {
-          yPercent: 0,
-          opacity: 1,
-          stagger: 0.05,
-          duration: 1.0,
-        },
+        this.subtitleSplit.words,
+        { yPercent: 140, rotate: -1.5 },
+        { yPercent: 0, rotate: 0, stagger: 0.025 },
+        '-=1.3',
+      )
+      // 3. Simultaneously reveal columns (sliding up) and dashes (expanding outward)
+      .fromTo(
+        [
+          this.leftColumn().nativeElement.children,
+          this.centerColumn().nativeElement.children,
+          this.rightColumn().nativeElement.children,
+        ],
+        { y: 45, opacity: 0 },
+        { y: 0, opacity: 1, stagger: 0.05, duration: 1.3, ease: 'power3.out' },
         '-=0.9',
-      )
-
-      // Step 4: The anchor button snaps cleanly into layout framing
-      .fromTo(
-        this.targetBtn().nativeElement,
-        { yPercent: -100, opacity: 0 },
-        { yPercent: 0, duration: 1.0, opacity: 1 },
-        '<',
       );
+    const activeDashes = [this.leftDash().nativeElement, this.rightDash().nativeElement].filter(
+      (el) => el.offsetWidth > 0,
+    );
+
+    // Only build the animation path if the screen size is large enough to render them
+    if (activeDashes.length > 0) {
+      tl.fromTo(
+        activeDashes,
+        { scaleX: 0, opacity: 0 },
+        { scaleX: 1, opacity: 1, duration: 1.4, ease: 'power4.out', stagger: 0.1 },
+        '-=1.1',
+      );
+    }
 
     return tl;
   }

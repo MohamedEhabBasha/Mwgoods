@@ -1,0 +1,20 @@
+<div
+  class="square-label flex items-center gap-3 select-none"
+  [class.flex-row-reverse]="align() === 'right'"
+>
+  <!-- Square -->
+  <span
+    class="square shrink-0 rounded-[1px]"
+    [style.width.px]="size()"
+    [style.height.px]="size()"
+    [style.background-color]="color()"
+  ></span>
+
+  <!-- Label -->
+  <span
+    class="label whitespace-nowrap font-black uppercase leading-none tracking-[0.2rem] text-sm md:text-base lg:text-lg xl:text-xl"
+    [style.color]="textColor()"
+  >
+    {{ text() }}
+  </span>
+</div>

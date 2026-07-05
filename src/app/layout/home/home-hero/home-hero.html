@@ -1,47 +1,105 @@
-<app-pixi-web [squareSize]="100" [thickness]="1.5" class="-z-10 pointer-events-none"></app-pixi-web>
-<main class="relative bg-transparent w-full h-screen overflow-hidden">
-  <!-- Typography -->
-  <section class="absolute flex flex-col bottom-[3%] left-1/2 -translate-x-1/2 w-full">
-    <!-- Sub Header -->
-    <div
-      class="px-6 md:px-16 flex flex-col lg:flex-row justify-between items-center xl:items-end w-full mb-6 lg:mb-12"
-    >
-      <p
-        #targetParagraph
-        [ngClass]="`
-          max-w-full md:max-w-100  xl:max-w-120 text-center md:text-left normal-case 
-          font-normal tracking-normal text-stone-800
-          text-[1rem] lg:text-[1.25rem] leading-tight my-4 lg:my-0
-        `"
-      >
-        <span
-          class="paragraph-square inline-block w-2 h-2 bg-stone-900 mr-2 mb-0.5 shrink-0"
-        ></span>
+<app-pixi-web [squareSize]="50" [thickness]="1.5" class="-z-10 pointer-events-none"></app-pixi-web>
 
-        <span>
-          A curated ecosystem bridging elite commerce with a real-time social network. Launch your
-          storefront, broadcast your process, and own your audience.
-        </span>
-      </p>
-      <div #targetBtn class="xl:mr-26 pointer-events-auto">
-        <app-orbital-button [text]="'Join'"></app-orbital-button>
+<main class="relative bg-transparent w-full h-screen overflow-hidden select-none">
+  <section
+    class="absolute flex flex-col bottom-[20%] md:bottom-[20%] lg:bottom-[6%] left-0 w-full px-6 md:px-16"
+  >
+    <div
+      class="flex items-end justify-between w-full mb-12 lg:mb-10 font-mono text-stone-900 gap-4 md:gap-6"
+    >
+      <div #leftColumn class="flex flex-col space-y-1.5 md:space-y-2 overflow-hidden shrink-0">
+        <app-square-label
+          text="BUY"
+          [size]="5"
+          color="#78716c"
+          textColor="#78716c"
+          class="scale-75 origin-left"
+        />
+        <app-square-label
+          text="SELL"
+          [size]="5"
+          color="#78716c"
+          textColor="#78716c"
+          class="scale-75 origin-left"
+        />
+        <app-square-label text="E-Commerce" [size]="6" color="#1c1917" textColor="#1c1917" />
+      </div>
+
+      <div
+        #leftDash
+        class="hidden md:block grow h-px mb-1 md:mb-1.5 bg-[linear-gradient(to_right,#333_8px,transparent_8px)] bg-size-[20px_1px] bg-repeat-x origin-center"
+      ></div>
+
+      <div
+        #centerColumn
+        class="flex justify-between items-end overflow-hidden w-full max-w-40  lg:max-w-xl px-2 shrink-0"
+      >
+        <div class="mr-auto">
+          <app-square-label text="MW" [size]="6" color="#dc2626" textColor="#0c0a09" />
+        </div>
+        <div class="ml-auto">
+          <app-square-label
+            text="Goods"
+            [size]="6"
+            color="#dc2626"
+            textColor="#0c0a09"
+            align="right"
+          />
+        </div>
+      </div>
+
+      <div
+        #rightDash
+        class="hidden md:block grow h-px mb-1 md:mb-1.5 bg-[linear-gradient(to_right,#333_8px,transparent_8px)] bg-size-[20px_1px] bg-repeat-x origin-center"
+      ></div>
+
+      <div
+        #rightColumn
+        class="flex flex-col space-y-1.5 md:space-y-2 items-end overflow-hidden shrink-0"
+      >
+        <app-square-label
+          text="CHAT"
+          [size]="5"
+          color="#78716c"
+          textColor="#78716c"
+          align="right"
+          class="scale-75 origin-right"
+        />
+        <app-square-label
+          text="REVIEWS"
+          [size]="5"
+          color="#78716c"
+          textColor="#78716c"
+          align="right"
+          class="scale-75 origin-right"
+        />
+        <app-square-label
+          text="Community"
+          [size]="6"
+          color="#1c1917"
+          textColor="#1c1917"
+          align="right"
+        />
       </div>
     </div>
-    <!-- Header -->
+
     <h1
       #mainHeroStructure
-      [ngClass]="'order-first lg:order-last py-2 px-6 md:px-16 text-4xl md:text-5xl lg:text-7xl xl:text-[6.75rem] 
-    font-bold leading-none uppercase tracking-tighter'"
+      class="w-full py-2 text-4xl md:text-6xl lg:text-7xl xl:text-[6.5rem] font-black leading-[0.85] uppercase tracking-tighter text-stone-900"
     >
-      <div #targetHeading class="flex justify-between items-center w-full">
+      <div #targetHeading class="flex justify-between items-center w-full overflow-hidden">
         <span>Turn Your</span>
         <span>Products</span>
       </div>
 
-      <div #targetSubtitle class="text-center w-full mt-2 md:mt-4 text-[3.5xl] xl:text-[5.5rem]">
+      <div #targetSubtitle class="text-center w-full mt-4 xl:text-[5.5rem] overflow-hidden">
         <span>
           Into a
-          <span class="text-accent-red">Trusted</span>
+          <span
+            class="text-accent-red font-serif italic font-normal normal-case tracking-normal px-2"
+          >
+            Trusted
+          </span>
           Business
         </span>
       </div>

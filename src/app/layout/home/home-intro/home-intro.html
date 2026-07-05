@@ -1,17 +1,18 @@
 <main
   #mainIntroStructure
-  class="absolute inset-0 bg-transparent grid grid-cols-1 xl:grid-cols-3 min-h-screen w-full"
+  class="absolute inset-0 grid min-h-screen w-full grid-cols-1 bg-transparent xl:grid-cols-3"
 >
+  <!-- Story Line -->
   <div
     #storylineSvg
-    class="absolute pointer-events-none w-full h-full items-center justify-center z-1 opacity-0 hidden xl:flex"
+    class="pointer-events-none absolute z-1 hidden h-full w-full items-center justify-center opacity-0 xl:flex"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
       xml:space="preserve"
       width="2200"
       height="625.772"
-      class="absolute left-[0%] bottom-[-5%] xl:scale-[80%] opacity-10 overflow-visible"
+      class="absolute bottom-[-5%] left-0 overflow-visible opacity-10 xl:scale-[80%]"
     >
       <path
         #storylinePath
@@ -25,73 +26,95 @@
       />
     </svg>
   </div>
-  <div
+
+  <!-- ================= LEFT ================= -->
+
+  <section
     #leftColumn
-    class="relative bg-white text-white flex items-end justify-center p-6 md:items-center overflow-hidden md:border-b-0 md:border-neutral-300"
+    class="relative flex items-end justify-center overflow-hidden bg-white p-6 text-white md:items-center"
   >
     <div
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px hidden xl:block bg-neutral-300 pointer-events-none"
+      class="pointer-events-none absolute top-1/2 left-1/2 hidden h-px w-full -translate-x-1/2 -translate-y-1/2 bg-neutral-300 xl:block"
     ></div>
 
     <h2
-      [ngClass]="'flex items-center text-accent-red text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold uppercase font-OpenSans tracking-tighter mt-10 md:mt-0 xl:ml-16 z-20'"
+      class="z-20 mt-10 font-OpenSans text-5xl font-bold uppercase tracking-tighter text-accent-red md:mt-0 md:text-6xl lg:text-7xl xl:ml-16 xl:text-8xl"
     >
       Kill
     </h2>
-    <p
-      class="absolute bottom-3.5 uppercase text-[#1c1c1e] text-[0.5rem] tracking-[0.2rem] font-OpenSans font-extrabold hidden xl:block"
-    >
-      <span
-        class="paragraph-square inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e] mr-1"
-      ></span>
-      About
-    </p>
-  </div>
 
-  <div
-    #centerColumn
-    class="relative bg-white text-white flex items-center justify-center xl:border border-neutral-300"
-  >
-    <p
+    <div
       #targetCenterText
-      class="px-6 md:px-10 py-10 text-lg md:text-xl font-light text-neutral-500 xl:border-y border-neutral-300 leading-tight"
+      class="absolute bottom-8 left-8 z-20 hidden xl:block select-none"
     >
-      <span
-        class="paragraph-square inline-block w-[0.55em] h-[0.55em] bg-neutral-500 mr-2 mb-0.5 shrink-0"
-      ></span>
-      Traditional e-commerce is dead quiet. We turned it into a live arena. Broadcast your build
-      process, drop rare assets in real-time, and own your audience equity without the middleman
-      taxing your vision.
-    </p>
-    <p
-      class="absolute bottom-3.5 uppercase text-[#1c1c1e] text-[0.5rem] tracking-[0.2rem] font-OpenSans font-extrabold hidden xl:block"
-    >
-      <span
-        class="paragraph-square inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e] mr-1"
-      ></span>
-      mw goods
-    </p>
-  </div>
+      <p
+        class="text-[0.72rem] font-medium leading-relaxed tracking-[0.16rem] text-neutral-500 font-sans text-left normal-case"
+      >
+        <span
+          class="inline-block shrink-0 rounded-[1px] bg-[#333] align-middle mr-1 w-1 h-1"
+        ></span>
 
-  <div
+        <span class="font-black uppercase tracking-[0.22em] text-[#333] font-mono">About</span>
+        <span class="opacity-0">------------------</span>
+
+        Traditional e-commerce is dead quiet. We turned it into a live arena. Broadcast your build
+        process, drop rare assets in real time and build a trusted audience around your brand.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= CENTER ================= -->
+
+  <section
+    #centerColumn
+    class="relative flex items-center justify-center overflow-hidden border-neutral-300 bg-white xl:border"
+  >
+    <video
+      #targetCenterVideo
+      autoplay
+      [muted]="true"
+      loop
+      playsinline
+      class="h-50 md:h-60 w-full object-cover z-100 rounded-2xl border-4 border-accent-red hidden xl:block"
+    >
+      <source src="home/intro.webm" type="video/mp4" />
+    </video>
+    <p
+      class="text-[0.72rem] font-medium leading-relaxed tracking-[0.16rem] text-neutral-500 font-sans text-left normal-case xl:hidden px-5"
+    >
+      <span
+        class="inline-block shrink-0 rounded-[1px] bg-[#333] align-middle w-1 h-1 mr-1"
+      ></span>
+
+      <span class="font-black uppercase tracking-[0.22em] text-[#333] font-mono">About</span>
+      <span class="opacity-0">------------------</span>
+
+      Traditional e-commerce is dead quiet. We turned it into a live arena. Broadcast your build
+      process, drop rare assets in real time and build a trusted audience around your brand.
+    </p>
+  </section>
+
+  <!-- ================= RIGHT ================= -->
+
+  <section
     #rightColumn
-    class="relative bg-white text-white flex flex-col items-center justify-center p-6 xl:justify-end overflow-visible lg:border-b md:border-neutral-300"
+    class="relative flex flex-col items-center justify-center overflow-visible bg-white p-6 text-white lg:border-b md:border-neutral-300 xl:justify-end"
   >
     <div
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px hidden xl:block bg-neutral-300 pointer-events-none z-0"
+      class="pointer-events-none absolute top-1/2 left-1/2 z-0 hidden h-px w-full -translate-x-1/2 -translate-y-1/2 bg-neutral-300 xl:block"
     ></div>
+
     <h2
-      class="text-4xl lg:text-5xl xl:text-6xl font-bold font-OpenSans text-[#333] uppercase text-center xl:text-left tracking-[0.1rem]"
+      class="text-center font-OpenSans text-4xl font-bold uppercase tracking-[0.1rem] text-[#333] lg:text-5xl xl:text-left xl:text-6xl"
     >
-      the
+      The
       <br class="hidden xl:block" />
       Standard Storefront
     </h2>
+
     <app-orbital-button
       text="About"
-      [ngClass]="`
-          mt-10 xl:mb-22 xl:mt-0 xl:order-first xl:ml-12 z-10
-        `"
+      class="z-10 mt-10 xl:order-first xl:mt-0 xl:mb-22 xl:ml-12"
     ></app-orbital-button>
-  </div>
+  </section>
 </main>

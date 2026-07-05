@@ -1,57 +1,135 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
-  OnDestroy,
-  ViewChild,
+  DestroyRef,
   HostListener,
+  inject,
+  viewChild,
+  afterNextRender,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
 import Matter from 'matter-js';
-
-gsap.registerPlugin(ScrollTrigger, MorphSVGPlugin);
 
 @Component({
   selector: 'app-footer',
   imports: [],
   templateUrl: './footer.html',
   styleUrl: './footer.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Footer implements AfterViewInit, OnDestroy {
-  @ViewChild('matterCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
+export class Footer {
+  private readonly canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('matterCanvas');
+  private readonly destroyRef = inject(DestroyRef);
+  private linkHoverCleanups: (() => void)[] = [];
 
   private engine!: Matter.Engine;
   private render!: Matter.Render;
   private runner!: Matter.Runner;
   private triggerInstance?: ScrollTrigger;
+  private dropTriggerInstance?: ScrollTrigger;
   private hasDropped = false;
   private isInitialised = false;
+  private resizeRaf = 0;
 
   private readonly LETTERS = ['M', 'W', 'G', 'O', 'O', 'D', 'S'];
 
-  // Responsive layout values determined at runtime
   private currentSquareSize = 150;
   private currentSquareGap = 40;
   private currentFontSize = 135;
+  private currentCanvasW = 1200;
 
-  ngAfterViewInit(): void {
-    this.initMatterFooter();
+  constructor() {
+    afterNextRender(() => {
+      this.initMatterFooter();
+    });
+
+    this.destroyRef.onDestroy(() => {
+      this.clearPhysics();
+      this.triggerInstance?.kill();
+      this.dropTriggerInstance?.kill();
+      cancelAnimationFrame(this.resizeRaf);
+      this.linkHoverCleanups.forEach((fn) => fn());
+    });
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any): void {
-    // Re-initialize physics to map perfectly to new container widths
-    this.clearPhysics();
-    this.initMatterFooter();
+  @HostListener('window:resize')
+  onResize(): void {
+    // Debounce via rAF so rapid resize events don't thrash Matter re-init
+    cancelAnimationFrame(this.resizeRaf);
+    this.resizeRaf = requestAnimationFrame(() => {
+      this.clearPhysics();
+      this.initMatterFooter();
+      ScrollTrigger.refresh();
+    });
+  }
 
-    // Refresh ScrollTrigger parameters to sync up new calculations
-    ScrollTrigger.refresh();
+  public initLinkScramble(): void {
+    const links = document.querySelectorAll<HTMLAnchorElement>('.footer nav a');
+
+    links.forEach((link) => {
+      const textSpan = link.querySelector('.link-text') as HTMLElement;
+      const dot = link.querySelector('.paragraph-square') as HTMLElement;
+      if (!textSpan) return;
+
+      const original = textSpan.textContent ?? '';
+      let tween: gsap.core.Tween | null = null;
+
+      const onEnter = () => {
+        tween?.kill();
+        tween = gsap.to(textSpan, {
+          duration: 0.6,
+          scrambleText: {
+            text: original,
+            chars: 'upperCase',
+            speed: 0.4,
+            revealDelay: 0.05,
+          },
+          ease: 'none',
+        });
+
+        gsap.to(dot, {
+          scale: 1.6,
+          backgroundColor: '#ffffff',
+          duration: 0.3,
+          ease: 'power2.out',
+        });
+      };
+
+      const onLeave = () => {
+        tween?.kill();
+        tween = gsap.to(textSpan, {
+          duration: 0.4,
+          scrambleText: {
+            text: original,
+            chars: 'upperCase',
+            speed: 0.5,
+            revealDelay: 0.02,
+          },
+          ease: 'none',
+        });
+
+        gsap.to(dot, {
+          scale: 1,
+          backgroundColor: '',
+          duration: 0.3,
+          ease: 'power2.out',
+        });
+      };
+
+      link.addEventListener('mouseenter', onEnter);
+      link.addEventListener('mouseleave', onLeave);
+
+      this.linkHoverCleanups.push(() => {
+        link.removeEventListener('mouseenter', onEnter);
+        link.removeEventListener('mouseleave', onLeave);
+        tween?.kill();
+      });
+    });
   }
 
   private computeLayout(W: number): void {
-    // Desktop layout baseline adjustments
     if (W >= 1440) {
       this.currentSquareSize = 150;
       this.currentSquareGap = 40;
@@ -59,7 +137,6 @@ export class Footer implements AfterViewInit, OnDestroy {
       this.currentSquareSize = 120;
       this.currentSquareGap = 30;
     } else {
-      // Tailwind desktop base scale breakdown (1024px to 1279px viewport ranges)
       this.currentSquareSize = 95;
       this.currentSquareGap = 20;
     }
@@ -77,7 +154,6 @@ export class Footer implements AfterViewInit, OnDestroy {
     this.isInitialised = false;
   }
 
-  // ─── SVG arc floor ────────────────────────────────────────────────────────
   private buildArcFloor(world: Matter.World, W: number, H: number): void {
     const { Bodies, Composite } = Matter;
 
@@ -95,6 +171,7 @@ export class Footer implements AfterViewInit, OnDestroy {
       pts.push({ x: (i / segments) * W, y: arcY((i / segments) * W) });
     }
 
+    const floorBodies: Matter.Body[] = [];
     for (let i = 0; i < pts.length - 1; i++) {
       const p1 = pts[i];
       const p2 = pts[i + 1];
@@ -105,8 +182,7 @@ export class Footer implements AfterViewInit, OnDestroy {
       const len = Math.sqrt(dx * dx + dy * dy);
       const angle = Math.atan2(dy, dx);
 
-      Composite.add(
-        world,
+      floorBodies.push(
         Bodies.rectangle(cx, cy, len + 1, 6, {
           isStatic: true,
           angle,
@@ -116,18 +192,19 @@ export class Footer implements AfterViewInit, OnDestroy {
         }),
       );
     }
+    // Batch add — single Composite.add call instead of one per segment
+    Composite.add(world, floorBodies);
   }
 
-  // ─── Physics init ──────────────────────────────────────────────────────────
   private initMatterFooter(): void {
     const { Engine, Render, Runner, Body, Bodies, Composite, Constraint, Events } = Matter;
 
-    const canvas = this.canvasRef.nativeElement;
+    const canvas = this.canvasRef().nativeElement;
     const parent = canvas.parentElement!;
     const W = parent.clientWidth || 1200;
     const H = parent.clientHeight || window.innerHeight;
+    this.currentCanvasW = W;
 
-    // Set computed scales
     this.computeLayout(W);
 
     canvas.style.pointerEvents = 'none';
@@ -144,12 +221,12 @@ export class Footer implements AfterViewInit, OnDestroy {
         height: H,
         background: 'transparent',
         wireframes: false,
+        pixelRatio: Math.min(window.devicePixelRatio || 1, 2), // cap DPR to avoid 3x/4x canvas cost on high-density displays
       },
     });
 
     Render.run(this.render);
     this.runner = Runner.create();
-    //Runner.run(this.runner, this.engine);
     this.isInitialised = true;
 
     this.buildArcFloor(world, W, H);
@@ -163,7 +240,6 @@ export class Footer implements AfterViewInit, OnDestroy {
       Bodies.rectangle(W + 25, H / 2, 50, H * 2, wallOpts),
     ]);
 
-    // ── Letter squares ──
     const totalChainW =
       this.LETTERS.length * this.currentSquareSize +
       (this.LETTERS.length - 1) * this.currentSquareGap;
@@ -190,7 +266,6 @@ export class Footer implements AfterViewInit, OnDestroy {
       ),
     );
 
-    // ── Single Circle Links between Squares ──
     const links: Matter.Body[] = [];
     const constraints: Matter.Constraint[] = [];
     const linkRadius = W < 1280 ? 8 : 12;
@@ -207,7 +282,6 @@ export class Footer implements AfterViewInit, OnDestroy {
       });
       links.push(link);
 
-      // Connect Left Square to Circle
       constraints.push(
         Constraint.create({
           bodyA: squares[i],
@@ -220,7 +294,6 @@ export class Footer implements AfterViewInit, OnDestroy {
         }),
       );
 
-      // Connect Circle to Right Square
       constraints.push(
         Constraint.create({
           bodyA: link,
@@ -236,20 +309,21 @@ export class Footer implements AfterViewInit, OnDestroy {
 
     Composite.add(world, [...squares, ...links, ...constraints]);
 
-    // Custom text overlays with updated sizes
+    // Pre-compute font string once instead of rebuilding it every frame
+    const fontString = `900 ${this.currentFontSize}px "Open Sans", system-ui, sans-serif`;
+
     Events.on(this.render, 'afterRender', () => {
       const ctx = this.render.context;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = fontString;
+      ctx.fillStyle = '#fff';
+
       squares.forEach((sq, i) => {
         ctx.save();
         ctx.translate(sq.position.x, sq.position.y);
         ctx.rotate(sq.angle);
-
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = `900 ${this.currentFontSize}px "Open Sans", system-ui, sans-serif`;
-        ctx.fillStyle = '#fff';
         ctx.fillText(this.LETTERS[i], 0, 2);
-
         ctx.restore();
       });
     });
@@ -267,7 +341,6 @@ export class Footer implements AfterViewInit, OnDestroy {
       this.triggerInstance.kill();
     }
 
-    // ── Existing morph trigger (start/end untouched) ──────────────────────
     this.triggerInstance = ScrollTrigger.create({
       trigger: '.footer',
       start: 'top bottom',
@@ -305,12 +378,10 @@ export class Footer implements AfterViewInit, OnDestroy {
       },
     });
 
-    // ── Drop chain trigger — fires when footer is actually visible ────────
-    ScrollTrigger.create({
+    this.dropTriggerInstance = ScrollTrigger.create({
       trigger: '.footer',
       start: 'top center',
       once: true,
-      //markers: true,
       onEnter: () => {
         if (!this.hasDropped) {
           this.hasDropped = true;
@@ -325,11 +396,10 @@ export class Footer implements AfterViewInit, OnDestroy {
     const links: Matter.Body[] = (this as any)._links;
     if (!squares || !links) return;
 
-    console.log('FIRED')
     Matter.Runner.run(this.runner, this.engine);
 
-    const canvas = this.canvasRef.nativeElement;
-    const W = canvas.width;
+    const W = this.currentCanvasW;
+
     const totalChainW =
       this.LETTERS.length * this.currentSquareSize +
       (this.LETTERS.length - 1) * this.currentSquareGap;
@@ -356,10 +426,5 @@ export class Footer implements AfterViewInit, OnDestroy {
       Matter.Body.setVelocity(link, { x: 0, y: 0 });
       Matter.Body.setAngularVelocity(link, 0);
     });
-  }
-
-  ngOnDestroy(): void {
-    this.clearPhysics();
-    if (this.triggerInstance) this.triggerInstance.kill();
   }
 }

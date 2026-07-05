@@ -1,148 +1,81 @@
-<div #pinnedSection class="relative w-full h-screen overflow-hidden bg-white z-50">
-  <app-hp-conveyor-scroll
-    [images]="[
-      {
-        src: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?q=80&w=1167&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        alt: 'mouse - electronics',
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1099&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        alt: 'watch - accessories',
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        alt: 'shoes - clothes',
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?q=80&w=1122&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        alt: 'bike',
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1514348871858-1d3c20902571?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        alt: 'perfume',
-      },
-    ]"
-  ></app-hp-conveyor-scroll>
-  @if (screenWidth() >= 1024) {
-    <div
-      class="absolute inset-0 w-full h-full z-20 pointer-events-none select-none overflow-hidden"
-    >
-      <svg
-        class="w-full h-full"
-        viewBox="0 0 1519 609.215"
-        preserveAspectRatio="none"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+<div #pinnedSection class="relative w-full overflow-hidden bg-white z-50" style="height: 100svh">
+  <div
+    #topLeftOverlay
+    class="absolute top-[40%] md:top-[40%] -translate-y-1/2 left-0 z-30 pointer-events-none will-change-transform"
+  >
+    <div class="flex flex-col lg:flex-row items-center gap-20 p-8">
+      <p class="uppercase text-[#1c1c1e] text-[0.675rem] font-OpenSans font-extrabold">
+        1
+        <span
+          class="inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e]"
+        ></span>
+        Your
+        <br />
+        <span class="text-accent-red text-3xl xl:text-[3.5rem] tracking-[0.2rem]">Career.</span>
+      </p>
+      <div
+        class="w-35 md:w-50 h-55 md:h-70 select-none mr-auto rotate-z-10 rounded-2xl border-4 border-accent-red order-first lg:order-last"
       >
-        <g #topLeftGroup class="will-change-transform">
-          <path
-            fill="#ffffff"
-            stroke="#000"
-            stroke-width="0.5"
-            stroke-miterlimit="10"
-            d="M.5 512.954s120.868-97.159 256.846-21.146c0 0 72.933 60.618 96.608 58.455 23.676-2.163 37.385-7.963 46.898-17.258s73.666-83.989 134.846-86.34c61.18-2.352 242.385 0 242.385 0s80.726-194.773-45.823-225.747-84.956-105.31-5.31-122.124c25.125-5.304 76.502-61.947-107.965-86.726 0 0-53.097-14.779-61.062-10.929S.5 1.14.5 1.14z"
-          />
-        </g>
-
-        <g #topRightGroup class="will-change-transform">
-          <path
-            fill="#fff"
-            stroke="#000"
-            stroke-width="0.5"
-            stroke-miterlimit="10"
-            d="M1518.5 512.708s-157.251-116.834-278.824-6.204c-121.574 110.629-117.224 3.413-174.658-25.9-57.435-29.312-48.939-38.505-284.21-36.829 0 0 44.724-171.531-52.97-213.368s-138.553-54.616-26.549-125.664c0 0 90.65-29.837 1.186-70.802L570.314 4.179l948.186.5z"
-          />
-        </g>
-
-        <g #bottomGroup class="will-change-transform overflow-visible">
-          <path
-            fill="#fff"
-            stroke="#000"
-            stroke-width="0.5"
-            stroke-miterlimit="10"
-            d="M1518.5 508.529s-148.575-114.159-286.628 0-101.77-65.487-274.336-68.142-198.035 0-198.035 0-25.469-2.655-198.035 0-136.283 182.301-274.336 68.142-286.628 0-286.628 0v100.186h1518V504.989"
-          />
-        </g>
-      </svg>
-    </div>
-
-    <div
-      #topLeftOverlay
-      class="absolute top-[40%] -translate-y-1/2 left-0 z-30 pointer-events-none will-change-transform"
-    >
-      <div class="flex items-center gap-20 p-8">
-        <p
-          class="uppercase text-[#1c1c1e] text-[0.675rem] tracking-[0.2rem] font-OpenSans font-extrabold"
-        >
-          <span
-            class="inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e]"
-          ></span>
-          Your
-          <br />
-          <span class="text-accent-red text-3xl xl:text-[3.5rem]">Career.</span>
-        </p>
-        <div
-          class="w-65 md:w-50 h-70 select-none mr-auto rotate-z-10 rounded-2xl border-4 border-accent-red"
-        >
-          <img
-            src="https://images.unsplash.com/vector-1763748991074-106dac3751e6?q=80&w=732&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt=""
-            class="w-full h-full object-cover rounded-2xl"
-          />
-        </div>
+        <img
+          src="https://images.unsplash.com/vector-1763748991074-106dac3751e6?q=80&w=732&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt=""
+          class="w-full h-full object-cover rounded-2xl"
+        />
       </div>
     </div>
-    <div
-      #topRightOverlay
-      class="absolute top-[40%] -translate-y-1/2 right-0 z-30 pointer-events-none will-change-transform"
-    >
-      <div class="flex items-center gap-20 p-8">
-        <div
-          class="w-65 md:w-50 h-70 select-none mr-auto rotate-z-10 rounded-2xl border-4 border-accent-red z-50"
-        >
-          <img
-            src="https://images.unsplash.com/vector-1762518230619-bc7bac12ae47?q=80&w=627&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt=""
-            class="w-full h-full object-cover rounded-2xl"
-          />
-        </div>
-        <p
-          class="uppercase text-[#1c1c1e] text-[0.675rem] tracking-[0.2rem] font-OpenSans font-extrabold text-left"
-        >
-          <span
-            class="inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e]"
-          ></span>
-          doesn't start with a
-          <br />
-          <span class="text-accent-red text-3xl xl:text-[3.5rem]">degree.</span>
-        </p>
+  </div>
+  <div
+    #topRightOverlay
+    class="absolute top-[40%] -translate-y-1/2 right-0 z-30 pointer-events-none will-change-transform"
+  >
+    <div class="flex flex-col lg:flex-row items-end lg:items-center gap-20 p-8">
+      <div
+        class="w-35 md:w-50 h-55 md:h-70 select-none lg:mr-auto rotate-z-10 rounded-2xl border-4 border-accent-red z-50"
+      >
+        <img
+          src="https://images.unsplash.com/vector-1762518230619-bc7bac12ae47?q=80&w=627&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt=""
+          class="w-full h-full object-cover rounded-2xl"
+        />
       </div>
+      <p
+        class="uppercase text-[#1c1c1e] text-[0.675rem] font-OpenSans font-extrabold text-right lg:text-left"
+      >
+        2
+        <span
+          class="inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e]"
+        ></span>
+        doesn't start with a
+        <br />
+        <span class="text-accent-red text-3xl xl:text-[3.5rem] tracking-[0.2rem]">degree.</span>
+      </p>
     </div>
-    <div
-      #bottomOverlay
-      class="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none will-change-transform"
-    >
-      <div class="flex flex-col items-center justify-center gap-20 p-8 pt-0 text-left">
-        <div
-          class="w-65 md:w-55 h-75 select-none -rotate-z-10 rounded-2xl border-4 border-secondary z-50"
-        >
-          <img
-            src="https://images.unsplash.com/vector-1767330127364-a7afcf7a8936?q=80&w=628&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt=""
-            class="w-full h-full object-cover rounded-2xl"
-          />
-        </div>
-        <p
-          class="uppercase text-[#1c1c1e] text-[0.675rem] tracking-[0.2rem] font-OpenSans font-extrabold mb-0"
-        >
-          <span
-            class="inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e]"
-          ></span>
-          it starts with a
-          <br />
-          <span class="text-accent-red text-3xl xl:text-[3.5rem]">decision.</span>
-        </p>
+  </div>
+  <div
+    #bottomOverlay
+    class="absolute bottom-40 lg:bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none will-change-transform"
+  >
+    <div class="flex flex-col items-center justify-center gap-30 lg:gap-20 p-8 pt-0 text-left">
+      <div
+        class="w-35 md:w-55 h-55 md:h-75 select-none -rotate-z-10 rounded-2xl border-4 border-secondary z-50"
+      >
+        <img
+          src="https://images.unsplash.com/vector-1767330127364-a7afcf7a8936?q=80&w=628&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt=""
+          class="w-full h-full object-cover rounded-2xl"
+        />
       </div>
+      <p
+        class="uppercase text-[#1c1c1e] text-[0.675rem] font-OpenSans font-extrabold mb-0"
+      >
+      3
+        <span
+          class="inline-block w-[0.1rem] h-[0.1rem] bg-accent-red border-2 border-[#1c1c1e]"
+        ></span>
+        it starts with a
+        <br />
+        <span class="text-accent-red text-3xl xl:text-[3.5rem] tracking-[0.2rem]">decision.</span>
+      </p>
     </div>
-  }
+  </div>
 </div>

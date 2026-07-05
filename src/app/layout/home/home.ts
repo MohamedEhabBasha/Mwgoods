@@ -9,10 +9,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import * as THREE from 'three';
+
 import { HomeIntro } from './home-intro/home-intro';
 import { HomeHero } from './home-hero/home-hero';
-import * as THREE from 'three';
 import { ThreejsSceneService } from '../../core/services/threejs-scene';
 import { HPHeader } from './home-process/hp-header/hp-header';
 import { HPStepsShowcase } from './home-process/hp-steps-showcase/hp-steps-showcase';
@@ -20,8 +20,7 @@ import { HpChainBullets } from './home-process/hp-chain-bullets/hp-chain-bullets
 import { HpSlidingImages } from './home-process/hp-sliding-images/hp-sliding-images';
 import { HomeCta } from './home-cta/home-cta';
 import { ScrollTriggerReadyService } from '../../core/services/scroll-trigger-ready';
-
-gsap.registerPlugin(ScrollTrigger);
+import { HomeProductsShowcase } from "./home-products-showcase/home-products-showcase";
 
 @Component({
   selector: 'app-home',
@@ -33,18 +32,20 @@ gsap.registerPlugin(ScrollTrigger);
     HpChainBullets,
     HpSlidingImages,
     HomeCta,
-  ],
+    HomeProductsShowcase
+],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements AfterViewInit, OnInit {
   private readyService = inject(ScrollTriggerReadyService);
-  
+
   private canvasService = inject(ThreejsSceneService);
 
   private scrollContainer__one = viewChild.required<ElementRef>('scrollContainer__one');
   private webglCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('webglCanvas');
-  private webglCanvasContainer = viewChild.required<ElementRef<HTMLElement>>('webglCanvasContainer');
+  private webglCanvasContainer =
+    viewChild.required<ElementRef<HTMLElement>>('webglCanvasContainer');
 
   /* MAIN SECTIONS */
   private heroSection = viewChild.required<HomeHero>(HomeHero);
@@ -57,6 +58,7 @@ export class Home implements AfterViewInit, OnInit {
     'processSectionScrollContainer',
   );
   private ctaSection = viewChild.required<HomeCta>(HomeCta);
+  private productsShowcaseSection = viewChild.required<HomeProductsShowcase>(HomeProductsShowcase);
 
   public screenWidth = signal<number>(0);
 
@@ -81,6 +83,8 @@ export class Home implements AfterViewInit, OnInit {
 
     this.animate_processSection();
 
+    this.productsShowcaseSection().scrollAnimation();
+
     this.ctaSection().scrollAnimation();
 
     this.readyService.signal();
@@ -93,9 +97,8 @@ export class Home implements AfterViewInit, OnInit {
       scrollTrigger: {
         trigger: scrollContainer__one,
         start: 'top top',
-        end: '+=150%',
+        end: '+=200%',
         scrub: 1.5,
-        /* snap: 0.5, */
         pin: true,
         pinSpacing: true,
         anticipatePin: 1,
@@ -106,7 +109,6 @@ export class Home implements AfterViewInit, OnInit {
     if (window.innerWidth >= 1024 && window.innerWidth < 1280) {
       //scrollContanierOne__Tl.to(this.webglCanvasContainer().nativeElement, {zIndex: 10});
     } else if (window.innerWidth >= 1280) {
-      //this.renderer.setStyle(this.webglCanvasContainer().nativeElement, 'z-index', '10');
       // 3. Listen to the shared service stream safely
       this.canvasService.modelLoaded$.subscribe((vase: THREE.Group) => {
         scrollContanierOne__Tl
@@ -115,9 +117,9 @@ export class Home implements AfterViewInit, OnInit {
             { x: 0, y: -1, z: 0, duration: 0.8, ease: 'power1.inOut', delay: 1 },
             0,
           )
-          .to(vase.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 0.8, ease: 'power1.inOut' }, '<')
+          .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power1.inOut' }, '<')
           .to(vase.rotation, { x: -Math.PI / 8, duration: 0.8, ease: 'power1.inOut' }, '<')
-          .to(this.canvasService.canvasContainer, {zIndex: 10}, '<');
+          .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');
       });
     }
 
