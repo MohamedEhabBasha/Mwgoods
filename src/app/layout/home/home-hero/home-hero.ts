@@ -63,6 +63,7 @@ export class HomeHero {
     });
 
     const tl = gsap.timeline({
+      paused: true,
       defaults: { ease: 'power4.inOut', duration: 1.6 },
     });
 

@@ -96,7 +96,7 @@ export class HomeCta {
     afterNextRender(() => {
       if (!isPlatformBrowser(this.platformId)) return;
       this.cacheElements();
-      this.scrollAnimation();
+      //this.scrollAnimation();
 
       this.destroyRef.onDestroy(() => {
         this.scrollTimeline?.kill();

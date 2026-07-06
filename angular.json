@@ -59,6 +59,9 @@
             },
             "development": {
               "buildTarget": "mega-project:build:development"
+            },
+            "options": {
+              "hmr": false
             }
           },
           "defaultConfiguration": "development"

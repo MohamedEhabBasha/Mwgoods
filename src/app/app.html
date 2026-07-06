@@ -1,3 +1,7 @@
+@if (showPreloader()) {
+  <app-preloader (finished)="onPreloaderFinished()" />
+}
+
 <app-navbar></app-navbar>
 
 <main>

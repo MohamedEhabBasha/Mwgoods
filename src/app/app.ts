@@ -5,15 +5,20 @@ import { Footer } from './layout/footer/footer';
 import { filter, skip, take } from 'rxjs';
 import { ScrollTriggerReadyService } from './core/services/scroll-trigger-ready';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Preloader } from './layout/preloader/preloader';
+import { PreLoaderReady } from './core/services/pre-loader-ready';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, Navbar],
+  imports: [RouterOutlet, Footer, Navbar, Preloader],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App implements AfterViewInit, OnInit {
   protected readonly title = signal('mega-project');
+  protected readonly showPreloader = signal(true);
+  private readonly preloaderReady = inject(PreLoaderReady);
+
   private footer = viewChild.required<Footer>(Footer);
   private router = inject(Router);
   private readyService = inject(ScrollTriggerReadyService);
@@ -25,9 +30,11 @@ export class App implements AfterViewInit, OnInit {
         take(1), // exactly once
       )
       .subscribe(() => {
+      requestAnimationFrame(() => {
         this.footer().footerAnimation();
         this.footer().initLinkScramble();
         ScrollTrigger.refresh();
+      });
       });
   }
 
@@ -41,7 +48,9 @@ export class App implements AfterViewInit, OnInit {
         ScrollTrigger.refresh();
       });
   }
-
-  ngAfterViewInit(): void {
+  protected onPreloaderFinished(): void {
+    this.showPreloader.set(false);
+    this.preloaderReady.signal();
   }
+  ngAfterViewInit(): void {}
 }
