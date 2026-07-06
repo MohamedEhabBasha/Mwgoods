@@ -57,7 +57,7 @@ export class SceneManager {
     const loader = new GLTFLoader();
 
     loader.load(
-      'home/vase.glb',
+      'home/vase.compressed.glb',
       (gltf) => {
         this.vaseMesh = gltf.scene;
 

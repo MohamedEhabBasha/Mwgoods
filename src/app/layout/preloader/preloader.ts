@@ -39,7 +39,7 @@ export class Preloader {
   protected readonly displayPercent = signal(0);
 
   /** Floor so the animation always feels intentional, even on instant loads. */
-  private static readonly MIN_DURATION = 4.1;
+  private static readonly MIN_DURATION = 1.1;
   /** Ceiling so a slow network never turns this into a stall-feeling wait. */
   private static readonly MAX_DURATION = 4.5;
 

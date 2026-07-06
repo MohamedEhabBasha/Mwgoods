@@ -31,7 +31,7 @@ export class HomeCta {
   private rightImgEls = viewChildren<ElementRef<HTMLDivElement>>('rightImg');
 
   // ---- Static data ----
-  readonly words = ['JOIN', 'WORLD-CLASS', 'TOP', 'ACHIEVERS'] as const;
+  readonly words = ['find', 'your', 'next', 'peak'] as const;
 
   readonly left_images = [
     {

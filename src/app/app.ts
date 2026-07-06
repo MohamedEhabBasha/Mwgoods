@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, inject, OnInit, signal, viewChild } from '@angular/core';
+import {
+  afterNextRender,
+  AfterViewInit,
+  Component,
+  inject,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Navbar } from './layout/navbar/navbar';
 import { Footer } from './layout/footer/footer';
@@ -24,17 +32,21 @@ export class App implements AfterViewInit, OnInit {
   private readyService = inject(ScrollTriggerReadyService);
 
   constructor() {
+    afterNextRender(() => {
+      window.scrollTo(0, 0);
+    });
+
     this.readyService
       .onReady$()
       .pipe(
         take(1), // exactly once
       )
       .subscribe(() => {
-      requestAnimationFrame(() => {
-        this.footer().footerAnimation();
-        this.footer().initLinkScramble();
-        ScrollTrigger.refresh();
-      });
+        requestAnimationFrame(() => {
+          this.footer().footerAnimation();
+          this.footer().initLinkScramble();
+          ScrollTrigger.refresh();
+        });
       });
   }
 

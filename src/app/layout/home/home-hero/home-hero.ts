@@ -91,18 +91,44 @@ export class HomeHero {
         { y: 0, opacity: 1, stagger: 0.05, duration: 1.3, ease: 'power3.out' },
         '-=0.9',
       );
-    const activeDashes = [this.leftDash().nativeElement, this.rightDash().nativeElement].filter(
-      (el) => el.offsetWidth > 0,
-    );
+    const leftEl = this.leftDash()?.nativeElement;
+    const rightEl = this.rightDash()?.nativeElement;
 
-    // Only build the animation path if the screen size is large enough to render them
-    if (activeDashes.length > 0) {
-      tl.fromTo(
-        activeDashes,
-        { scaleX: 0, opacity: 0 },
-        { scaleX: 1, opacity: 1, duration: 1.4, ease: 'power4.out', stagger: 0.1 },
-        '-=1.1',
-      );
+    const isLeftVisible = leftEl && leftEl.offsetWidth > 0;
+    const isRightVisible = rightEl && rightEl.offsetWidth > 0;
+
+    if (isLeftVisible || isRightVisible) {
+      if (isLeftVisible && isRightVisible) {
+        // Both dashes are active: Animate left first, then stagger right right after it
+        tl.fromTo(
+          leftEl,
+          { scaleX: 0, opacity: 0, transformOrigin: 'right center' }, // Grows right-to-left
+          { scaleX: 1, opacity: 1, duration: 1.4, ease: 'power4.out' },
+          '-=1.1',
+        );
+        tl.fromTo(
+          rightEl,
+          { scaleX: 0, opacity: 0, transformOrigin: 'left center' }, // Grows left-to-right
+          { scaleX: 1, opacity: 1, duration: 1.4, ease: 'power4.out' },
+          '<0.1', // Emulates the 0.1s stagger delay
+        );
+      } else if (isLeftVisible) {
+        // Only left is visible
+        tl.fromTo(
+          leftEl,
+          { scaleX: 0, opacity: 0, transformOrigin: 'right center' },
+          { scaleX: 1, opacity: 1, duration: 1.4, ease: 'power4.out' },
+          '-=1.1',
+        );
+      } else if (isRightVisible) {
+        // Only right is visible
+        tl.fromTo(
+          rightEl,
+          { scaleX: 0, opacity: 0, transformOrigin: 'left center' },
+          { scaleX: 1, opacity: 1, duration: 1.4, ease: 'power4.out' },
+          '-=1.1',
+        );
+      }
     }
 
     return tl;
