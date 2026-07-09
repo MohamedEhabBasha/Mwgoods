@@ -1,0 +1,216 @@
+<main class="min-h-screen">
+  <!-- Hero (stacked layer 1, pinned) -->
+  <div #stackWrapper class="relative lg:h-[200svh]">
+    <section
+      #stackPanel
+      class="relative lg:sticky lg:top-0 h-screen lg:h-svh w-full overflow-hidden"
+    >
+      <app-pixi-web [squareSize]="50" [thickness]="1.5" class="pointer-events-none"></app-pixi-web>
+      <h1
+        #headerText
+        class="absolute bottom-10 left-10 py-2 text-4xl md:text-6xl lg:text-7xl xl:text-[6.5rem] font-black leading-[0.85] uppercase tracking-tighter text-stone-900"
+      >
+        Community
+      </h1>
+    </section>
+  </div>
+
+  <!-- Section 1 -->
+  <div #stackWrapper class="relative lg:h-[280svh]">
+    <section
+      #stackPanel
+      class="relative lg:sticky lg:top-0 flex h-screen lg:h-svh w-full items-center justify-center overflow-hidden"
+    >
+      <div
+        class="absolute top-0 left-0 flex h-full w-full items-center px-8 lg:px-24 pointer-events-none z-50"
+      >
+        <div class="max-w-2xl">
+          <h2
+            #header
+            class="text-5xl lg:text-7xl font-medium leading-[0.95] tracking-tight text-black pointer-events-auto"
+          >
+            Confidence through
+            <br />
+            <span class="text-accent-red">Conversation.</span>
+          </h2>
+
+          <p
+            #paragraph
+            class="mt-8 max-w-lg text-lg lg:text-xl leading-relaxed text-black/70 pointer-events-auto"
+          >
+            Chat directly with the people behind every fragrance. Ask questions, hear their story,
+            and discover what makes each scent truly special before you choose.
+          </p>
+        </div>
+      </div>
+
+      <div class="absolute top-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center">
+        <div class="absolute inset-0 bg-white lg:bg-white/40"></div>
+        <img
+          src="community/community-5.avif"
+          alt="chatting"
+          class="w-full h-full object-contain mt-25"
+        />
+      </div>
+    </section>
+  </div>
+
+  <!-- Section 2 -->
+  <div #stackWrapper class="relative lg:h-[280svh]">
+    <section
+      #stackPanel
+      class="relative lg:sticky lg:top-0 flex h-screen lg:h-svh w-full items-center justify-center overflow-hidden"
+    >
+      <div
+        class="absolute top-0 left-0 flex h-full w-full items-center px-8 lg:px-24 pointer-events-none z-50"
+      >
+        <div class="max-w-2xl">
+          <h2
+            #header
+            class="text-5xl lg:text-7xl font-medium leading-[0.95] tracking-tight text-black pointer-events-auto"
+          >
+            Every Review
+            <br />
+            <span class="text-accent-red">Builds Trust.</span>
+          </h2>
+
+          <p
+            #paragraph
+            class="mt-8 max-w-lg text-lg lg:text-xl leading-relaxed text-black/70 pointer-events-auto"
+          >
+            Read honest reviews from people who have already experienced the product. Every rating
+            and comment helps you shop with confidence.
+          </p>
+        </div>
+      </div>
+
+      <div class="absolute top-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center">
+        <div class="absolute inset-0 bg-white lg:bg-white/40"></div>
+        <img
+          src="community/community-6.avif"
+          alt="chatting"
+          class="w-full h-full object-contain mt-35"
+        />
+      </div>
+    </section>
+  </div>
+
+  <!-- Section 3 -->
+  <div #stackWrapper class="relative lg:h-[280svh]">
+    <section
+      #stackPanel
+      class="relative lg:sticky lg:top-0 flex h-screen lg:h-svh w-full items-center justify-center overflow-hidden"
+    >
+      <div
+        class="absolute top-0 left-0 flex h-full w-full items-center px-8 lg:px-24 pointer-events-none z-50"
+      >
+        <div class="max-w-2xl">
+          <h2
+            #header
+            class="text-5xl lg:text-7xl font-medium leading-[0.95] tracking-tight text-black pointer-events-auto"
+          >
+            Shared
+            <br />
+            <span class="text-accent-red">Legacy.</span>
+          </h2>
+
+          <p
+            #paragraph
+            class="mt-8 max-w-lg text-lg lg:text-xl leading-relaxed text-black/70 pointer-events-auto"
+          >
+            Beyond the buy, your product becomes a story. Shared, debated, and celebrated by a
+            global network of enthusiasts.
+          </p>
+        </div>
+      </div>
+
+      <div class="absolute top-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center">
+        <div class="absolute inset-0 bg-white lg:bg-white/40"></div>
+        <img
+          src="community/community-7.avif"
+          alt="chatting"
+          class="w-full h-full object-contain mt-25 mr-5"
+        />
+      </div>
+    </section>
+  </div>
+
+  <!-- Section 4 -->
+  <div #stackWrapper #vaseSettleWrapper class="relative lg:h-[280svh]">
+    <section
+      #stackPanel
+      class="relative lg:sticky lg:top-0 flex h-screen lg:h-svh w-full items-center justify-center overflow-hidden bg-transparent"
+    >
+      <div class="mr-auto ml-10 mb-30 lg:mb-0 z-10">
+        <app-square-label text="MW" [size]="6" color="#dc2626" textColor="#0c0a09" />
+      </div>
+      <div class="ml-auto mr-10 mb-30 lg:mb-0 z-10">
+        <app-square-label
+          text="Goods"
+          [size]="6"
+          color="#dc2626"
+          textColor="#0c0a09"
+          align="right"
+        />
+      </div>
+      <div class="-z-1">
+        <app-pixi-web [squareSize]="50" [thickness]="1.5"></app-pixi-web>
+      </div>
+      <div
+        class="absolute top-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center -z-10"
+      >
+        <img
+          src="community/products-bck.avif"
+          alt="chatting"
+          class="w-full h-full object-contain"
+        />
+      </div>
+
+      <p
+        #header
+        class="absolute inset-x-0 bottom-10 lg:bottom-5 z-10 mx-auto max-w-xl px-6 text-center text-lg lg:text-2xl font-medium leading-snug tracking-tight text-stone-900"
+      >
+        This is community — every conversation, review, and story becomes part of the collection.
+      </p>
+    </section>
+  </div>
+
+  <!-- Section 5 (transition buffer — slides up while section 4 is still
+       pinned; gives the fixed vase canvas a clean, opaque backdrop to
+       finish fading behind before the footer appears) -->
+  <div #stackWrapper class="relative lg:h-[180svh]">
+    <section
+      #stackPanel
+      class="relative lg:sticky lg:top-0 flex h-screen lg:h-svh w-full items-center justify-center overflow-hidden bg-[#333]"
+    >
+      <p
+        #header
+        class="max-w-2xl px-6 text-center text-3xl lg:text-5xl font-medium leading-tight tracking-tight text-stone-100 z-10"
+      >
+        The community keeps writing the next chapter.
+      </p>
+      <div class="absolute inset-0 bg-secondary/20 lg:hidden z-5"></div>
+      <div
+        class="absolute top-1/2 left-[-30%] lg:left-[-10%] -translate-y-1/2 w-full lg:w-1/2 h-full flex items-center justify-center"
+      >
+        <img
+          src="community/community-8-left.avif"
+          alt="happy"
+          class="w-full h-full object-contain lg:mt-25 mr-5"
+        />
+      </div>
+      <div
+        class="absolute top-1/2 right-[-30%] lg:right-[-10%] -translate-y-1/2 w-full lg:w-1/2 h-full flex items-center justify-center"
+      >
+        <img
+          src="community/community-8-right.avif"
+          alt="happy"
+          class="w-full h-full object-contain lg:mt-25 mr-5"
+        />
+      </div>
+      <div class="absolute bottom-[10%] z-50">
+        <app-orbital-button text="Register" color="#d32f2f"></app-orbital-button>
+      </div>
+    </section>
+  </div>
+</main>

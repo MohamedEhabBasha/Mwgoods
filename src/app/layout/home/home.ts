@@ -8,10 +8,10 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { gsap } from 'gsap';
+import type { Group } from 'three';
 import { take } from 'rxjs';
-import * as THREE from 'three';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HomeIntro } from './home-intro/home-intro';
 import { HomeHero } from './home-hero/home-hero';
@@ -52,9 +52,6 @@ export class Home {
   private readonly canvasService = inject(ThreejsSceneService);
 
   private readonly scrollContainer__one = viewChild.required<ElementRef>('scrollContainer__one');
-  private readonly webglCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('webglCanvas');
-  private readonly webglCanvasContainer =
-    viewChild.required<ElementRef<HTMLElement>>('webglCanvasContainer');
 
   /* MAIN SECTIONS */
   private readonly heroSection = viewChild.required<HomeHero>(HomeHero);
@@ -74,6 +71,7 @@ export class Home {
 
   private masterTl?: gsap.core.Timeline;
   private heroTl?: gsap.core.Timeline;
+  private scrollContanierOne__Tl?: gsap.core.Timeline;
 
   public readonly screenWidth = signal(typeof window !== 'undefined' ? window.innerWidth : 0);
 
@@ -81,8 +79,10 @@ export class Home {
     afterNextRender(() => this.initHome());
 
     this.destroyRef.onDestroy(() => {
+      console.log('Home component destroyed, killing timelines');
       this.masterTl?.kill();
       this.heroTl?.kill();
+      this.scrollContanierOne__Tl?.kill();
     });
   }
 
@@ -91,10 +91,6 @@ export class Home {
   }
 
   private initHome(): void {
-    const canvasElement = this.webglCanvas().nativeElement;
-    this.canvasService.initialize(canvasElement, this.webglCanvasContainer().nativeElement);
-
-    // Hero entrance is built now (so Three.js/GSAP are warm and ready to
     // play instantly) but held paused until the preloader is gone.
     this.heroTl = this.heroSection().createHeroAnimationTimeline();
     //this.heroTl.pause();
@@ -123,7 +119,7 @@ export class Home {
   private animate_heroIntro_sections() {
     const scrollContainer__one = this.scrollContainer__one().nativeElement;
 
-    const scrollContanierOne__Tl = gsap.timeline({
+    this.scrollContanierOne__Tl = gsap.timeline({
       scrollTrigger: {
         trigger: scrollContainer__one,
         start: 'top top',
@@ -139,18 +135,22 @@ export class Home {
     if (this.screenWidth() >= 1280) {
       this.canvasService.modelLoaded$
         .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-        .subscribe((vase: THREE.Group) => {
-          scrollContanierOne__Tl
-            .to(vase.position, { x: 0, y: -1, z: 0, duration: 0.8, ease: 'power1.inOut', delay: 1 }, 0)
+        .subscribe((vase: Group) => {
+          this.scrollContanierOne__Tl!
+            .to(
+              vase.position,
+              { x: 0, y: -1, z: 0, duration: 0.8, ease: 'power1.inOut', delay: 1 },
+              0,
+            )
             .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power1.inOut' }, '<')
             .to(vase.rotation, { x: -Math.PI / 8, duration: 0.8, ease: 'power1.inOut' }, '<')
             .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');
         });
     }
 
-    scrollContanierOne__Tl.add(this.introSection().createIntroAnimationTimeline());
+    this.scrollContanierOne__Tl.add(this.introSection().createIntroAnimationTimeline());
 
-    return scrollContanierOne__Tl;
+    return this.scrollContanierOne__Tl;
   }
 
   private animate_processSection(): void {

@@ -67,6 +67,7 @@
                   [routerLink]="link.path"
                   class="title-item cursor-pointer py-4 md:py-5 transition-opacity duration-100"
                   (mouseenter)="setImageRevealActiveIndex($index)"
+                  (click)="onNavLinkClick()"
                 >
                   <div class="text-white uppercase text-2xl md:text-3xl font-semibold block">
                     {{ link.label }}

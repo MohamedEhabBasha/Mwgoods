@@ -15,10 +15,11 @@ import { ScrollTriggerReadyService } from './core/services/scroll-trigger-ready'
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Preloader } from './layout/preloader/preloader';
 import { PreLoaderReady } from './core/services/pre-loader-ready';
+import { ThreeCanvasHost } from "./shared/components/three-canvas-host/three-canvas-host";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, Navbar, Preloader],
+  imports: [RouterOutlet, Footer, Navbar, Preloader, ThreeCanvasHost],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

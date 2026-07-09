@@ -1,19 +1,19 @@
-import { ElementRef, Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { SceneManager } from '../../layout/home/threejs-hero-scene/scene-manager';
-import * as THREE from 'three';
-import { Subject, BehaviorSubject, filter, take } from 'rxjs';
+import type { Group } from 'three';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ThreejsSceneService implements OnDestroy{
+export class ThreejsSceneService implements OnDestroy {
   private sceneManager!: SceneManager;
   private isInitialized$ = new BehaviorSubject<boolean>(false);
   public canvasContainer!: HTMLElement;
 
   // Expose an observable hook so child layouts know precisely when the asset is ready
-  public modelLoaded$ = new Subject<THREE.Group>();
-  private loadedModel: THREE.Group | null = null;
+  public modelLoaded$ = new ReplaySubject<Group>();
+  private loadedModel: Group | null = null;
 
   /**
    * Called ONCE by the parent Home element to mount the canvas element
@@ -28,16 +28,18 @@ export class ThreejsSceneService implements OnDestroy{
     this.isInitialized$.next(true);
 
     // Bind your Model Load tracking hook
-    this.sceneManager.onModelLoaded((model: THREE.Group) => {
+    this.sceneManager.onModelLoaded((model: Group) => {
       this.loadedModel = model;
       this.modelLoaded$.next(model);
     });
   }
-
+  public setRenderingEnabled(enabled: boolean): void {
+    this.sceneManager?.setRenderingEnabled(enabled);
+  }
   /**
    * Safe getter utility for child components to grab model data synchronously if already cached
    */
-  public getModel(): THREE.Group | null {
+  public getModel(): Group | null {
     return this.loadedModel;
   }
 
@@ -56,9 +58,6 @@ export class ThreejsSceneService implements OnDestroy{
     return (vwPercentage / 100) * totalThreeWidth - totalThreeWidth / 2;
   }
 
-  /**
-   * Handles total execution cleanup when leaving the Home component shell
-   */
   ngOnDestroy(): void {
     if (this.sceneManager) {
       this.sceneManager.setupCleanup();
