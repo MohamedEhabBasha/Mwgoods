@@ -1,0 +1,54 @@
+:host {
+  display: block;
+}
+
+/* Upside-down trapezoid: full width at the top, tapering inward at the
+   bottom. Flush against the top of the section (m-0 on the heading, no
+   padding above it in the markup). */
+.faq-trapezoid {
+  clip-path: polygon(0% 0%, 100% 0%, 82% 100%, 18% 100%);
+}
+
+/* Smooth height animation without measuring JS heights. */
+.faq-answer-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.faq-answer-inner {
+  overflow: hidden;
+}
+
+/* Red accent line: grows in to mark the currently open question. */
+.faq-accent {
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* "+" morphs into "−" by fading and rotating the vertical stroke. */
+.faq-icon-v {
+  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.35s ease;
+}
+
+.faq-item.is-open .faq-answer-wrapper {
+  grid-template-rows: 1fr;
+}
+
+.faq-item.is-open .faq-accent {
+  transform: scaleY(1);
+}
+
+.faq-item.is-open .faq-icon-v {
+  transform: rotate(90deg);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-answer-wrapper,
+  .faq-accent,
+  .faq-icon-v {
+    transition: none;
+  }
+}

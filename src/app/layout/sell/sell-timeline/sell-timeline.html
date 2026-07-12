@@ -1,0 +1,97 @@
+<section #timeline class="relative block h-[400vh] bg-white">
+  <!-- progress line -->
+  <svg
+    class="pointer-events-none absolute left-1/2 top-0 h-full w-1.5 -translate-x-1/2"
+    preserveAspectRatio="none"
+  >
+    <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#d0d0d0" stroke-width="2" stroke-linecap="round" />
+    <line
+      #progressLine
+      x1="50%"
+      y1="0"
+      x2="50%"
+      y2="100%"
+      stroke="#d32f2f"
+      stroke-width="2"
+      stroke-linecap="round"
+    />
+  </svg>
+
+  <!-- dot anchors -->
+  <div class="relative flex h-full flex-col items-center justify-around">
+    @for (_ of dots; track $index) {
+      <div
+        #dot
+        [attr.data-index]="$index"
+        class="relative h-3.5 w-3.5 rounded-full bg-neutral-400
+               after:absolute after:-inset-1.5 after:rounded-full after:bg-accent-red
+               after:opacity-(--glow,0) after:blur-[6px] after:transition-none after:content-['']"
+      ></div>
+    }
+  </div>
+
+  <!-- cards -->
+  <div class="absolute inset-0 z-10 flex flex-col items-center justify-around">
+    @for (step of steps; track $index) {
+      <article
+        #card
+        class="w-[80vw] min-h-[40vh] translate-y-10 scale-[0.96] overflow-hidden rounded-2xl p-8
+               opacity-0 transition-shadow duration-300 ease-[ease]
+               md:w-[35vw]
+               md:odd:translate-x-[-75%]
+               md:even:translate-x-[75%]"
+      >
+        <h5
+       class="card-title border-b border-accent-red py-3 text-3xl lg:text-5xl font-medium leading-[1.15] tracking-tight text-secondary pointer-events-auto"
+        >
+          Step {{ $index + 1 }}: {{ step.header }}
+        </h5>
+        <p class="card-body mt-8 max-w-lg text-lg lg:text-xl leading-relaxed text-secondary/60 pointer-events-auto">
+          {{ step.description }}
+        </p>
+      </article>
+    }
+  </div>
+
+  <!-- images: mirrored to the opposite side of each card -->
+  <div class="pointer-events-none absolute inset-0 z-10 hidden flex-col items-center justify-around md:flex">
+    @for (step of steps; track $index) {
+      <img
+        #image
+        [src]="step.image"
+        [alt]="step.header"
+        class="h-[40vh] w-[35vw] rounded-2xl object-cover
+               odd:translate-x-[75%]
+               even:translate-x-[-75%]"
+      />
+    }
+  </div>
+
+  <!-- curved decorative lines -->
+  <div class="absolute left-[-5%] md:left-0 top-[25%] flex w-full scale-105 items-center justify-center">
+    <svg id="sell-timeline-curve-1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="1632.67" height="720.954" class="opacity-60">
+      <path
+        id="sell-timeline-curve-1-path"
+        fill="none"
+        stroke="#d32f2f"
+        stroke-linecap="round"
+        stroke-miterlimit="10"
+        stroke-width="30"
+        d="M7.5 7.5s159.165 365.692 735.67 348.954 812.925 357 882 357"
+      />
+    </svg>
+  </div>
+  <div class="absolute left-[7%] top-[60%] flex w-full items-center justify-center">
+    <svg id="sell-timeline-curve-2" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="1432.083" height="990.3" class="opacity-60">
+      <path
+        id="sell-timeline-curve-2-path"
+        fill="none"
+        stroke="#d32f2f"
+        stroke-linecap="round"
+        stroke-miterlimit="10"
+        stroke-width="30"
+        d="M1417.083 15S955.152 255.839 530.555 247.77C-97.885 235.828-154.58 791.3 375.773 863.273c0 0 922.273 80.408 991.647 112.026"
+      />
+    </svg>
+  </div>
+</section>

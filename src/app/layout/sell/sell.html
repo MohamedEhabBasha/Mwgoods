@@ -1,11 +1,40 @@
 <main class="min-h-screen">
-  <section  class="relative h-screen w-full overflow-hidden">
-    <app-pixi-web [squareSize]="50" [thickness]="1.5" class="pointer-events-none"></app-pixi-web>
-    <h1
-      #headerText
-      class="absolute bottom-10 left-10 py-2 text-4xl md:text-6xl lg:text-7xl xl:text-[6.5rem] font-black leading-[0.85] uppercase tracking-tighter text-stone-900"
-    >
-      Sell
-    </h1>
+  <section #pinnedSection class="relative min-h-screen overflow-hidden">
+    <section class="relative h-screen w-full overflow-hidden">
+      <app-pixi-web [squareSize]="50" [thickness]="1.5" class="pointer-events-none"></app-pixi-web>
+      <h1
+        #headerText
+        class="absolute bottom-10 left-10 py-2 text-4xl md:text-6xl lg:text-7xl xl:text-[6.5rem] font-black leading-[0.85] uppercase tracking-tighter text-stone-900"
+      >
+        Sell
+      </h1>
+    </section>
+    <section #timelineHeader class="absolute inset-0 h-screen bg-white">
+      <h1
+        #sellingToolsHeader
+        class="absolute inset-x-10 bottom-10 flex items-baseline justify-between py-2 text-4xl md:text-6xl lg:text-7xl xl:text-[6.5rem] font-black leading-[0.85] uppercase tracking-tighter text-stone-900"
+      >
+        <span #sellingWord>Selling</span>
+        <span #toolsWord>Tools</span>
+      </h1>
+      <p
+        #sellingParagraph
+        class="absolute top-1/2 left-1/2 -translate-1/2 w-[80%] md:max-w-xl text-[0.5rem] md:text-[.9rem] font-black leading-relaxed tracking-[0.08rem] text-neutral-400 font-mono text-left normal-case"
+      >
+        <span class="opacity-0">------------------</span>
+
+        <span #sellingParagraphCopy>
+          Powerful yet intuitive tools help you manage every part of your selling journey. Organize
+          your inventory, showcase your products, engage with customers, and build trust—all from a
+          single, streamlined experience.
+        </span>
+      </p>
+    </section>
+  </section>
+  <section class="overflow-hidden">
+    <app-sell-timeline></app-sell-timeline>
+  </section>
+  <section class="overflow-hidden">
+    <app-sell-faq></app-sell-faq>
   </section>
 </main>

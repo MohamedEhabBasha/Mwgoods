@@ -1,0 +1,126 @@
+<section class="relative w-full bg-secondary text-white overflow-hidden">
+  <div
+    class="absolute top-[-1%] left-1/2 -translate-x-1/2 faq-trapezoid w-100 h-40 bg-white hidden xl:inline-block"
+    aria-hidden="true"
+  >
+    <svg
+      class="pointer-events-none absolute left-1/2 top-0 h-full w-1.5 -translate-x-1/2"
+      preserveAspectRatio="none"
+    >
+      <line
+        x1="50%"
+        y1="0"
+        x2="50%"
+        y2="100%"
+        stroke="#d0d0d0"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+      <line
+        #progressLine
+        x1="50%"
+        y1="0"
+        x2="50%"
+        y2="100%"
+        stroke="#d32f2f"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+    </svg>
+  </div>
+  <h2
+    #hero
+    class="hidden lg:flex lg:flex-col lg:items-center m-0 mt-10 text-xl lg:text-6xl xl:text-8xl"
+  >
+    <span class="flex items-center justify-between gap-8 xl:gap-10">
+      <span #frequentlyWord class="font-semibold tracking-tight whitespace-nowrap">Frequently</span>
+
+      <span class="opacity-0">-------------</span>
+
+      <span #askedWord class="font-semibold tracking-tight whitespace-nowrap">
+        Asked
+        <span class="text-accent-red font-mono text-[3rem]">>FAQ<</span>
+      </span>
+    </span>
+
+    <span #questionsWord class="mt-6 font-bold tracking-tight text-accent-red">Questions</span>
+  </h2>
+
+  <!-- Mobile heading: no rectangle, no split words, just a plain line -->
+  <h2
+    class="lg:hidden pt-16 sm:pt-20 px-6 text-2xl sm:text-3xl font-semibold text-center tracking-tight"
+  >
+    Frequently Asked
+    <span class="text-accent-red">Questions</span>
+  </h2>
+
+  <!-- Body -->
+  <div
+    class="relative max-w-7xl mx-auto px-6 sm:px-10 lg:px-20 pt-14 sm:pt-16 lg:pt-20 pb-20 sm:pb-24 lg:pb-28"
+  >
+    <!-- Background image: desktop only, absolutely centered on the right,
+         behind the questions (lower z-index) -->
+    <img
+      ngSrc="/sell/faq-sticker.avif"
+      width="480"
+      height="480"
+      priority
+      alt=""
+      class="hidden lg:block absolute top-1/2 right-0 xl:right-6 -translate-y-1/2 z-0 w-95 xl:w-115 h-auto object-contain pointer-events-none select-none"
+    />
+
+    <div class="absolute inset-0 w-full h-full bg-secondary/70 z-5"></div>
+
+    <!-- Questions: full width, layered above the image -->
+    <div class="relative z-10 w-full">
+      @for (item of faqs; track item.question; let i = $index) {
+        <div
+          class="faq-item relative border-b border-white/10 pl-5 sm:pl-6"
+          [class.is-open]="openIndex() === i"
+        >
+          <span
+            class="faq-accent absolute left-0 top-0 bottom-0 w-0.5 bg-accent-red"
+            aria-hidden="true"
+          ></span>
+
+          <button
+            type="button"
+            class="w-full flex items-center justify-between gap-5 sm:gap-8 py-6 sm:py-7 text-left group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-4 focus-visible:ring-offset-secondary rounded-sm"
+            (click)="toggle(i)"
+            [attr.aria-expanded]="openIndex() === i"
+            [attr.aria-controls]="'faq-panel-' + i"
+          >
+            <span
+              class="text-base sm:text-lg lg:text-xl font-medium leading-snug transition-colors duration-300 group-hover:text-accent-red"
+            >
+              {{ item.question }}
+            </span>
+
+            <span class="faq-icon relative shrink-0 w-6 h-6 sm:w-7 sm:h-7">
+              <span class="faq-icon-h absolute inset-0 flex items-center justify-center">
+                <span class="block w-3.5 sm:w-4 h-[1.5px] bg-white"></span>
+              </span>
+              <span class="faq-icon-v absolute inset-0 flex items-center justify-center">
+                <span class="block h-3.5 sm:h-4 w-[1.5px] bg-white"></span>
+              </span>
+            </span>
+          </button>
+
+          <div
+            class="faq-answer-wrapper"
+            [id]="'faq-panel-' + i"
+            [attr.aria-hidden]="openIndex() !== i"
+          >
+            <div class="faq-answer-inner">
+              <p
+                class="pb-6 sm:pb-7 pr-10 sm:pr-16 text-sm sm:text-base text-white/80 leading-relaxed"
+              >
+                {{ item.answer }}
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
