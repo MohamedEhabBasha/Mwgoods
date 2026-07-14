@@ -1,0 +1,6 @@
+/* Character perspective styling used by SplitText */
+.usr-char {
+  display: inline-block;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}

@@ -65,10 +65,6 @@ export class Community {
     this.createHeroAnimation();
     this.createContentAnimations();
     this.createStackedSectionsAnimation();
-
-    this.canvasService.modelLoaded$
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe((vase) => this.animateVase(vase));
   }
 
   private createHeroAnimation(): void {
@@ -254,6 +250,4 @@ export class Community {
         this.stackTimelines.push(tl);
       });
   }
-
-  private animateVase(vase: Group): void {}
 }

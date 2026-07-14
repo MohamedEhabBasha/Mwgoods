@@ -1,0 +1,43 @@
+<main class="min-h-screen">
+  <section #pinnedSection class="relative min-h-screen overflow-hidden">
+    <!-- Hero Page -->
+    <section class="relative h-screen w-full overflow-hidden">
+      <app-pixi-web [squareSize]="50" [thickness]="1.5" class="pointer-events-none"></app-pixi-web>
+      <h1
+        #headerText
+        class="absolute bottom-10 left-10 py-2 text-4xl md:text-6xl lg:text-7xl xl:text-[6.5rem] font-black leading-[0.85] uppercase tracking-tighter text-stone-900"
+      >
+        About
+      </h1>
+    </section>
+    <!-- First about Section -->
+    <section
+      #descriptionWrapper
+      class="absolute inset-0 flex justify-between items-center xl:items-start p-5 h-screen bg-white overflow-hidden about-desc-line"
+    >
+      <p
+        #leftParagraph
+        class="max-w-60 xl:max-w-110 text-[1rem] md:text-xl lg:text-xl xl:text-[2rem] font-black leading-[1.8] tracking-tighter text-stone-900"
+      >
+        <span class="text-4xl md:text-5xl lg:text-5xl xl:text-6xl">W</span>
+        e believe shopping shouldn't be a solitary activity. MWgoods is built to bring the "social"
+        back to social commerce. It's more than a place to add items to your cart—it's a digital
+        ecosystem where buyers, sellers, and enthusiasts come together to share ideas, exchange
+        recommendations, and discover products through talks.
+      </p>
+      <p
+        #rightParagraph
+        class="max-w-60 xl:max-w-110 text-[1rem] md:text-xl lg:text-xl xl:text-[2rem] font-black leading-[1.8] tracking-tighter text-stone-900"
+      >
+        <span class="text-4xl md:text-5xl lg:text-5xl xl:text-6xl">Y</span>
+        ou go to a site, click buy, and wait. We missed the feeling of going to the mall with
+        friends, asking for opinions, and meeting shop owners who care. That's why we built MWgoods.
+        We combined the inventory you love with the friends you trust. Shopping should feel less
+        like a transaction and more like a shared experience.
+      </p>
+    </section>
+  </section>
+
+  <app-about-mission></app-about-mission>
+  <app-about-user-stories></app-about-user-stories>
+</main>

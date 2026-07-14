@@ -1,0 +1,144 @@
+<section class="about-mission relative min-h-screen">
+  <!-- Tall wrapper pre-allocates scroll travel at parse time (replaces GSAP pin/pinSpacing) -->
+  <div class="mission-wrapper relative lg:h-[400vh]">
+    <div class="relative lg:sticky lg:top-0 min-h-screen w-full overflow-hidden bg-white">
+      <div class="relative flex flex-col lg:flex-row h-auto lg:h-screen">
+        <!-- Left Title Section -->
+        <div
+          #leftSection
+          class="lg:w-3/12 relative p-4 lg:p-10 flex items-end justify-start lg:h-full lg:bg-accent-red border-r"
+        >
+          <div class="bg-white absolute left-0 top-0 w-full h-1/2 hidden lg:block">
+            <div class="relative w-full h-full flex items-end z-50">
+              <img
+                src="/about/about-story-wave.avif"
+                alt="wave"
+                class="w-full h-auto object-contain"
+              />
+            </div>
+          </div>
+          <div class="mission-title-wrapper relative">
+            <h2
+              class="mission-title font-OpenSans text-[clamp(2.5rem,4vw,4rem)] leading-none lg:text-white font-extrabold"
+            >
+              Our
+              <br />
+              Story
+            </h2>
+          </div>
+        </div>
+
+        <!-- Right Content Panels Section -->
+        <div class="lg:w-9/12 relative lg:h-full lg:overflow-hidden">
+          <!-- Paragraph 1 -->
+          <div
+            class="ph-1 mission-paragraph relative h-auto lg:h-full flex flex-col items-start justify-end border-b border-black pl-4 pb-4"
+          >
+            <div class="max-w-2xl px-2 py-10 lg:p-5">
+              <h2
+                #header
+                class="text-3xl lg:text-5xl font-medium leading-[0.95] tracking-tight text-black pointer-events-auto"
+              >
+                {{ paragraphs[0] }}
+              </h2>
+              <p
+                #paragraph
+                class="mt-5 max-w-lg text-xs lg:text-[1rem] leading-relaxed text-black/70 pointer-events-auto"
+              >
+                Every marketplace starts with a transaction. MWgoods starts with people. Behind
+                every product is a story — a maker, a seller, a passion. We built MWgoods to give
+                those stories a place to live, not disappear behind a "Buy Now" button. This is
+                where selling becomes human again.
+              </p>
+            </div>
+
+            <!-- Wrapped Image 1 Container -->
+            <div
+              class="ph-1-img-1 absolute z-[-1] w-120 xl:w-160 h-auto aspect-square right-[-10%] bottom-[-10%] xl:bottom-[-20%]"
+            >
+              <img src="/about/about-story-1.avif" alt="" class="w-full h-full object-contain" />
+            </div>
+          </div>
+
+          <!-- Paragraph 2 -->
+          <div
+            class="ph-2 mission-paragraph relative h-auto lg:h-full flex flex-col items-start justify-end border-b border-black pl-4 pb-4"
+          >
+            <div class="max-w-2xl px-2 py-10 lg:p-5">
+              <h2
+                #header
+                class="text-3xl lg:text-5xl font-medium leading-[0.95] tracking-tight text-black pointer-events-auto font-orbitron"
+              >
+                {{ paragraphs[1] }}
+              </h2>
+              <p
+                #paragraph
+                class="mt-5 max-w-lg text-xs lg:text-[1rem] leading-relaxed text-black/70 pointer-events-auto"
+              >
+                Buying is easy. Trust is not. True confidence comes from asking questions, sharing
+                experiences, and hearing real voices. MWgoods turns reviews into conversations —
+                where feedback is honest, and decisions are informed. Here, trust grows through
+                dialogue.
+              </p>
+            </div>
+
+            <!-- Wrapped Image 1 Container -->
+            <div
+              class="ph-2-img-1 absolute z-[-1] w-120 xl:w-160 h-auto aspect-square right-[-10%] bottom-[-10%] xl:bottom-[-20%]"
+            >
+              <img src="/about/about-story-1.avif" alt="" class="w-full h-full object-contain" />
+            </div>
+            <!-- Wrapped Image 2 Container -->
+            <div
+              class="ph-2-img-2 absolute z-[-1] w-120 xl:w-160 h-auto aspect-square top-[-10%] left-[-10%]"
+            >
+              <img src="/about/about-story-2.avif" alt="" class="w-full h-full object-contain" />
+            </div>
+          </div>
+
+          <!-- Paragraph 3 -->
+          <div
+            class="ph-3 mission-paragraph relative h-auto lg:h-full flex flex-col items-start justify-end border-b border-black pl-4 pb-4"
+          >
+            <div class="max-w-2xl px-2 py-10 lg:p-5">
+              <h2
+                #header
+                class="text-3xl lg:text-5xl font-medium leading-[0.95] tracking-tight text-black pointer-events-auto font-orbitron"
+              >
+                {{ paragraphs[2] }}
+              </h2>
+              <p
+                #paragraph
+                class="mt-5 max-w-lg text-xs lg:text-[1rem] leading-relaxed text-black/70 pointer-events-auto"
+              >
+                When commerce and conversation unite, something new emerges. MWgoods is not just a
+                place to buy and sell — it's a space to share, learn, improve, and belong. Products
+                evolve through feedback. Communities grow through collaboration. And the marketplace
+                becomes a living system — shaped by the people within it.
+              </p>
+            </div>
+
+            <!-- Wrapped Image 1 Container -->
+            <div
+              class="ph-3-img-1 absolute z-[-1] w-120 xl:w-160 h-auto aspect-square right-[-10%] bottom-[-10%] xl:bottom-[-20%]"
+            >
+              <img src="/about/about-story-1.avif" alt="" class="w-full h-full object-contain" />
+            </div>
+            <!-- Wrapped Image 2 Container -->
+            <div
+              class="ph-3-img-2 absolute z-[-1] w-120 xl:w-160 h-auto aspect-square top-[-10%] left-[-10%]"
+            >
+              <img src="/about/about-story-2.avif" alt="" class="w-full h-full object-contain" />
+            </div>
+            <!-- Wrapped Image 3 Container -->
+            <div
+              class="ph-3-img-3 absolute z-[-1] w-80 h-auto aspect-square left-[50%] top-[50%] -translate-1/2"
+            >
+              <img src="/about/about-story-3.avif" alt="" class="w-full h-full object-contain" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

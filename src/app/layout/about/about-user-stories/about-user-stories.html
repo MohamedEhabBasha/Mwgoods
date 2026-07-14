@@ -1,0 +1,97 @@
+<section
+  #host
+  id="user-stories"
+  class="relative flex h-[170vh] w-full flex-col overflow-hidden bg-secondary"
+>
+  <div class="w-3/12 absolute top-[-5.2%] left-0 hidden lg:block">
+    <img src="/about/about-user-story-wave.avif" alt="" class="w-full object-contain">
+  </div>
+  <!-- Top row — right to left -->
+  <div
+    class="relative flex flex-1 items-center overflow-hidden"
+    style="
+      -webkit-mask-image: linear-gradient(to right, transparent, black 25%, black 75%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 25%, black 75%, transparent);
+    "
+  >
+    <!-- Padding matches the gap spacing to create a mathematically perfect loop without jumping -->
+    <div #topTrack class="flex w-max gap-20 pr-20 will-change-transform">
+      @for (story of topRow(); track story.id + '-top-' + $index) {
+        <ng-container
+          [ngTemplateOutlet]="cardTpl"
+          [ngTemplateOutletContext]="{ $implicit: story }"
+        />
+      }
+    </div>
+  </div>
+
+  <!-- Editorial Header -->
+  <div class="relative z-10 flex shrink-0 flex-col items-center justify-center py-14 md:py-20">
+    <div>
+      <!-- Centered subtitle with tight tracking -->
+      <div class="mr-auto">
+        <app-square-label text="User" [size]="6" color="#dc2626" textColor="#dc2626" />
+      </div>
+      <!-- Headline with Syne font and wide spacing -->
+      <h1
+        #headerEl
+        class="select-none font-OpenSans font-black uppercase text-white text-[11vw] leading-none sm:text-[8vw] lg:text-[6rem] lg:tracking-[3rem]"
+      >
+        Stories
+      </h1>
+    </div>
+  </div>
+
+  <!-- Bottom row — left to right -->
+  <div
+    class="relative flex flex-1 items-center overflow-hidden"
+    style="
+      -webkit-mask-image: linear-gradient(to right, transparent, black 25%, black 75%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 25%, black 75%, transparent);
+    "
+  >
+    <div #bottomTrack class="flex w-max gap-20 pr-20 will-change-transform">
+      @for (story of bottomRow(); track story.id + '-bottom-' + $index) {
+        <ng-container
+          [ngTemplateOutlet]="cardTpl"
+          [ngTemplateOutletContext]="{ $implicit: story }"
+        />
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Card Template -->
+<ng-template #cardTpl let-story>
+  <article
+    class="flex w-72 shrink-0 flex-col gap-4 rounded-2xl border border-accent-red bg-[#333333] p-6 shadow-2xl sm:w-80 sm:p-8"
+  >
+    <div class="flex items-center gap-4">
+      <!-- High-resolution portrait image instead of plain letter icons -->
+      <div
+        class="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-accent-red/40 bg-accent-red"
+      >
+        <img
+          [src]="story.portrait"
+          [alt]="story.name"
+          class="h-full w-full object-cover grayscale transition-all duration-300 hover:grayscale-0"
+        />
+      </div>
+      <div class="min-w-0">
+        <p class="truncate font-semibold text-white">{{ story.name }}</p>
+        <p class="truncate text-sm text-white/60">{{ story.role }}</p>
+      </div>
+      <svg
+        class="ml-auto h-6 w-6 shrink-0 text-accent-red"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          d="M7 7c-2.2 0-4 1.8-4 4v6h6v-6H6.2C6.6 9.6 7.8 8.4 9 8V7H7Zm10 0c-2.2 0-4 1.8-4 4v6h6v-6h-2.8c.4-1.4 1.6-2.6 2.8-3V7h-2Z"
+        />
+      </svg>
+    </div>
+    <p class="text-sm leading-relaxed text-white/80">{{ story.quote }}</p>
+  </article>
+</ng-template>
