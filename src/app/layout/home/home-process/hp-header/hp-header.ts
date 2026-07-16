@@ -1,5 +1,4 @@
 import { Component, DestroyRef, ElementRef, inject, viewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
@@ -13,61 +12,72 @@ import { ThreejsSceneService } from '../../../../core/services/threejs-scene';
   styleUrl: './hp-header.css',
 })
 export class HPHeader {
+  private readonly hostEl: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
   private canvasService = inject(ThreejsSceneService);
   private storylineSvg = viewChild.required<ElementRef<HTMLElement>>('storylineSvg');
   private storylinePath = viewChild.required<ElementRef<SVGPathElement>>('storylinePath');
 
-  private vaseScrollTrigger?: ScrollTrigger;
-  private introScrollTrigger?: ScrollTrigger;
-  private vaseTimeline?: gsap.core.Timeline;
-  private introTimeline?: gsap.core.Timeline;
+  private ctx?: ReturnType<typeof gsap.context>;
   private splitHow?: SplitText;
   private splitStart?: SplitText;
   private splitTo?: SplitText;
 
+  // This component's OWN vase-position timeline, tracked locally so repeated
+  // onEnter/onLeaveBack firing (scrolling back and forth across the trigger
+  // boundary) kills only its own previous run — not anything else animating
+  // the same shared per-page vase instance. gsap.killTweensOf(vase.position)
+  // would kill Home's hero timeline's position tween too, since it targets
+  // the same object; a timeline instance's own .kill() only takes down its
+  // own children.
+  private vasePositionTl?: gsap.core.Timeline;
+
   constructor() {
     this.destroyRef.onDestroy(() => {
-      this.vaseScrollTrigger?.kill();
-      this.introScrollTrigger?.kill();
-      this.vaseTimeline?.kill();
-      this.introTimeline?.kill();
+      // Revert clears out all inner SplitTexts, ScrollTriggers and timelines instantly
+      this.ctx?.revert();
+      this.ctx = undefined;
+
       this.splitHow?.revert();
       this.splitStart?.revert();
       this.splitTo?.revert();
     });
   }
 
-  public initScrollAnimation(): void {
-    const splitHow = new SplitText('#animate-how', { type: 'chars' });
-    this.splitHow = splitHow;
+  /**
+   * Initializes the scroll animation choreography.
+   * Receives the unique route model instance as a parameter, avoiding any global subscription drift.
+   */
+  public initScrollAnimation(vase: THREE.Group): void {
+    this.ctx = gsap.context(() => {
+      const splitHow = new SplitText('#animate-how', { type: 'chars' });
+      this.splitHow = splitHow;
 
-    const splitStart = new SplitText('#animate-start', { type: 'chars' });
-    this.splitStart = splitStart;
+      const splitStart = new SplitText('#animate-start', { type: 'chars' });
+      this.splitStart = splitStart;
 
-    const splitTo = new SplitText('#animate-to', { type: 'chars' });
-    this.splitTo = splitTo;
+      const splitTo = new SplitText('#animate-to', { type: 'chars' });
+      this.splitTo = splitTo;
 
-    if (splitTo.chars.length < 2) return;
-    const letterT = splitTo.chars[0] as HTMLElement;
-    const letterO = splitTo.chars[1] as HTMLElement;
+      if (splitTo.chars.length < 2) return;
+      const letterT = splitTo.chars[0] as HTMLElement;
+      const letterO = splitTo.chars[1] as HTMLElement;
 
-    const svgContainer = this.storylineSvg().nativeElement;
-    const rawPath = this.storylinePath().nativeElement;
-    const totalPathLength = rawPath.getTotalLength();
+      const svgContainer = this.storylineSvg().nativeElement;
+      const rawPath = this.storylinePath().nativeElement;
+      const totalPathLength = rawPath.getTotalLength();
 
-    // 1. Setup global initial states
-    gsap.set(rawPath, {
-      strokeDasharray: totalPathLength,
-      strokeDashoffset: -totalPathLength,
-    });
-    gsap.set(svgContainer, { opacity: 0 });
-    gsap.set([letterO, letterT], { opacity: 0, scale: 0.5 });
+      // 1. Setup global initial states
+      gsap.set(rawPath, {
+        strokeDasharray: totalPathLength,
+        strokeDashoffset: -totalPathLength,
+      });
+      gsap.set(svgContainer, { opacity: 0 });
+      gsap.set([letterO, letterT], { opacity: 0, scale: 0.5 });
 
-    const cachedModel = this.canvasService.getModel();
-    if (cachedModel) {
+      // Directly hook triggers using the passed instance
       this.createBoundTriggers(
-        cachedModel,
+        vase,
         splitHow,
         splitStart,
         letterT,
@@ -75,23 +85,7 @@ export class HPHeader {
         svgContainer,
         rawPath,
       );
-      return;
-    }
-
-    // Fallback if model isn't ready yet
-    this.canvasService.modelLoaded$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((vase) =>
-        this.createBoundTriggers(
-          vase,
-          splitHow,
-          splitStart,
-          letterT,
-          letterO,
-          svgContainer,
-          rawPath,
-        ),
-      );
+    }, this.hostEl.nativeElement);
   }
 
   private createBoundTriggers(
@@ -103,47 +97,47 @@ export class HPHeader {
     svgContainer: HTMLElement,
     rawPath: SVGPathElement,
   ): void {
-    // 🏎️ Vase choreography — the 3D object is shared across sections, so it keeps
-    // responding on every enter/leave, exactly like before.
-    this.vaseScrollTrigger = ScrollTrigger.create({
+    ScrollTrigger.create({
       trigger: '#trigger-section',
       start: 'top 35%',
       invalidateOnRefresh: true,
 
       onEnter: () => {
+        this.vasePositionTl?.kill();
+
         const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-        this.vaseTimeline = tl;
+        this.vasePositionTl = tl;
 
         if (window.innerWidth >= 1024 && window.innerWidth < 1280) {
-          tl.to(vase.position, { x: 0, y: 4, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
-            .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power2.inOut' }, '<')
-            .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');
+          tl.to(vase.position, { x: 0, y: 4, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0).to(
+            this.canvasService.canvasContainer,
+            { zIndex: 10 },
+            '<',
+          );
         } else if (window.innerWidth >= 1280) {
-          tl.to(vase.position, { x: 0, y: 4.5, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
-            .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power2.inOut' }, '<');
+          tl.to(vase.position, { x: 0, y: 4.5, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0);
         }
       },
 
-      // ⚡ WHEN SCROLLING BACK UP: return the vase home, fast
       onLeaveBack: () => {
-        gsap.killTweensOf([vase.position, vase.scale, this.canvasService.canvasContainer]);
+        this.vasePositionTl?.kill();
 
         const tl = gsap.timeline({ defaults: { ease: 'power1.inOut' } });
-        this.vaseTimeline = tl;
+        this.vasePositionTl = tl;
 
         if (window.innerWidth >= 1024 && window.innerWidth < 1280) {
-          tl.to(vase.position, { x: 0, y: 2.5, z: 0, duration: 0.4 }, 0)
-            .set(this.canvasService.canvasContainer, { zIndex: 0 }, 0)
-            .to(vase.scale, { x: 2.4, y: 2.4, z: 2.4, duration: 0.8, ease: 'power2.inOut' }, '<');
+          tl.to(vase.position, { x: 0, y: 2.5, z: 0, duration: 0.4 }, 0).set(
+            this.canvasService.canvasContainer,
+            { zIndex: 0 },
+            0,
+          );
         } else if (window.innerWidth >= 1280) {
           tl.to(vase.position, { x: 0, y: -1, z: 0, duration: 0 }, 0);
         }
       },
     });
 
-    // ✨ Header text/SVG reveal — plays once, then this trigger kills itself.
-    // No onLeaveBack here: once it's revealed, it stays revealed.
-    this.introScrollTrigger = ScrollTrigger.create({
+    ScrollTrigger.create({
       trigger: '#trigger-section',
       start: 'top 35%',
       invalidateOnRefresh: true,
@@ -151,7 +145,6 @@ export class HPHeader {
 
       onEnter: () => {
         const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-        this.introTimeline = tl;
 
         const firstDuration = 0.4;
         const secondDuration = 0.6;

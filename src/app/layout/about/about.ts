@@ -9,19 +9,19 @@ import {
 import { PixiWeb } from '../../shared/components/pixi-web/pixi-web';
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ThreejsSceneService } from '../../core/services/threejs-scene';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { take } from 'rxjs';
 import { Group } from 'three';
-import { AboutMission } from "./about-mission/about-mission";
-import { AboutUserStories } from "./about-user-stories/about-user-stories";
+import { AboutMission } from './about-mission/about-mission';
+import { AboutUserStories } from './about-user-stories/about-user-stories';
+import { ScrollTriggerReadyService } from '../../core/services/scroll-trigger-ready';
 
-/** Must mirror the Tailwind `lg:`/`xl:` breakpoints used in the template. */
 const MD_MIN_WIDTH = 768;
 const LG_MIN_WIDTH = 1024;
 const XL_MIN_WIDTH = 1280;
 
-/** Px shift per "distance from middle line" step — tune to taste. */
 const MD_TRIANGLE_STEP_PX = 20;
 const LG_TRIANGLE_STEP_PX = 28;
 const XL_TRIANGLE_STEP_PX = 36;
@@ -36,7 +36,8 @@ type ParagraphSide = 'left' | 'right';
 })
 export class About {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly canvasService = inject(ThreejsSceneService);
+  private readonly sceneService = inject(ThreejsSceneService);
+  private readonly readyService = inject(ScrollTriggerReadyService);
 
   private headerText = viewChild.required<ElementRef<HTMLElement>>('headerText');
   private readonly pinnedSection = viewChild.required<ElementRef<HTMLElement>>('pinnedSection');
@@ -51,25 +52,57 @@ export class About {
   private heroSplit?: SplitText;
   private leftLinesSplit?: SplitText;
   private rightLinesSplit?: SplitText;
+  private mainTl?: ScrollTrigger;
+
+  private glbCtx?: gsap.Context;
 
   constructor() {
     afterNextRender(() => {
-      this.initAbout();
-      this.aboutMission().initAnimation();
-      this.aboutUserStories().initHeaderReveal();
+      const model = this.sceneService.spawnVaseInstance();
+      if (model) {
+        this.startAboutRouteAnimations(model);
+      } else {
+        // GLB still loading — try again once it's ready
+        this.sceneService.sourceReady$
+          .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+          .subscribe(() => {
+            const m = this.sceneService.spawnVaseInstance();
+            if (m) {
+              this.startAboutRouteAnimations(m);
+            }
+          });
+      }
     });
 
     this.destroyRef.onDestroy(() => {
+      this.glbCtx?.revert();
       this.heroSplit?.revert();
       this.leftLinesSplit?.revert();
       this.rightLinesSplit?.revert();
-      this.canvasService.setRenderingEnabled(true);
+      this.mainTl?.kill();
+      this.sceneService.setRenderingEnabled(true);
+      if (this.sceneService.canvasContainer) {
+        gsap.set(this.sceneService.canvasContainer, { clearProps: 'opacity,zIndex' });
+      }
+      //console.log('ABOUT CONSTRUCTOR ONDESTROY');
     });
   }
 
-  private initAbout(): void {
+  private startAboutRouteAnimations(model: Group): void {
+    //model.traverse((c: any) => c.isMesh && (c.material = c.material.clone()));
+
+    this.initAbout(model);
+
+    // Direct, synchronous injection of the route's custom model clone
+    this.aboutMission().initAnimation(model);
+    this.aboutUserStories().initHeaderReveal(model);
+
+    this.readyService.signal();
+  }
+
+  private initAbout(model: Group): void {
     this.createHeroAnimation();
-    this.createDescriptionAnimation();
+    this.createDescriptionAnimation(model);
   }
 
   private createHeroAnimation(): void {
@@ -88,7 +121,7 @@ export class About {
       );
   }
 
-  private createDescriptionAnimation(): void {
+  private createDescriptionAnimation(model: Group): void {
     const pinnedSection = this.pinnedSection().nativeElement;
     const descriptionSection = this.descriptionWrapper().nativeElement;
 
@@ -112,8 +145,6 @@ export class About {
       ease: 'power3.out',
     });
 
-    // Triangle line-reveal is an >=1024px enhancement only. Below that,
-    // the wrapper reveal above is the whole animation for this section.
     const width = window.innerWidth;
     if (width < MD_MIN_WIDTH) {
       return;
@@ -138,7 +169,7 @@ export class About {
       this.rightParagraph().nativeElement,
       'right',
       step,
-      '<', // start at the same time as the left paragraph's reveal
+      '<',
     );
 
     if (width < LG_MIN_WIDTH) {
@@ -146,32 +177,19 @@ export class About {
     }
 
     let scale = 3;
+    if (width < XL_MIN_WIDTH) scale = 2;
 
-    if (width < XL_MIN_WIDTH)
-      scale = 2;
+    this.glbCtx = gsap.context(() => {
+      tl.to(
+        model.scale,
+        { x: scale, y: scale, z: scale, duration: 0.8, ease: 'power1.inOut' },
+        0,
+      ).to(this.sceneService.canvasContainer, { zIndex: 10 }, 0);
+    });
 
-    // Animate the VASE
-    this.canvasService.modelLoaded$
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe((vase: Group) => {
-        tl.to(vase.scale, { x: scale, y: scale, z: scale, duration: 0.8, ease: 'power1.inOut' }, 0).to(
-          this.canvasService.canvasContainer,
-          { zIndex: 10 },
-          0,
-        );
-      });
+    this.mainTl = tl.scrollTrigger;
   }
 
-  /**
-   * Splits a paragraph into lines and reveals them line by line from the
-   * given side. Each line's resting horizontal offset grows with its
-   * distance from the middle line, so the resting lines form a symmetric
-   * triangle. The offset is anchored to the END of each line (its ragged,
-   * natural-wrap edge) rather than the start: each line box is forced to
-   * the paragraph's full width and right-aligned, so the box's right edge
-   * — which our `x` shift controls precisely — always coincides with the
-   * last glyph, regardless of that line's actual text length.
-   */
   private revealParagraphLines(
     tl: gsap.core.Timeline,
     el: HTMLElement,
@@ -186,8 +204,6 @@ export class About {
 
     const lines = split.lines;
 
-    // Deterministic box width + right-aligned glyphs -> the box's right
-    // edge is always the visual end of the line.
     gsap.set(lines, {
       display: 'block',
       width: '100%',

@@ -15,7 +15,7 @@ import { ScrollTriggerReadyService } from './core/services/scroll-trigger-ready'
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Preloader } from './layout/preloader/preloader';
 import { PreLoaderReady } from './core/services/pre-loader-ready';
-import { ThreeCanvasHost } from "./shared/components/three-canvas-host/three-canvas-host";
+import { ThreeCanvasHost } from './shared/components/three-canvas-host/three-canvas-host';
 
 @Component({
   selector: 'app-root',
@@ -37,21 +37,18 @@ export class App implements AfterViewInit, OnInit {
       window.scrollTo(0, 0);
     });
 
-    this.readyService
-      .onReady$()
-      .pipe(
-        take(1), // exactly once
-      )
-      .subscribe(() => {
-        requestAnimationFrame(() => {
-          this.footer().footerAnimation();
-          this.footer().initLinkScramble();
-          ScrollTrigger.refresh();
-        });
+    this.readyService.onReady$().subscribe(() => {
+      requestAnimationFrame(() => {
+        this.footer().initMorphAnimation();
+        this.footer().initDropChainAnimation();
+        ScrollTrigger.refresh();
       });
+    });
   }
 
   ngOnInit(): void {
+    this.footer().initLinkScramble();
+    
     this.router.events
       .pipe(
         filter((e) => e instanceof NavigationEnd),

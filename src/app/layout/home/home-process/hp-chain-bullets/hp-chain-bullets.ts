@@ -13,6 +13,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import Matter from 'matter-js';
+import { ThreejsSceneService } from '../../../../core/services/threejs-scene';
 
 // ---- Types ----
 interface Card {
@@ -51,6 +52,7 @@ interface CachedCardLines {
 export class HpChainBullets {
   private platformId = inject(PLATFORM_ID);
   private destroyRef = inject(DestroyRef);
+  private readonly canvasService = inject(ThreejsSceneService);
 
   // ---- Template refs ----
   private canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
@@ -61,51 +63,73 @@ export class HpChainBullets {
   private subtitleWordsContainer = viewChild<ElementRef<HTMLElement>>('subtitleWordsContainer');
 
   // ---- Reactive state ----
-  private screenWidth = signal(
-    typeof window !== 'undefined' ? window.innerWidth : 1024,
-  );
+  private screenWidth = signal(typeof window !== 'undefined' ? window.innerWidth : 1024);
 
   // Derived breakpoint config — recomputes only when screenWidth crosses a boundary
   private config = computed<BreakpointConfig>(() => {
     const w = this.screenWidth();
     if (w < 640) {
       return {
-        squareSize: 150, squareGap: 20,
-        iconFontSize: '20px', titleFontSize: '9px',
-        bodyFontSize: '9px', textLineHeight: 13,
-        linkCount: 2, linkRadius: 8,
-        anchorDotRadius: 4, anchorOffset: 15,
-        chamferRadius: 15, stabilizerLength: 60,
+        squareSize: 150,
+        squareGap: 20,
+        iconFontSize: '20px',
+        titleFontSize: '9px',
+        bodyFontSize: '9px',
+        textLineHeight: 13,
+        linkCount: 2,
+        linkRadius: 8,
+        anchorDotRadius: 4,
+        anchorOffset: 15,
+        chamferRadius: 15,
+        stabilizerLength: 60,
         maxTextPad: 20,
       };
     } else if (w < 1024) {
       return {
-        squareSize: 220, squareGap: 20,
-        iconFontSize: '28px', titleFontSize: '10px',
-        bodyFontSize: '11px', textLineHeight: 16,
-        linkCount: 3, linkRadius: 15,
-        anchorDotRadius: 6, anchorOffset: 40,
-        chamferRadius: 30, stabilizerLength: 100,
+        squareSize: 220,
+        squareGap: 20,
+        iconFontSize: '28px',
+        titleFontSize: '10px',
+        bodyFontSize: '11px',
+        textLineHeight: 16,
+        linkCount: 3,
+        linkRadius: 15,
+        anchorDotRadius: 6,
+        anchorOffset: 40,
+        chamferRadius: 30,
+        stabilizerLength: 100,
         maxTextPad: 40,
       };
     } else if (w < 1280) {
       return {
-        squareSize: 280, squareGap: 90,
-        iconFontSize: '36px', titleFontSize: '16px',
-        bodyFontSize: '12px', textLineHeight: 20,
-        linkCount: 3, linkRadius: 15,
-        anchorDotRadius: 6, anchorOffset: 40,
-        chamferRadius: 30, stabilizerLength: 100,
+        squareSize: 280,
+        squareGap: 90,
+        iconFontSize: '36px',
+        titleFontSize: '16px',
+        bodyFontSize: '12px',
+        textLineHeight: 20,
+        linkCount: 3,
+        linkRadius: 15,
+        anchorDotRadius: 6,
+        anchorOffset: 40,
+        chamferRadius: 30,
+        stabilizerLength: 100,
         maxTextPad: 40,
       };
     } else {
       return {
-        squareSize: 320, squareGap: 140,
-        iconFontSize: '36px', titleFontSize: '16px',
-        bodyFontSize: '12px', textLineHeight: 20,
-        linkCount: 3, linkRadius: 15,
-        anchorDotRadius: 6, anchorOffset: 40,
-        chamferRadius: 30, stabilizerLength: 100,
+        squareSize: 320,
+        squareGap: 140,
+        iconFontSize: '36px',
+        titleFontSize: '16px',
+        bodyFontSize: '12px',
+        textLineHeight: 20,
+        linkCount: 3,
+        linkRadius: 15,
+        anchorDotRadius: 6,
+        anchorOffset: 40,
+        chamferRadius: 30,
+        stabilizerLength: 100,
         maxTextPad: 40,
       };
     }
@@ -187,6 +211,8 @@ export class HpChainBullets {
         trigger: headerContainerEl,
         start: 'top 30%',
         invalidateOnRefresh: true,
+        onLeave: () => this.canvasService.setRenderingEnabled(false),
+        onEnterBack: () => this.canvasService.setRenderingEnabled(true),
       },
       defaults: { ease: 'power1.out', duration: 0.8 },
     });
@@ -215,8 +241,17 @@ export class HpChainBullets {
 
   private initPhysics(): void {
     const {
-      Engine, Render, Runner, Body, Bodies,
-      Composite, Composites, Constraint, Mouse, MouseConstraint, Events,
+      Engine,
+      Render,
+      Runner,
+      Body,
+      Bodies,
+      Composite,
+      Composites,
+      Constraint,
+      Mouse,
+      MouseConstraint,
+      Events,
     } = Matter;
 
     const canvas = this.canvasRef().nativeElement;
@@ -287,7 +322,12 @@ export class HpChainBullets {
       const { linkCount, linkRadius, stabilizerLength } = cfg;
 
       const rope = Composites.stack(
-        anchorX, anchorY, linkCount, 1, 10, 10,
+        anchorX,
+        anchorY,
+        linkCount,
+        1,
+        10,
+        10,
         (x: number, y: number) =>
           Bodies.circle(x - linkRadius, y, linkRadius, {
             collisionFilter: { group },
@@ -299,31 +339,42 @@ export class HpChainBullets {
 
       Composites.chain(rope, 0.3, 0, -0.3, 0, { stiffness: 1, length: 1 });
 
-      Composite.add(rope, Constraint.create({
-        pointA: { x: anchorX, y: anchorY },
-        bodyB: rope.bodies[0],
-        pointB: { x: -linkRadius, y: 0 },
-        stiffness: 1, length: 0,
-        render: { strokeStyle: '#333', lineWidth: 1 },
-      }));
+      Composite.add(
+        rope,
+        Constraint.create({
+          pointA: { x: anchorX, y: anchorY },
+          bodyB: rope.bodies[0],
+          pointB: { x: -linkRadius, y: 0 },
+          stiffness: 1,
+          length: 0,
+          render: { strokeStyle: '#333', lineWidth: 1 },
+        }),
+      );
 
-      Composite.add(rope, Constraint.create({
-        bodyA: rope.bodies[rope.bodies.length - 1],
-        pointA: { x: linkRadius, y: 0 },
-        bodyB: squareBody,
-        pointB: { x: squareOffsetX, y: 0 },
-        stiffness: 0.5, length: 0,
-        render: { strokeStyle: '#333', lineWidth: 1 },
-      }));
+      Composite.add(
+        rope,
+        Constraint.create({
+          bodyA: rope.bodies[rope.bodies.length - 1],
+          pointA: { x: linkRadius, y: 0 },
+          bodyB: squareBody,
+          pointB: { x: squareOffsetX, y: 0 },
+          stiffness: 0.5,
+          length: 0,
+          render: { strokeStyle: '#333', lineWidth: 1 },
+        }),
+      );
 
-      Composite.add(world, Constraint.create({
-        pointA: { x: anchorX, y: anchorY },
-        bodyB: squareBody,
-        pointB: { x: squareOffsetX, y: 0 },
-        stiffness: 0.5,
-        length: stabilizerLength,
-        render: { visible: false },
-      }));
+      Composite.add(
+        world,
+        Constraint.create({
+          pointA: { x: anchorX, y: anchorY },
+          bodyB: squareBody,
+          pointB: { x: squareOffsetX, y: 0 },
+          stiffness: 0.5,
+          length: stabilizerLength,
+          render: { visible: false },
+        }),
+      );
 
       return rope;
     };
@@ -335,9 +386,7 @@ export class HpChainBullets {
     const rope2L = buildRope(anchorXs[2], squares[2], -squareSize / 2);
     const rope2R = buildRope(anchorXs[3], squares[2], squareSize / 2);
 
-    Composite.add(world, [
-      ...squares, rope0L, rope0R, rope1L, rope1R, rope2L, rope2R,
-    ]);
+    Composite.add(world, [...squares, rope0L, rope0R, rope1L, rope1R, rope2L, rope2R]);
 
     // ---- Pre-cache wrapped text lines once per init, not per frame ----
     // Set up a temporary off-screen canvas to measure text widths

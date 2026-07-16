@@ -3,18 +3,12 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  afterNextRender,
   inject,
   viewChild,
 } from '@angular/core';
 import gsap from 'gsap';
 import { ThreejsSceneService } from '../../../core/services/threejs-scene';
-import { take } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Group } from 'three';
-
-// ScrollTrigger is assumed registered once in app.config.ts per project convention —
-// not re-registered here.
 
 @Component({
   selector: 'app-about-mission',
@@ -28,7 +22,12 @@ export class AboutMission {
   private readonly hostEl: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
   private readonly canvasService = inject(ThreejsSceneService);
-  private ctx?: ReturnType<typeof gsap.context>;
+
+  // Dedicated context solely for isolating GLB animations
+  private vaseCtx?: ReturnType<typeof gsap.context>;
+
+  // Tracking list to clean up standard DOM animations manually
+  private domAnims: (gsap.core.Timeline | gsap.core.Tween)[] = [];
 
   protected readonly leftSection = viewChild.required<ElementRef<HTMLElement>>('leftSection');
 
@@ -39,129 +38,117 @@ export class AboutMission {
   ];
 
   constructor() {
-    afterNextRender(() => {});
+    this.destroyRef.onDestroy(() => {
+      //console.log('ABOUT MISSION ONDESTROY - CLEANING UP ANIMATIONS');
 
-    this.destroyRef.onDestroy(() => this.ctx?.revert());
+      // 1. Revert and unbind only the isolated GLB ScrollTriggers
+      this.vaseCtx?.revert();
+      this.vaseCtx = undefined;
+
+      // 2. Kill all remaining domestic DOM triggers manually
+      this.domAnims.forEach((anim) => {
+        anim.scrollTrigger?.kill();
+        anim.kill();
+      });
+      this.domAnims = [];
+
+      if (this.canvasService.canvasContainer) {
+        gsap.set(this.canvasService.canvasContainer, { clearProps: 'opacity,zIndex' });
+      }
+    });
   }
 
-  public initAnimation() {
+  public initAnimation(vase: Group) {
     const width = window.innerWidth;
-    // Scroll-jacked animation disabled below the lg breakpoint (project convention).
     if (width < 1024) return;
 
-    this.ctx = gsap.context(() => {
-      const tl = gsap.timeline({
+    // 1. Setup domestic parallax paragraph scroll animation
+    const paragraphTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.mission-wrapper',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        pin: false,
+        pinSpacing: false,
+      },
+    });
+    paragraphTl.to('.mission-paragraph', { y: '-200vh', ease: 'none' }, 0);
+    this.domAnims.push(paragraphTl);
+
+    // 2. Wrap the GLB scale and rotate timeline in its own isolated context
+    this.vaseCtx = gsap.context(() => {
+      const vaseTl = gsap.timeline({
         scrollTrigger: {
           trigger: '.mission-wrapper',
-          start: 'top top',
-          end: 'bottom bottom', // = 300vh of scroll, given the 400vh wrapper + 100vh sticky child
-          scrub: true,
-          pin: false,
-          pinSpacing: false,
-        },
-      });
-
-      tl.to('.mission-paragraph', { y: '-200vh', ease: 'none' }, 0);
-
-      this.canvasService.modelLoaded$
-        .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-        .subscribe((vase: Group) => {
-          const vaseTl = gsap.timeline({
-            scrollTrigger: {
-              trigger: '.mission-wrapper',
-              start: 'top center',
-              end: '20% center',
-              scrub: true,
-            },
-            defaults: {
-              duration: 0.8,
-              ease: 'power1.Out',
-            },
-          });
-
-          let xOffset = -9;
-          let rotate = -0.1;
-
-          if (width < 1280) {
-            xOffset = -6;
-            rotate = -0.02;
-          }
-
-          vaseTl.to(
-            vase.position,
-            {
-              x: xOffset,
-              y: 6,
-              z: -1,
-            },
-            0,
-          );
-          vaseTl.to(
-            vase.rotation,
-            {
-              x: rotate,
-              y: rotate,
-              z: rotate,
-            },
-            '<',
-          );
-
-          vaseTl.to(
-            vase.scale,
-            {
-              x: 1,
-              y: 1,
-              z: 1,
-            },
-            '<',
-          );
-        });
-
-      // Left title column and the first paragraph's image converge together —
-      // one shared timeline/trigger so both moves stay in lockstep instead of
-      // two independently-timed ScrollTriggers that could drift apart.
-      const heroTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: '.ph-1',
           start: 'top center',
-          end: 'center center',
+          end: '20% center',
+          scrub: true,
         },
         defaults: {
-          duration: 0.7,
+          duration: 0.8,
+          ease: 'power1.out',
         },
       });
 
-      heroTl
-        .fromTo(this.leftSection().nativeElement, { yPercent: 100 }, { yPercent: 0 }, 0)
-        .fromTo('.ph-1-img-1', { xPercent: 200 }, { xPercent: 0 }, 0);
+      let xOffset = -9;
+      let rotate = -0.1;
 
-      gsap.fromTo(
-        '.ph-2-img-2',
-        { xPercent: -100 },
-        {
-          xPercent: 0,
-          duration: 0.7,
-          scrollTrigger: {
-            trigger: '.ph-2',
-            start: 'top top',
-            //scrub: true,
-          },
-        },
-      );
+      if (width < 1280) {
+        xOffset = -6;
+        rotate = -0.02;
+      }
 
-      gsap.fromTo(
-        '.ph-3-img-3',
-        { scale: 0 },
-        {
-          scale: 1,
-          duration: 1.5,
-          ease: 'bounce.out',
-          scrollTrigger: {
-            trigger: '.ph-3',
-            start: 'top top',
-          },
-        },
-      );
+      vaseTl.to(vase.position, { x: xOffset, y: 6, z: -1 }, 0);
+      vaseTl.to(vase.rotation, { x: rotate, y: rotate, z: rotate }, '<');
+      vaseTl.to(vase.scale, { x: 1, y: 1, z: 1 }, '<');
     }, this.hostEl.nativeElement);
+
+    const heroTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.ph-1',
+        start: 'top center',
+        end: 'center center',
+      },
+      defaults: {
+        duration: 0.7,
+      },
+    });
+
+    heroTl
+      .fromTo(this.leftSection().nativeElement, { yPercent: 100 }, { yPercent: 0 }, 0)
+      .fromTo('.ph-1-img-1', { xPercent: 200 }, { xPercent: 0 }, 0);
+
+    this.domAnims.push(heroTl);
+
+    const img2Tween = gsap.fromTo(
+      '.ph-2-img-2',
+      { xPercent: -100 },
+      {
+        xPercent: 0,
+        duration: 0.7,
+        scrollTrigger: {
+          trigger: '.ph-2',
+          start: 'top top',
+        },
+      },
+    );
+    this.domAnims.push(img2Tween);
+
+    const img3Tween = gsap.fromTo(
+      '.ph-3-img-3',
+      { scale: 0 },
+      {
+        scale: 1,
+        duration: 1.5,
+        ease: 'bounce.out',
+        scrollTrigger: {
+          trigger: '.ph-3',
+          start: 'top top',
+          once: true,
+        },
+      },
+    );
+    this.domAnims.push(img3Tween);
   }
 }

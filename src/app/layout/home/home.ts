@@ -46,6 +46,7 @@ import { PreLoaderReady } from '../../core/services/pre-loader-ready';
   styleUrl: './home.css',
 })
 export class Home {
+  private readonly hostEl: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
   private readonly readyService = inject(ScrollTriggerReadyService);
   private readonly preloaderReady = inject(PreLoaderReady);
@@ -69,20 +70,45 @@ export class Home {
   private readonly productsShowcaseSection =
     viewChild.required<HomeProductsShowcase>(HomeProductsShowcase);
 
-  private masterTl?: gsap.core.Timeline;
+  private ctx?: ReturnType<typeof gsap.context>;
   private heroTl?: gsap.core.Timeline;
   private scrollContanierOne__Tl?: gsap.core.Timeline;
 
   public readonly screenWidth = signal(typeof window !== 'undefined' ? window.innerWidth : 0);
 
   constructor() {
-    afterNextRender(() => this.initHome());
+    afterNextRender(() => {
+      // Spawn this page's exclusive, detached copy of the 3D model clone
+      const model = this.canvasService.spawnVaseInstance();
+      if (model) {
+        this.initHome(model);
+      } else {
+        // If the GLTF hasn't finished loading yet, subscribe and wait for it
+        this.canvasService.sourceReady$
+          .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+          .subscribe(() => {
+            const freshModel = this.canvasService.spawnVaseInstance();
+            if (freshModel) {
+              this.initHome(freshModel);
+            }
+          });
+      }
+    });
 
     this.destroyRef.onDestroy(() => {
       console.log('Home component destroyed, killing timelines');
-      this.masterTl?.kill();
+      // 1. Kill and revert everything scoped to this page component's context
+      this.ctx?.revert();
+      this.ctx = undefined;
+      
       this.heroTl?.kill();
       this.scrollContanierOne__Tl?.kill();
+
+      // 2. Clean global styling on the canvas container so subsequent pages start fresh
+      if (this.canvasService.canvasContainer) {
+        gsap.set(this.canvasService.canvasContainer, { clearProps: 'opacity,zIndex' });
+      }
+      this.canvasService.setRenderingEnabled(true);
     });
   }
 
@@ -90,41 +116,36 @@ export class Home {
     this.screenWidth.set(window.innerWidth);
   }
 
-  private initHome(): void {
-    // play instantly) but held paused until the preloader is gone.
-    this.heroTl = this.heroSection().createHeroAnimationTimeline();
-    //this.heroTl.pause();
+  private initHome(vase: Group): void {
+    this.ctx = gsap.context(() => {
+      this.heroTl = this.heroSection().createHeroAnimationTimeline();
 
-    this.masterTl = gsap.timeline({});
-    this.masterTl.add(this.animate_heroIntro_sections());
+      this.scrollContanierOne__Tl = this.animate_heroIntro_sections(vase);
 
-    this.animate_processSection();
-    this.productsShowcaseSection().scrollAnimation();
-    this.ctaSection().scrollAnimation();
+      this.animate_processSection(vase);
+      this.productsShowcaseSection().scrollAnimation();
+      this.ctaSection().scrollAnimation();
 
-    // "Home ready" for App's purposes must mean "final layout is settled,"
-    // not just "DOM exists." Scroll may still be locked and hero elements
-    // still sit in their paused state while the preloader is up, so
-    // ScrollTrigger.refresh() (fired in App off this signal) has to wait
-    // for the same moment the preloader actually clears.
-    this.preloaderReady
-      .onReady$()
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.heroTl?.play();
-        this.readyService.signal();
-      });
+      // Signal ready state once the preloader fades out
+      this.preloaderReady
+        .onReady$()
+        .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.heroTl?.play();
+          this.readyService.signal();
+        });
+    }, this.hostEl.nativeElement);
   }
 
-  private animate_heroIntro_sections() {
+  private animate_heroIntro_sections(vase: Group): gsap.core.Timeline {
     const scrollContainer__one = this.scrollContainer__one().nativeElement;
 
-    this.scrollContanierOne__Tl = gsap.timeline({
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: scrollContainer__one,
         start: 'top top',
-        end: '+=200%',
-        scrub: 1.5,
+        end: '+=300%',
+        scrub: 1,
         pin: true,
         pinSpacing: true,
         anticipatePin: 1,
@@ -133,28 +154,23 @@ export class Home {
     });
 
     if (this.screenWidth() >= 1280) {
-      this.canvasService.modelLoaded$
-        .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-        .subscribe((vase: Group) => {
-          this.scrollContanierOne__Tl!
-            .to(
-              vase.position,
-              { x: 0, y: -1, z: 0, duration: 0.8, ease: 'power1.inOut', delay: 1 },
-              0,
-            )
-            .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power1.inOut' }, '<')
-            .to(vase.rotation, { x: -Math.PI / 8, duration: 0.8, ease: 'power1.inOut' }, '<')
-            .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');
-        });
+      tl.to(
+        vase.position,
+        { x: 0, y: -1, z: 0, duration: 0.8, ease: 'power1.inOut', delay: 1 },
+        0,
+      )
+        .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power1.inOut' }, '<')
+        .to(vase.rotation, { x: -Math.PI / 8, duration: 0.8, ease: 'power1.inOut' }, '<')
+        .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');
     }
 
-    this.scrollContanierOne__Tl.add(this.introSection().createIntroAnimationTimeline());
+    tl.add(this.introSection().createIntroAnimationTimeline());
 
-    return this.scrollContanierOne__Tl;
+    return tl;
   }
 
-  private animate_processSection(): void {
-    this.processSection__Header().initScrollAnimation();
+  private animate_processSection(vase: Group): void {
+    this.processSection__Header().initScrollAnimation(vase);
     this.processSection__HpSlidingImages().initScrollAnimation();
     this.processSection__Showcase().animateStepsSection();
     this.processSection__ChainBullets().animateChainBulletsSection();

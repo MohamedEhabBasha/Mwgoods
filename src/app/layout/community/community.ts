@@ -14,10 +14,12 @@ import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import type { Group } from 'three';
 
-import { ThreejsSceneService } from '../../core/services/threejs-scene';
+;
 import { PixiWeb } from '../../shared/components/pixi-web/pixi-web';
 import { SquareLabel } from '../../shared/components/square-label/square-label';
 import { OrbitalButton } from '../../shared/components/orbital-button/orbital-button';
+import { ThreejsSceneService } from '../../core/services/threejs-scene';
+import { ScrollTriggerReadyService } from '../../core/services/scroll-trigger-ready';
 
 @Component({
   selector: 'app-community',
@@ -27,14 +29,12 @@ import { OrbitalButton } from '../../shared/components/orbital-button/orbital-bu
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Community {
+  private readonly hostEl: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
   private readonly canvasService = inject(ThreejsSceneService);
+  private readonly readyService = inject(ScrollTriggerReadyService);
 
   private headerText = viewChild.required<ElementRef<HTMLElement>>('headerText');
-
-  // Section 4's own tall wrapper — dedicated ref (rather than reading it
-  // positionally out of stackWrappers()) so the vase-settle/fade logic
-  // below doesn't silently break if a section gets added/removed later.
   private vaseSettleWrapper = viewChild.required<ElementRef<HTMLElement>>('vaseSettleWrapper');
 
   private headers = viewChildren<ElementRef<HTMLElement>>('header');
@@ -42,29 +42,56 @@ export class Community {
   private stackWrappers = viewChildren<ElementRef<HTMLElement>>('stackWrapper');
   private stackPanels = viewChildren<ElementRef<HTMLElement>>('stackPanel');
 
-  private vaseTl?: gsap.core.Timeline;
+  private ctx?: ReturnType<typeof gsap.context>;
   private heroSplit?: SplitText;
   private headerSplits: SplitText[] = [];
   private paragraphSplits: SplitText[] = [];
-  private stackTimelines: gsap.core.Timeline[] = [];
 
   constructor() {
-    afterNextRender(() => this.initCommunity());
+    afterNextRender(() => {
+      // 1. Spawns this page's exclusive, detached copy of the 3D vase
+      const model = this.canvasService.spawnVaseInstance();
+      if (model) {
+        this.initCommunity(model);
+      } else {
+        this.canvasService.sourceReady$
+          .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+          .subscribe(() => {
+            const freshModel = this.canvasService.spawnVaseInstance();
+            if (freshModel) {
+              this.initCommunity(freshModel);
+            }
+          });
+      }
+    });
 
     this.destroyRef.onDestroy(() => {
-      this.vaseTl?.kill();
+      // 2. Kill page animations cleanly
+      this.ctx?.revert();
+      this.ctx = undefined;
+
       this.heroSplit?.revert();
       this.headerSplits.forEach((split) => split.revert());
       this.paragraphSplits.forEach((split) => split.revert());
-      this.stackTimelines.forEach((tl) => tl.kill());
+
+      // 3. Re-enable default global canvas container layout parameters
+      if (this.canvasService.canvasContainer) {
+        gsap.set(this.canvasService.canvasContainer, { clearProps: 'opacity,zIndex' });
+      }
       this.canvasService.setRenderingEnabled(true);
     });
   }
 
-  private initCommunity(): void {
-    this.createHeroAnimation();
-    this.createContentAnimations();
-    this.createStackedSectionsAnimation();
+  private initCommunity(vase: Group): void {
+    //vase.traverse((c: any) => c.isMesh && (c.material = c.material.clone()));
+
+    this.ctx = gsap.context(() => {
+      this.createHeroAnimation();
+      this.createContentAnimations();
+      this.createStackedSectionsAnimation(vase);
+    }, this.hostEl.nativeElement);
+
+    this.readyService.signal();
   }
 
   private createHeroAnimation(): void {
@@ -91,7 +118,7 @@ export class Community {
     const paragraphs = this.paragraphs();
 
     headers.forEach((headerRef, index) => {
-      const wrapper = wrappers[index + 1]; // skip hero wrapper
+      const wrapper = wrappers[index + 1];
       if (!wrapper) return;
 
       const headerSplit = new SplitText(headerRef.nativeElement, { type: 'words,chars' });
@@ -120,8 +147,6 @@ export class Community {
         },
       );
 
-      // Sections 1-3 pair a header with a paragraph; sections 4 and 5 are a
-      // single closing line each, so the paragraph reveal is optional.
       const paragraphRef = paragraphs[index];
       if (paragraphRef) {
         const paragraphSplit = new SplitText(paragraphRef.nativeElement, {
@@ -137,12 +162,10 @@ export class Community {
           '-=1.1',
         );
       }
-
-      this.stackTimelines.push(tl);
     });
   }
 
-  private createStackedSectionsAnimation(): void {
+  private createStackedSectionsAnimation(vase: Group): void {
     if (window.innerWidth < 1024) return;
 
     const wrappers = this.stackWrappers();
@@ -151,36 +174,29 @@ export class Community {
     const HOLD_FRACTION = 0.55;
     const lastIndex = wrappers.length - 1;
 
-    // Vase arrives at the hero: scales up and steps in front of the pixi web.
-    this.canvasService.modelLoaded$
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe((vase: Group) => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: wrappers[0].nativeElement,
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: true,
-          },
-        });
+    // This page owns rotation, turn off default idle rotation
+    //this.canvasService.setIdleRotationEnabled(false);
 
-        tl.to(vase.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 0.8, ease: 'power1.inOut' }, 0).to(
-          this.canvasService.canvasContainer,
-          { zIndex: 10 },
-          '<',
-        );
+    // Vase arrives at the hero
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: wrappers[0].nativeElement,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+      },
+    });
 
-        this.stackTimelines.push(tl);
-      });
+    tl.to(vase.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 0.8, ease: 'power1.inOut' }, 0)
+      .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');
 
-    // Hold -> shrink+fade for every panel except the very last, which just
-    // holds via CSS sticky until it naturally releases into the footer.
+    // Panel tracking
     wrappers.forEach((wrapperRef, i) => {
       const panel = panels[i]?.nativeElement;
       if (!panel) return;
       if (i === lastIndex) return;
 
-      const tl = gsap.timeline({
+      const pTl = gsap.timeline({
         scrollTrigger: {
           trigger: wrapperRef.nativeElement,
           start: 'top top',
@@ -189,65 +205,44 @@ export class Community {
         },
       });
 
-      tl.to(panel, { duration: HOLD_FRACTION, ease: 'none' });
+      pTl.to(panel, { duration: HOLD_FRACTION, ease: 'none' });
 
       if (i !== 0) {
-        tl.fromTo(
+        pTl.fromTo(
           panel,
           { scale: 1, opacity: 1 },
           { scale: 0.7, opacity: 0.5, duration: (1 - HOLD_FRACTION) * 0.9, ease: 'none' },
         );
       }
 
-      tl.to(panel, { opacity: 0, duration: (1 - HOLD_FRACTION) * 0.1, ease: 'none' });
-
-      this.stackTimelines.push(tl);
+      pTl.to(panel, { opacity: 0, duration: (1 - HOLD_FRACTION) * 0.1, ease: 'none' });
     });
 
-    // Vase settles at section 4: scales to its final size and steps behind
-    // the product labels, timed to resolve exactly as the closing sentence
-    // finishes revealing.
-    this.canvasService.modelLoaded$
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe((vase: Group) => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: this.vaseSettleWrapper().nativeElement,
-            start: 'top center',
-            end: 'top top',
-            scrub: true,
-          },
-        });
+    // Vase settles at section 4
+    const settleTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: this.vaseSettleWrapper().nativeElement,
+        start: 'top center',
+        end: 'top top',
+        scrub: true,
+      },
+    });
 
-        tl.to(vase.scale, { x: 3.4, y: 3.4, z: 3.4, duration: 0.8, ease: 'power1.inOut' }, 0).to(
-          this.canvasService.canvasContainer,
-          { zIndex: 1 },
-          '<',
-        );
+    settleTl.to(vase.scale, { x: 3.4, y: 3.4, z: 3.4, duration: 0.8, ease: 'power1.inOut' }, 0)
+      .to(this.canvasService.canvasContainer, { zIndex: 1 }, '<');
 
-        this.stackTimelines.push(tl);
-      });
+    // Vase fades out in lockstep with section 4
+    const fadeTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: this.vaseSettleWrapper().nativeElement,
+        start: `${HOLD_FRACTION * 100}% top`,
+        end: 'bottom bottom',
+        scrub: true,
+        onLeave: () => this.canvasService.setRenderingEnabled(false),
+        onEnterBack: () => this.canvasService.setRenderingEnabled(true),
+      },
+    });
 
-    // Vase fades out in lockstep with section 4's own shrink+fade window
-    // (same HOLD_FRACTION boundary) — by the time section 5 has fully
-    // covered the screen, the fixed canvas is already gone, so there's
-    // nothing left to clip against the footer.
-    this.canvasService.modelLoaded$
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: this.vaseSettleWrapper().nativeElement,
-            start: `${HOLD_FRACTION * 100}% top`,
-            end: 'bottom bottom',
-            scrub: true,
-            onLeave: () => this.canvasService.setRenderingEnabled(false),
-            onEnterBack: () => this.canvasService.setRenderingEnabled(true),
-          },
-        });
-
-        tl.to(this.canvasService.canvasContainer, { opacity: 0, ease: 'none' });
-        this.stackTimelines.push(tl);
-      });
+    fadeTl.to(this.canvasService.canvasContainer, { opacity: 0, ease: 'none' });
   }
 }

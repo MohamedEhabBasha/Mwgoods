@@ -123,7 +123,7 @@ export class HomeIntro {
       yPercent: 0,
       ease: 'none',
       duration: 1,
-    })
+    }, 0)
 
       //
       // Center Panel

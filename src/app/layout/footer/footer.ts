@@ -27,12 +27,14 @@ export class Footer {
   private engine!: Matter.Engine;
   private render!: Matter.Render;
   private runner!: Matter.Runner;
-  private triggerInstance?: ScrollTrigger;
-  private dropTriggerInstance?: ScrollTrigger;
+  private morphTrigger?: ScrollTrigger;
+  private dropTrigger?: ScrollTrigger;
   private hasDropped = false;
   private isInitialised = false;
   private resizeRaf = 0;
 
+  private readonly DOWN_PATH = 'M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z';
+  private readonly CENTER_PATH = 'M0-0.3C0-0.3,464,0,1139,0s1139-0.3,1139-0.3V683H0V-0.3z';
   private readonly LETTERS = ['M', 'W', 'G', 'O', 'O', 'D', 'S'];
 
   private currentSquareSize = 150;
@@ -47,8 +49,8 @@ export class Footer {
 
     this.destroyRef.onDestroy(() => {
       this.clearPhysics();
-      this.triggerInstance?.kill();
-      this.dropTriggerInstance?.kill();
+      this.morphTrigger?.kill();
+      this.dropTrigger?.kill();
       cancelAnimationFrame(this.resizeRaf);
       this.linkHoverCleanups.forEach((fn) => fn());
     });
@@ -333,15 +335,10 @@ export class Footer {
     (this as any)._world = world;
   }
 
-  public footerAnimation(): void {
-    const down = 'M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z';
-    const center = 'M0-0.3C0-0.3,464,0,1139,0s1139-0.3,1139-0.3V683H0V-0.3z';
+  public initMorphAnimation(): void {
+    this.morphTrigger?.kill();
 
-    if (this.triggerInstance) {
-      this.triggerInstance.kill();
-    }
-
-    this.triggerInstance = ScrollTrigger.create({
+    this.morphTrigger = ScrollTrigger.create({
       trigger: '.footer',
       start: 'top bottom',
       end: 'bottom top',
@@ -351,34 +348,38 @@ export class Footer {
 
         gsap.fromTo(
           ['#bouncy-path', '#bouncy-path-stroke'],
-          { morphSVG: down },
+          { morphSVG: this.DOWN_PATH },
           {
             duration: 2,
-            morphSVG: center,
+            morphSVG: this.CENTER_PATH,
             ease: `elastic.out(${1 + variation}, ${1 - variation})`,
             overwrite: 'auto',
           },
         );
       },
-      onLeave: () => {
-        gsap.to(['#bouncy-path', '#bouncy-path-stroke'], {
-          duration: 0.5,
-          morphSVG: down,
-          ease: 'power2.out',
-          overwrite: 'auto',
-        });
-      },
-      onLeaveBack: () => {
-        gsap.to(['#bouncy-path', '#bouncy-path-stroke'], {
-          duration: 0.5,
-          morphSVG: down,
-          ease: 'power2.out',
-          overwrite: 'auto',
-        });
-      },
+      onLeave: () => this.collapseBouncyPath(),
+      onLeaveBack: () => this.collapseBouncyPath(),
     });
+  }
 
-    this.dropTriggerInstance = ScrollTrigger.create({
+  private collapseBouncyPath(): void {
+    gsap.to(['#bouncy-path', '#bouncy-path-stroke'], {
+      duration: 0.5,
+      morphSVG: this.DOWN_PATH,
+      ease: 'power2.out',
+      overwrite: 'auto',
+    });
+  }
+
+  /** Re-armed on every navigation, so it plays once per page instead of once ever */
+  public initDropChainAnimation(): void {
+    if (this.hasDropped) {
+      return;
+    }
+
+    this.dropTrigger?.kill();
+
+    this.dropTrigger = ScrollTrigger.create({
       trigger: '.footer',
       start: 'top center',
       once: true,

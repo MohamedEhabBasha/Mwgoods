@@ -7,7 +7,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -17,7 +16,7 @@ interface FaqItem {
 }
 @Component({
   selector: 'app-sell-faq',
-  imports: [NgOptimizedImage],
+  imports: [],
   templateUrl: './sell-faq.html',
   styleUrl: './sell-faq.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
