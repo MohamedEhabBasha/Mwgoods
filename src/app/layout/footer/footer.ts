@@ -8,13 +8,19 @@ import {
   afterNextRender,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Matter from 'matter-js';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
 @Component({
   selector: 'app-footer',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './footer.html',
   styleUrl: './footer.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,6 +38,13 @@ export class Footer {
   private hasDropped = false;
   private isInitialised = false;
   private resizeRaf = 0;
+
+  readonly navItems: NavItem[] = [
+    { label: 'Home', route: '/' },
+    { label: 'About', route: '/about' },
+    { label: 'Community', route: '/community' },
+    { label: 'Sell', route: '/sell' },
+  ];
 
   private readonly DOWN_PATH = 'M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z';
   private readonly CENTER_PATH = 'M0-0.3C0-0.3,464,0,1139,0s1139-0.3,1139-0.3V683H0V-0.3z';

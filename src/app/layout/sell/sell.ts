@@ -14,6 +14,7 @@ import { PixiWeb } from '../../shared/components/pixi-web/pixi-web';
 import { SellTimeline } from './sell-timeline/sell-timeline';
 import { ThreejsSceneService } from '../../core/services/threejs-scene';
 import { SellFAQ } from "./sell-faq/sell-faq";
+import { ScrollTriggerReadyService } from '../../core/services/scroll-trigger-ready';
 
 @Component({
   selector: 'app-sell',
@@ -25,6 +26,7 @@ import { SellFAQ } from "./sell-faq/sell-faq";
 export class Sell {
   private readonly destroyRef = inject(DestroyRef);
   private readonly canvasService = inject(ThreejsSceneService);
+  private readonly readyService = inject(ScrollTriggerReadyService);
 
   private readonly sellingParagraphRef =
     viewChild.required<ElementRef<HTMLElement>>('sellingParagraph');
@@ -47,7 +49,7 @@ export class Sell {
       this.headerTimelineReveal();
       this.sellTimeline().initTimeline();
       this.sellFAQ().initHeroReveal();
-      ScrollTrigger.refresh();
+      this.readyService.signal();
     });
 
     this.destroyRef.onDestroy(() => {

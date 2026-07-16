@@ -34,6 +34,7 @@ export class App implements AfterViewInit, OnInit {
 
   constructor() {
     afterNextRender(() => {
+      this.footer().initLinkScramble();
       window.scrollTo(0, 0);
     });
 
@@ -47,8 +48,6 @@ export class App implements AfterViewInit, OnInit {
   }
 
   ngOnInit(): void {
-    this.footer().initLinkScramble();
-    
     this.router.events
       .pipe(
         filter((e) => e instanceof NavigationEnd),
