@@ -7,10 +7,11 @@
     class="bg-secondary flex items-center justify-between flex-none h-[12vh] rounded-2xl mx-0 px-3.5 py-3.5 overflow-hidden border border-white"
   >
     <!-- Logo -->
-    <div class="w-14 ml-2.5">
-      <img src="navbar/MW LOGO.svg" alt="" loading="eager" class="object-cover" />
-    </div>
+    <a routerLink="/" (click)="onNavLinkClick()" class="block w-14 ml-2.5">
+      <img src="navbar/MW LOGO.svg" alt="MW Logo" loading="eager" class="object-cover" />
+    </a>
     <!-- Menu Button -->
+
     <a
       (click)="toggleMenu()"
       class="flex items-center justify-center gap-1.5 p-2.5 cursor-pointer hover:bg-[rgba(255,255,255,0.1)] rounded-lg md:order-first"
@@ -29,19 +30,23 @@
 
       <div class="uppercase text-white text-2xl tracking-[-1px] order-first md:order-0">Menu</div>
     </a>
-    <!-- Login Button -->
+    <!-- Contact Button -->
+
     <a
-      #loginBtn
+      #contactBtn
+      [href]="linkedinUrl"
+      target="_blank"
+      rel="noopener noreferrer"
       (mouseenter)="onHover()"
       (mouseleave)="onLeave()"
       class="bg-accent-red text-white uppercase text-[1.15rem] font-medium mr-2.5 px-6 py-2.5 rounded-md cursor-pointer hidden md:block overflow-hidden"
     >
       <div
-        class="relative w-16 h-4 flex items-center justify-center transform-3d perspective-normal"
+        class="relative w-24 h-4 flex items-center justify-center transform-3d perspective-normal"
       >
-        <span #textDefault class="absolute block backface-hidden whitespace-nowrap">Log in</span>
+        <span #textDefault class="absolute block backface-hidden whitespace-nowrap">Contact</span>
 
-        <span #textHover class="absolute block backface-hidden whitespace-nowrap">Log in</span>
+        <span #textHover class="absolute block backface-hidden whitespace-nowrap">Contact</span>
       </div>
     </a>
   </div>
@@ -63,6 +68,7 @@
               <!-- Text Items -->
               @for (link of navLinks; track link.label; let isLast = $last) {
                 <app-divider />
+
                 <a
                   [routerLink]="link.path"
                   class="title-item cursor-pointer py-4 md:py-5 transition-opacity duration-100"
@@ -110,44 +116,47 @@
       <div class="flex md:justify-end md:row-span-2 z-50 lg:pr-8">
         <!-- Second Grid Container -->
         <div
-          class="bg-accent-red p-4 flex md:flex-col items-end md:items-start w-full h-full xl:w-[75%] md:h-[80%] my-auto rounded-xl"
+          class="bg-accent-red p-4 flex md:flex-col items-center justify-around lg:justify-between w-[70%] md:w-full xl:w-[75%] h-[80%] mx-auto md:mx-0 my-auto rounded-xl"
         >
-          <!-- Services Item -->
-          <a
-            class="group services-item relative flex flex-col justify-between items-start w-[50%] sm:w-[30%] md:w-full h-full p-5 rounded-xl text-white uppercase cursor-pointer overflow-hidden"
-          >
-            <div class="services-overlay rounded-xl"></div>
+          <!-- Face + Contact Me -->
+          <div class="flex flex-col items-center justify-center lg:flex-1 gap-3 py-2">
+            <img
+              src="navbar/personal-photo.avif"
+              alt="Portrait"
+              loading="lazy"
+              class="w-20 h-20 md:w-full md:h-auto rounded-xl object-cover"
+            />
 
-            <h3 class="text-[16px] md:text-3xl font-semibold block z-10">Our Services</h3>
-
-            <p class="z-10 text-[8px] font-medium flex items-center gap-1">
-              <span>Learn more</span>
-              <span
-                class="inline-block transition-transform duration-300 ease-out transform group-hover:translate-x-1"
-              >
-                &rarr;
-              </span>
-            </p>
-          </a>
-          <!-- Social Media Links -->
-          <div class="flex flex-col h-[75%] md:h-auto ml-4 mb-1 md:m-0 md:ml-1 md:mt-2">
-            <!-- Login Button -->
             <a
-              class="bg-secondary text-white text-center uppercase text-[0.6rem] font-medium tracking-[-0.2px] p-2 rounded-md cursor-pointer my-auto md:hidden"
+              [href]="linkedinUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-white font-mono text-sm md:text-xl font-semibold tracking-wide hover:opacity-80 transition-opacity"
             >
-              Log in
+              Contact Me
             </a>
-            <div class="text-white text-[8px] uppercase tracking-tight font-semibold">Social</div>
-            <!-- Social Media Icons -->
-            <div class="flex items-center gap-2">
-              <a href="#" class="text-white hover:text-accent-red transition-colors w-6 md:w-5">
-                <img src="navbar/facebook.png" alt="Facebook" loading="lazy" />
+          </div>
+
+          <!-- Social Media Links -->
+          <div class="mt-autom md:mt-0 md:w-full">
+            <div class="text-white text-[8px] uppercase tracking-tight font-semibold text-left">
+              Social
+            </div>
+            <div class="flex justify-center gap-3 items-center w-full">
+              <a
+                [href]="upworkUrl"
+                class="flex justify-center hover:opacity-80 transition-opacity"
+              >
+                <img src="navbar/upwork.png" alt="Facebook" loading="lazy" class="w-6 md:w-5" />
               </a>
-              <a href="#" class="text-white hover:text-accent-red transition-colors w-6 md:w-5">
-                <img src="navbar/x.png" alt="Twitter" loading="lazy" />
+              <a [href]="githubUrl" class="flex justify-center hover:opacity-80 transition-opacity">
+                <img src="navbar/github.png" alt="Twitter" loading="lazy" class="w-6 md:w-5" />
               </a>
-              <a href="#" class="text-white hover:text-accent-red transition-colors w-6 md:w-5">
-                <img src="navbar/linkedin.png" alt="LinkedIn" loading="lazy" />
+              <a
+                [href]="linkedinUrl"
+                class="flex justify-center hover:opacity-80 transition-opacity"
+              >
+                <img src="navbar/linkedin.png" alt="LinkedIn" loading="lazy" class="w-6 md:w-5" />
               </a>
             </div>
           </div>

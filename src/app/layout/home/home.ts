@@ -28,7 +28,6 @@ import { PreLoaderReady } from '../../core/services/pre-loader-ready';
 
 @Component({
   selector: 'app-home',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '(window:resize)': 'onResize()',
   },
@@ -44,6 +43,7 @@ import { PreLoaderReady } from '../../core/services/pre-loader-ready';
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {
   private readonly hostEl: ElementRef<HTMLElement> = inject(ElementRef);
@@ -96,11 +96,11 @@ export class Home {
     });
 
     this.destroyRef.onDestroy(() => {
-      console.log('Home component destroyed, killing timelines');
+      //console.log('Home component destroyed, killing timelines');
       // 1. Kill and revert everything scoped to this page component's context
       this.ctx?.revert();
       this.ctx = undefined;
-      
+
       this.heroTl?.kill();
       this.scrollContanierOne__Tl?.kill();
 
@@ -154,11 +154,7 @@ export class Home {
     });
 
     if (this.screenWidth() >= 1280) {
-      tl.to(
-        vase.position,
-        { x: 0, y: -1, z: 0, duration: 0.8, ease: 'power1.inOut', delay: 1 },
-        0,
-      )
+      tl.to(vase.position, { x: 0, y: -1, z: 0, duration: 0.8, ease: 'power1.inOut', delay: 1 }, 0)
         .to(vase.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.8, ease: 'power1.inOut' }, '<')
         .to(vase.rotation, { x: -Math.PI / 8, duration: 0.8, ease: 'power1.inOut' }, '<')
         .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');

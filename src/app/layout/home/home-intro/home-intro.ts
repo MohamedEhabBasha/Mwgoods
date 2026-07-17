@@ -3,7 +3,6 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  afterNextRender,
   inject,
   viewChild,
 } from '@angular/core';
@@ -22,6 +21,7 @@ import { OrbitalButton } from '../../../shared/components/orbital-button/orbital
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeIntro {
+  private readonly hostEl: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly mainIntroStructure =
@@ -40,11 +40,16 @@ export class HomeIntro {
 
   private readonly storylinePath = viewChild.required<ElementRef<SVGPathElement>>('storylinePath');
 
+  private ctx?: ReturnType<typeof gsap.context>;
+
   constructor() {
-    afterNextRender(() => {
-      this.destroyRef.onDestroy(() => {
-        gsap.killTweensOf('*');
-      });
+    // Initialize the context scoped to this host element
+    this.ctx = gsap.context(() => {}, this.hostEl.nativeElement);
+
+    this.destroyRef.onDestroy(() => {
+      // Safely cleans up and reverts ALL sets/timelines created inside this component context
+      this.ctx?.revert();
+      this.ctx = undefined;
     });
   }
 
@@ -52,7 +57,10 @@ export class HomeIntro {
    * Called by the parent master timeline.
    */
   public createIntroAnimationTimeline(): gsap.core.Timeline {
-    return window.innerWidth < 1280 ? this.createMobileTimeline() : this.createDesktopTimeline();
+    // Wrapping the call in ctx.add ensures everything generated is cataloged by this context
+    return this.ctx?.add(() => {
+      return window.innerWidth < 1280 ? this.createMobileTimeline() : this.createDesktopTimeline();
+    }) as gsap.core.Timeline;
   }
 
   /**
@@ -66,78 +74,44 @@ export class HomeIntro {
     });
 
     const main = this.mainIntroStructure().nativeElement;
-
     const left = this.leftColumn().nativeElement;
     const center = this.centerColumn().nativeElement;
     const right = this.rightColumn().nativeElement;
-
     const video = this.targetCenterVideo().nativeElement;
-
     const svgContainer = this.storylineSvg().nativeElement;
     const path = this.storylinePath().nativeElement;
 
-    const pathLength = path.getTotalLength();
-
+    const pathLength = path.getTotalLength() || 0;
     const aboutParagraph = left.querySelector('p');
 
     //
     // Initial States
     //
-
-    gsap.set(main, {
-      yPercent: 100,
-    });
-
-    gsap.set(center, {
-      yPercent: 100,
-    });
-
-    gsap.set([left, right], {
-      clipPath: 'inset(100% 0% 0% 0%)',
-    });
-
-    gsap.set(video, {
-      scale: 1.15,
-      opacity: 0,
-    });
-
-    gsap.set([aboutParagraph], {
-      opacity: 0,
-      y: 30,
-    });
-
+    gsap.set(main, { yPercent: 100 });
+    gsap.set(center, { yPercent: 100 });
+    gsap.set([left, right], { clipPath: 'inset(100% 0% 0% 0%)' });
+    gsap.set(video, { scale: 1.15, opacity: 0 });
+    gsap.set([aboutParagraph], { opacity: 0, y: 30 });
     gsap.set(path, {
       strokeDasharray: pathLength,
       strokeDashoffset: pathLength,
     });
-
-    gsap.set(svgContainer, {
-      opacity: 0,
-    });
+    gsap.set(svgContainer, { opacity: 0 });
 
     //
     // Timeline
     //
-
     tl.to(main, {
       yPercent: 0,
       ease: 'none',
       duration: 1,
     }, 0)
-
-      //
       // Center Panel
-      //
-
       .to(center, {
         yPercent: 0,
         duration: 1.2,
       })
-
-      //
       // Side Panels
-      //
-
       .to(
         [left, right],
         {
@@ -147,11 +121,7 @@ export class HomeIntro {
         },
         '-=1',
       )
-
-      //
       // Video Reveal
-      //
-
       .to(
         video,
         {
@@ -162,11 +132,7 @@ export class HomeIntro {
         },
         '-=0.85',
       )
-
-      //
       // Story Line
-      //
-
       .to(
         svgContainer,
         {
@@ -175,16 +141,10 @@ export class HomeIntro {
         },
         '-=0.8',
       )
-
-      //
       // About Section
-      //
-
       .fromTo(
         aboutParagraph,
-        {
-          y: 25,
-        },
+        { y: 25 },
         {
           y: 0,
           opacity: 1,
@@ -192,7 +152,6 @@ export class HomeIntro {
         },
         '-=0.65',
       )
-
       .to(
         path,
         {
@@ -202,11 +161,7 @@ export class HomeIntro {
         },
         '<',
       )
-
-      //
       // Final Background
-      //
-
       .to(
         main,
         {
@@ -240,9 +195,7 @@ export class HomeIntro {
 
     tl.fromTo(
       main,
-      {
-        yPercent: 100,
-      },
+      { yPercent: 100 },
       {
         yPercent: 0,
         duration: 1.3,

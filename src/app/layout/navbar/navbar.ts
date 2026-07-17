@@ -30,6 +30,7 @@ export class Navbar {
   readonly closeIcon = viewChild.required<ElementRef<HTMLElement>>('closeIcon');
   readonly textDefault = viewChild.required<ElementRef<HTMLElement>>('textDefault');
   readonly textHover = viewChild.required<ElementRef<HTMLElement>>('textHover');
+  readonly contactBtn = viewChild.required<ElementRef<HTMLElement>>('contactBtn');
 
   private splitDefault!: SplitText;
   private splitHover!: SplitText;
@@ -40,6 +41,10 @@ export class Navbar {
   readonly activeImageRevealIndex = signal<number>(0);
   readonly isMenuOpen = signal<boolean>(false);
 
+  readonly linkedinUrl = 'https://www.linkedin.com/in/mohamed-ehab-102341231/';
+  readonly githubUrl = 'https://github.com/MohamedEhabBasha';
+  readonly upworkUrl = 'https://www.upwork.com/freelancers/~0199103b866c474966?mp_source=share';
+
   readonly navLinks = [
     { label: 'About', path: '/about', image: 'navbar/lamp.avif' },
     { label: 'Community', path: '/community', image: 'navbar/community.avif' },
@@ -47,42 +52,50 @@ export class Navbar {
   ];
 
   private timeline?: gsap.core.Timeline;
+  private showAnim?: gsap.core.Tween;
+  private trigger?: ScrollTrigger;
 
   constructor() {
     afterNextRender(() => {
-      const navElement = this.navbarWrapper().nativeElement;
-
-      // Hide-on-scroll-down / reveal-on-scroll-up navbar
-      const showAnim = gsap
-        .from(navElement, { yPercent: -200, paused: true, duration: 0.2 })
-        .progress(1);
-
-      const trigger = ScrollTrigger.create({
-        start: 'top top',
-        end: 'max',
-        onUpdate: (self) => {
-          self.direction === -1 ? showAnim.play() : showAnim.reverse();
-        },
-      });
-
-      // 3D roll-effect text split
-      this.splitDefault = new SplitText(this.textDefault().nativeElement, { type: 'chars' });
-      this.splitHover = new SplitText(this.textHover().nativeElement, { type: 'chars' });
-
-      gsap.set(this.splitDefault.chars, { rotationX: 0, transformOrigin: this.transformOrigin });
-      gsap.set(this.splitHover.chars, { rotationX: -90, transformOrigin: this.transformOrigin });
-
-      // Initial state for the nav-link image reveal
-      gsap.set(this.imageContainer().nativeElement, { yPercent: 50 });
-
-      this.destroyRef.onDestroy(() => {
-        trigger.kill();
-        showAnim.kill();
-        this.timeline?.kill();
-        this.splitDefault?.revert();
-        this.splitHover?.revert();
-      });
+      this.initNavbar();
     });
+
+    this.destroyRef.onDestroy(() => {
+      this.trigger?.kill();
+      this.showAnim?.kill();
+      this.timeline?.kill();
+      this.splitDefault?.revert();
+      this.splitHover?.revert();
+    });
+  }
+
+  public initNavbar() {
+    const navElement = this.navbarWrapper().nativeElement;
+
+    // Hide-on-scroll-down / reveal-on-scroll-up navbar
+    this.showAnim = gsap
+      .from(navElement, { yPercent: -200, paused: true, duration: 0.2 })
+      .progress(1);
+
+    this.trigger = ScrollTrigger.create({
+      start: 'top top',
+      end: 'max',
+      onUpdate: (self) => {
+        if (!this.isMenuOpen()) {
+          self.direction === -1 ? this.showAnim?.play() : this.showAnim?.reverse();
+        }
+      },
+    });
+
+    // 3D roll-effect text split
+    this.splitDefault = new SplitText(this.textDefault().nativeElement, { type: 'chars' });
+    this.splitHover = new SplitText(this.textHover().nativeElement, { type: 'chars' });
+
+    gsap.set(this.splitDefault.chars, { rotationX: 0, transformOrigin: this.transformOrigin });
+    gsap.set(this.splitHover.chars, { rotationX: -90, transformOrigin: this.transformOrigin });
+
+    // Initial state for the nav-link image reveal
+    gsap.set(this.imageContainer().nativeElement, { yPercent: 50 });
   }
 
   toggleMenu(): void {

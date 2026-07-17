@@ -23,7 +23,7 @@ import { ThreeCanvasHost } from './shared/components/three-canvas-host/three-can
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App implements AfterViewInit, OnInit {
+export class App implements OnInit {
   protected readonly title = signal('mega-project');
   protected readonly showPreloader = signal(true);
   private readonly preloaderReady = inject(PreLoaderReady);
@@ -61,5 +61,4 @@ export class App implements AfterViewInit, OnInit {
     this.showPreloader.set(false);
     this.preloaderReady.signal();
   }
-  ngAfterViewInit(): void {}
 }
