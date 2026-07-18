@@ -23,14 +23,15 @@ import gsap from 'gsap';
 export class OrbitalButton implements AfterViewInit {
   private destroyRef = inject(DestroyRef);
 
-  text      = input<string>('EXPLORE');
+  text = input<string>('EXPLORE');
   ariaLabel = input<string>('');
-  color     = input<string>('#333');
-  routeLink     = input<string>('/');
+  color = input<string>('#333');
+  isGlobal = input.required<boolean>();
+  link = input<string>('/');
 
-  letterElements   = viewChildren<ElementRef<HTMLSpanElement>>('letter');
+  letterElements = viewChildren<ElementRef<HTMLSpanElement>>('letter');
   containerElement = viewChild<ElementRef<HTMLButtonElement>>('btnContainer');
-  textWrapper      = viewChild<ElementRef<HTMLDivElement>>('textWrapper');
+  textWrapper = viewChild<ElementRef<HTMLDivElement>>('textWrapper');
 
   protected chars = signal<string[]>([]);
   private radius = 0;
@@ -46,7 +47,9 @@ export class OrbitalButton implements AfterViewInit {
   constructor() {
     effect(() => {
       // Replaces layout-breaking literal text '&nbsp;' with a real Unicode space character
-      this.baseChars = this.text().split('').map(c => c === ' ' ? '\u00A0' : c);
+      this.baseChars = this.text()
+        .split('')
+        .map((c) => (c === ' ' ? '\u00A0' : c));
       this.currentRepeatCount = 1;
       this.chars.set(this.baseChars);
 
@@ -91,15 +94,18 @@ export class OrbitalButton implements AfterViewInit {
     if (!letters.length || !wordLength || !this.radius) return;
 
     // Batch read to completely prevent Layout Thrashing
-    letters.forEach(r => (r.nativeElement.style.position = 'static'));
-    const widths = letters.map(r => r.nativeElement.offsetWidth);
-    letters.forEach(r => (r.nativeElement.style.position = 'absolute'));
+    letters.forEach((r) => (r.nativeElement.style.position = 'static'));
+    const widths = letters.map((r) => r.nativeElement.offsetWidth);
+    letters.forEach((r) => (r.nativeElement.style.position = 'absolute'));
 
     const oneWordWidth = widths.slice(0, wordLength).reduce((a, b) => a + b, 0);
     if (!oneWordWidth) return;
 
     const circumference = 2 * Math.PI * this.radius;
-    const desiredRepeatCount = Math.max(1, Math.floor(circumference / (oneWordWidth + this.minGapPx)));
+    const desiredRepeatCount = Math.max(
+      1,
+      Math.floor(circumference / (oneWordWidth + this.minGapPx)),
+    );
 
     if (desiredRepeatCount !== this.currentRepeatCount) {
       this.currentRepeatCount = desiredRepeatCount;
