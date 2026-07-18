@@ -1,0 +1,50 @@
+:host {
+  --route-transition-panel: #111827;
+  --route-transition-edge: #f9fafb;
+  --route-transition-edge-width: 3px;
+
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+:host(.is-running) {
+  opacity: 1;
+}
+
+.route-transition-panel {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  background: var(--route-transition-panel);
+  clip-path: polygon(0% 100%, 0% 100%, 0% 100%);
+}
+
+.route-transition-edge-canvas {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.route-transition-edge {
+  fill: none;
+  stroke: var(--route-transition-edge);
+  stroke-width: var(--route-transition-edge-width);
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: square;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    display: none;
+  }
+}

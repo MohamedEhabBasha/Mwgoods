@@ -107,7 +107,9 @@ export class Navbar {
   onNavLinkClick(): void {
     if (!this.isMenuOpen()) return;
     this.isMenuOpen.set(false);
-    this.playCloseAnimation();
+    requestAnimationFrame(() => {
+      this.playCloseAnimation();
+    });
   }
 
   private playOpenAnimation(): void {

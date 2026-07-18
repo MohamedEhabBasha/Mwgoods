@@ -16,10 +16,11 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Preloader } from './layout/preloader/preloader';
 import { PreLoaderReady } from './core/services/pre-loader-ready';
 import { ThreeCanvasHost } from './shared/components/three-canvas-host/three-canvas-host';
+import { RouteTransitionOverlay } from "./shared/components/route-transition-overlay/route-transition-overlay";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, Navbar, Preloader, ThreeCanvasHost],
+  imports: [RouterOutlet, Footer, Navbar, Preloader, ThreeCanvasHost, RouteTransitionOverlay],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

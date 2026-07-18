@@ -23,6 +23,8 @@ export class HPHeader {
   private splitStart?: SplitText;
   private splitTo?: SplitText;
 
+  private vaseScale!: number;
+
   // This component's OWN vase-position timeline, tracked locally so repeated
   // onEnter/onLeaveBack firing (scrolling back and forth across the trigger
   // boundary) kills only its own previous run — not anything else animating
@@ -41,6 +43,10 @@ export class HPHeader {
       this.splitHow?.revert();
       this.splitStart?.revert();
       this.splitTo?.revert();
+
+      if (this.canvasService.canvasContainer) {
+        gsap.set(this.canvasService.canvasContainer, { clearProps: 'zIndex' });
+      }
     });
   }
 
@@ -76,15 +82,7 @@ export class HPHeader {
       gsap.set([letterO, letterT], { opacity: 0, scale: 0.5 });
 
       // Directly hook triggers using the passed instance
-      this.createBoundTriggers(
-        vase,
-        splitHow,
-        splitStart,
-        letterT,
-        letterO,
-        svgContainer,
-        rawPath,
-      );
+      this.createBoundTriggers(vase, splitHow, splitStart, letterT, letterO, svgContainer, rawPath);
     }, this.hostEl.nativeElement);
   }
 
@@ -109,11 +107,9 @@ export class HPHeader {
         this.vasePositionTl = tl;
 
         if (window.innerWidth >= 1024 && window.innerWidth < 1280) {
-          tl.to(vase.position, { x: 0, y: 4, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0).to(
-            this.canvasService.canvasContainer,
-            { zIndex: 10 },
-            '<',
-          );
+          tl.to(vase.position, { x: 0, y: 4, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
+            .to(vase.scale, { x: 1, y: 1, z: 1 }, '<')
+            .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');
         } else if (window.innerWidth >= 1280) {
           tl.to(vase.position, { x: 0, y: 4.5, z: 0, duration: 0.8, ease: 'power2.inOut' }, 0);
         }
@@ -126,11 +122,9 @@ export class HPHeader {
         this.vasePositionTl = tl;
 
         if (window.innerWidth >= 1024 && window.innerWidth < 1280) {
-          tl.to(vase.position, { x: 0, y: 2.5, z: 0, duration: 0.4 }, 0).set(
-            this.canvasService.canvasContainer,
-            { zIndex: 0 },
-            0,
-          );
+          tl.to(vase.position, { x: 0, y: 2.5, z: 0, duration: 0.4 }, 0)
+            .to(vase.scale, { x: 2.4, y: 2.4, z: 2.4 }, '<')
+            .set(this.canvasService.canvasContainer, { zIndex: 0 }, 0);
         } else if (window.innerWidth >= 1280) {
           tl.to(vase.position, { x: 0, y: -1, z: 0, duration: 0 }, 0);
         }

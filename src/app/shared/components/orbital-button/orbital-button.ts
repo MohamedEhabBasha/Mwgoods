@@ -10,12 +10,13 @@ import {
   inject,
   DestroyRef,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import gsap from 'gsap';
 
 @Component({
   selector: 'app-orbital-button',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './orbital-button.html',
   styleUrl: './orbital-button.css',
 })
@@ -25,6 +26,7 @@ export class OrbitalButton implements AfterViewInit {
   text      = input<string>('EXPLORE');
   ariaLabel = input<string>('');
   color     = input<string>('#333');
+  routeLink     = input<string>('/');
 
   letterElements   = viewChildren<ElementRef<HTMLSpanElement>>('letter');
   containerElement = viewChild<ElementRef<HTMLButtonElement>>('btnContainer');

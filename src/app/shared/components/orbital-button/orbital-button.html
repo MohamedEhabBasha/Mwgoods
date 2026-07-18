@@ -1,9 +1,10 @@
-<button
+<a
   #btnContainer
   [attr.aria-label]="ariaLabel() || text()"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
   [style.background]="color()"
+  [routerLink]="routeLink()"
   class="relative aspect-square min-w-30 max-w-62.5 px-15 flex items-center justify-center rounded-full border border-white/20 shadow-xl transition-all duration-300 ease-out cursor-pointer perspective-stage group select-none"
 >
   <div class="absolute inset-0 rounded-full bg-linear-to-tr from-black/20 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -21,4 +22,4 @@
       </span>
     }
   </div>
-</button>
+</a>

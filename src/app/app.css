@@ -1,3 +1,8 @@
 :host {
   min-height: 100svh;
 }
+app-route-transition-overlay {
+  --route-transition-panel: #d32f2f;
+  --route-transition-edge: #d32f2f;
+  --route-transition-edge-width: 1px;
+}

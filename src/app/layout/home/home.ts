@@ -76,6 +76,9 @@ export class Home {
 
   public readonly screenWidth = signal(typeof window !== 'undefined' ? window.innerWidth : 0);
 
+  private firstFrame?: number;
+  private secondFrame?: number;
+
   constructor() {
     afterNextRender(() => {
       // Spawn this page's exclusive, detached copy of the 3D model clone
@@ -109,6 +112,9 @@ export class Home {
         gsap.set(this.canvasService.canvasContainer, { clearProps: 'opacity,zIndex' });
       }
       this.canvasService.setRenderingEnabled(true);
+
+      if (this.firstFrame) cancelAnimationFrame(this.firstFrame);
+      if (this.secondFrame) cancelAnimationFrame(this.secondFrame);
     });
   }
 
@@ -122,18 +128,24 @@ export class Home {
 
       this.scrollContanierOne__Tl = this.animate_heroIntro_sections(vase);
 
-      this.animate_processSection(vase);
-      this.productsShowcaseSection().scrollAnimation();
-      this.ctaSection().scrollAnimation();
+      this.firstFrame = requestAnimationFrame(() => {
+        this.secondFrame = requestAnimationFrame(() => {
+          this.ctx?.add(() => {
+            this.animate_processSection(vase);
+            this.productsShowcaseSection().scrollAnimation();
+            this.ctaSection().scrollAnimation();
 
-      // Signal ready state once the preloader fades out
-      this.preloaderReady
-        .onReady$()
-        .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => {
-          this.heroTl?.play();
-          this.readyService.signal();
+            // Signal ready state once the preloader fades out
+            this.preloaderReady
+              .onReady$()
+              .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+              .subscribe(() => {
+                this.heroTl?.play();
+                this.readyService.signal();
+              });
+          });
         });
+      });
     }, this.hostEl.nativeElement);
   }
 
