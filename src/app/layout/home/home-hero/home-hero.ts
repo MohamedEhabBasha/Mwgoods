@@ -1,5 +1,4 @@
 import {
-  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
@@ -12,7 +11,6 @@ import { SplitText } from 'gsap/SplitText';
 import { PixiWeb } from '../../../shared/components/pixi-web/pixi-web';
 import { SquareLabel } from '../../../shared/components/square-label/square-label';
 import { ViewportService } from '../../../core/services/viewport-service';
-
 
 @Component({
   selector: 'app-home-hero',
@@ -42,28 +40,6 @@ export class HomeHero {
   private headingSplit?: SplitText;
   private subtitleSplit?: SplitText;
 
-  constructor() {
-    afterNextRender({
-      write: () => {
-        // Checked once, not reactively: this is a one-shot entrance sequence,
-        // not a persistent effect, so it shouldn't re-arm itself if the user
-        // resizes across 1024px mid-session.
-        if (!this.viewport.isDesktop()) {
-          this.revealStaticState();
-          return;
-        }
-
-        const tl = this.createHeroAnimationTimeline();
-
-        this.destroyRef.onDestroy(() => {
-          tl.kill();
-          this.headingSplit?.revert();
-          this.subtitleSplit?.revert();
-        });
-      },
-    });
-  }
-
   /**
    * Mobile path: skip SplitText and the timeline entirely — SplitText's DOM
    * splitting and the per-frame tween updates were the actual jank source,
@@ -71,6 +47,23 @@ export class HomeHero {
    * "to" values the real timeline would have landed on, so mobile shows the
    * finished layout instead of getting stuck at the animation's start state.
    */
+  public initHeroAnimation(): gsap.core.Timeline {
+    if (!this.viewport.isDesktop()) {
+      this.revealStaticState();
+      return gsap.timeline();
+    }
+
+    const tl = this.createHeroAnimationTimeline();
+
+    this.destroyRef.onDestroy(() => {
+      tl.kill();
+      this.headingSplit?.revert();
+      this.subtitleSplit?.revert();
+    });
+
+    return tl;
+  }
+
   private revealStaticState(): void {
     gsap.set(
       [
@@ -91,7 +84,7 @@ export class HomeHero {
     if (rightEl) gsap.set(rightEl, { scaleX: 1, opacity: 1 });
   }
 
-  public createHeroAnimationTimeline(): gsap.core.Timeline {
+  private createHeroAnimationTimeline(): gsap.core.Timeline {
     this.headingSplit = new SplitText(this.targetHeading().nativeElement, {
       type: 'words,chars',
     });

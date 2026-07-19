@@ -124,7 +124,7 @@ export class Home {
 
   private initHome(vase: Group): void {
     this.ctx = gsap.context(() => {
-      this.heroTl = this.heroSection().createHeroAnimationTimeline();
+      this.heroTl = this.heroSection().initHeroAnimation();
 
       this.scrollContanierOne__Tl = this.animate_heroIntro_sections(vase);
 
