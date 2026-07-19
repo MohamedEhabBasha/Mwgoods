@@ -1,59 +1,31 @@
-# MegaProject
+# MWgoods
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.11.
+**📅 Timeline:** Jul. 2025 – Jul. 2026  
+**🔗 Links:** [Live Demo](https://mwgoods.web.app/)
 
-## Development server
+MWgoods is a premium, fully responsive frontend Single Page Application (SPA) that seamlessly merges an e-commerce marketplace with community-driven social networking mechanics. Designed from the ground up as a standalone, client-side digital showcase, the project focuses on high-end editorial layouts, immersive 3D interactions, and advanced motion graphics.
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## 🛠️ Tech Stack & Tools
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+* **Core Architecture:** Angular, TypeScript
+* **Styling & Layout:** Tailwind CSS
+* **3D & Motion Graphics:** ThreeJS (GLB Object Rendering), GSAP Library
+* **Design Pipeline:** Figma, Adobe Illustrator
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🚀 Technical Highlights & Features
 
-```bash
-ng generate component component-name
-```
+### 📦 Immersive 3D Graphics & Motion
+* **ThreeJS Integration:** Engineered a custom 3D asset pipeline, utilizing ThreeJS to load, render, and manipulate complex `.glb` models directly within the browser ecosystem.
+* **Fluid Motion Sequences:** Leveraged GSAP to implement synchronized, high-performance animation timelines tightly coupled with route transitions and user interactions.
+* **State & Timing Synchronization:** Overcame complex architectural challenges to maintain a shared, seamless 3D scene state and precise animation timing during cross-cutting route shifts.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### 🏪 E-Commerce & Social Connectivity
+* **Unified Client-Side Architecture:** Developed a complete frontend marketplace that supports product browsing and member networking interfaces without relying on a traditional backend infrastructure.
+* **Flawless Responsiveness:** Translated advanced design mockups from Figma and Illustrator into pixel-perfect, fully responsive web interfaces that adapt elegantly across all device form factors.
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### ⚡ Performance Engineering
+* **Lighthouse Optimization:** Profiled client-side rendering pathways and resolved deep layout thrashing and animation bottlenecks, aggressively raising the platform's **Lighthouse Performance score from 27 to 79**.
