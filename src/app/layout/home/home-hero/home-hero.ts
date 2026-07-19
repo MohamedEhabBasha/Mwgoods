@@ -11,6 +11,8 @@ import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { PixiWeb } from '../../../shared/components/pixi-web/pixi-web';
 import { SquareLabel } from '../../../shared/components/square-label/square-label';
+import { ViewportService } from '../../../core/services/viewport-service';
+
 
 @Component({
   selector: 'app-home-hero',
@@ -22,6 +24,7 @@ import { SquareLabel } from '../../../shared/components/square-label/square-labe
 })
 export class HomeHero {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly viewport = inject(ViewportService);
 
   // Structural Column References
   private leftColumn = viewChild.required<ElementRef<HTMLElement>>('leftColumn');
@@ -42,6 +45,14 @@ export class HomeHero {
   constructor() {
     afterNextRender({
       write: () => {
+        // Checked once, not reactively: this is a one-shot entrance sequence,
+        // not a persistent effect, so it shouldn't re-arm itself if the user
+        // resizes across 1024px mid-session.
+        if (!this.viewport.isDesktop()) {
+          this.revealStaticState();
+          return;
+        }
+
         const tl = this.createHeroAnimationTimeline();
 
         this.destroyRef.onDestroy(() => {
@@ -51,6 +62,33 @@ export class HomeHero {
         });
       },
     });
+  }
+
+  /**
+   * Mobile path: skip SplitText and the timeline entirely — SplitText's DOM
+   * splitting and the per-frame tween updates were the actual jank source,
+   * not just bundle weight — and explicitly set every element to the same
+   * "to" values the real timeline would have landed on, so mobile shows the
+   * finished layout instead of getting stuck at the animation's start state.
+   */
+  private revealStaticState(): void {
+    gsap.set(
+      [
+        this.leftColumn().nativeElement.children,
+        this.centerColumn().nativeElement.children,
+        this.rightColumn().nativeElement.children,
+      ],
+      { y: 0, opacity: 1 },
+    );
+
+    gsap.set([this.targetHeading().nativeElement, this.targetSubtitle().nativeElement], {
+      opacity: 1,
+    });
+
+    const leftEl = this.leftDash()?.nativeElement;
+    const rightEl = this.rightDash()?.nativeElement;
+    if (leftEl) gsap.set(leftEl, { scaleX: 1, opacity: 1 });
+    if (rightEl) gsap.set(rightEl, { scaleX: 1, opacity: 1 });
   }
 
   public createHeroAnimationTimeline(): gsap.core.Timeline {
@@ -91,6 +129,7 @@ export class HomeHero {
         { y: 0, opacity: 1, stagger: 0.05, duration: 1.3, ease: 'power3.out' },
         '-=0.9',
       );
+
     const leftEl = this.leftDash()?.nativeElement;
     const rightEl = this.rightDash()?.nativeElement;
 
@@ -99,21 +138,19 @@ export class HomeHero {
 
     if (isLeftVisible || isRightVisible) {
       if (isLeftVisible && isRightVisible) {
-        // Both dashes are active: Animate left first, then stagger right right after it
         tl.fromTo(
           leftEl,
-          { scaleX: 0, opacity: 0, transformOrigin: 'right center' }, // Grows right-to-left
+          { scaleX: 0, opacity: 0, transformOrigin: 'right center' },
           { scaleX: 1, opacity: 1, duration: 1.4, ease: 'power4.out' },
           '-=1.1',
         );
         tl.fromTo(
           rightEl,
-          { scaleX: 0, opacity: 0, transformOrigin: 'left center' }, // Grows left-to-right
+          { scaleX: 0, opacity: 0, transformOrigin: 'left center' },
           { scaleX: 1, opacity: 1, duration: 1.4, ease: 'power4.out' },
-          '<0.1', // Emulates the 0.1s stagger delay
+          '<0.1',
         );
       } else if (isLeftVisible) {
-        // Only left is visible
         tl.fromTo(
           leftEl,
           { scaleX: 0, opacity: 0, transformOrigin: 'right center' },
@@ -121,7 +158,6 @@ export class HomeHero {
           '-=1.1',
         );
       } else if (isRightVisible) {
-        // Only right is visible
         tl.fromTo(
           rightEl,
           { scaleX: 0, opacity: 0, transformOrigin: 'left center' },
