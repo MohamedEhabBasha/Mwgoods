@@ -42,3 +42,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+# Ignore local Firebase CLI cache and generated deployments files
+.firebase/
+firebase-debug.log
