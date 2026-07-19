@@ -11,7 +11,7 @@ import {
 import { RouterLink } from '@angular/router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Matter from 'matter-js';
+import type Matter from 'matter-js';
 
 interface NavItem {
   label: string;
@@ -27,8 +27,15 @@ interface NavItem {
 })
 export class Footer {
   private readonly canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('matterCanvas');
+  private readonly hostRef = inject(ElementRef<HTMLElement>);
   private readonly destroyRef = inject(DestroyRef);
   private linkHoverCleanups: (() => void)[] = [];
+
+  // matter-js itself — undefined until loadMatter() resolves. Everything that
+  // touches physics must go through this instead of a module-level import.
+  private matter!: typeof Matter;
+  private matterLoadPromise: Promise<typeof Matter> | null = null;
+  private intersectionObserver?: IntersectionObserver;
 
   private engine!: Matter.Engine;
   private render!: Matter.Render;
@@ -57,10 +64,11 @@ export class Footer {
 
   constructor() {
     afterNextRender(() => {
-      this.initMatterFooter();
+      this.observeFooterVisibility();
     });
 
     this.destroyRef.onDestroy(() => {
+      this.intersectionObserver?.disconnect();
       this.clearPhysics();
       this.morphTrigger?.kill();
       this.dropTrigger?.kill();
@@ -69,8 +77,43 @@ export class Footer {
     });
   }
 
+  /**
+   * Loads matter-js on demand and caches the promise so concurrent callers
+   * (visibility trigger, resize, a fast scroll into the drop trigger) all
+   * await the same load instead of re-fetching.
+   */
+  private loadMatter(): Promise<typeof Matter> {
+    if (!this.matterLoadPromise) {
+      this.matterLoadPromise = import('matter-js').then((mod) => {
+        this.matter = (mod as unknown as { default: typeof Matter }).default ?? (mod as unknown as typeof Matter);
+        return this.matter;
+      });
+    }
+    return this.matterLoadPromise;
+  }
+
+  /**
+   * Defers loading matter-js (and doing any physics setup at all) until the
+   * footer is actually approaching the viewport, instead of on every mount.
+   */
+  private observeFooterVisibility(): void {
+    this.intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          this.intersectionObserver?.disconnect();
+          void this.loadMatter().then(() => this.initMatterFooter());
+        }
+      },
+      { rootMargin: '600px 0px' }, // start well before the footer is on screen — no visible pop-in
+    );
+
+    this.intersectionObserver.observe(this.hostRef.nativeElement);
+  }
+
   @HostListener('window:resize')
   onResize(): void {
+    if (!this.matter) return; // nothing to resize until Matter has loaded and initialized once
+
     // Debounce via rAF so rapid resize events don't thrash Matter re-init
     cancelAnimationFrame(this.resizeRaf);
     this.resizeRaf = requestAnimationFrame(() => {
@@ -161,16 +204,16 @@ export class Footer {
   private clearPhysics(): void {
     if (!this.isInitialised) return;
 
-    Matter.Render.stop(this.render);
-    Matter.Runner.stop(this.runner);
+    this.matter.Render.stop(this.render);
+    this.matter.Runner.stop(this.runner);
     if (this.engine) {
-      Matter.Engine.clear(this.engine);
+      this.matter.Engine.clear(this.engine);
     }
     this.isInitialised = false;
   }
 
   private buildArcFloor(world: Matter.World, W: number, H: number): void {
-    const { Bodies, Composite } = Matter;
+    const { Bodies, Composite } = this.matter;
 
     const peakY = (H + 150) * 0.5;
     const baseY = (H + 150) * 0.8;
@@ -212,7 +255,7 @@ export class Footer {
   }
 
   private initMatterFooter(): void {
-    const { Engine, Render, Runner, Body, Bodies, Composite, Constraint, Events } = Matter;
+    const { Engine, Render, Runner, Body, Bodies, Composite, Constraint, Events } = this.matter;
 
     const canvas = this.canvasRef().nativeElement;
     const parent = canvas.parentElement!;
@@ -399,18 +442,29 @@ export class Footer {
       onEnter: () => {
         if (!this.hasDropped) {
           this.hasDropped = true;
-          this.dropChain();
+          void this.dropChain();
         }
       },
     });
   }
 
-  private dropChain(): void {
+  /**
+   * Async as a safety net only: by the time this trigger fires the footer
+   * has been in view for a while, so loadMatter()/initMatterFooter() should
+   * already be resolved via the IntersectionObserver. This just guarantees
+   * we never touch this.matter before it exists on an unusually fast scroll.
+   */
+  private async dropChain(): Promise<void> {
+    await this.loadMatter();
+    if (!this.isInitialised) {
+      this.initMatterFooter();
+    }
+
     const squares: Matter.Body[] = (this as any)._squares;
     const links: Matter.Body[] = (this as any)._links;
     if (!squares || !links) return;
 
-    Matter.Runner.run(this.runner, this.engine);
+    this.matter.Runner.run(this.runner, this.engine);
 
     const W = this.currentCanvasW;
 
@@ -421,24 +475,24 @@ export class Footer {
     const dropY = -this.currentSquareSize;
 
     squares.forEach((sq, i) => {
-      Matter.Body.setPosition(sq, {
+      this.matter.Body.setPosition(sq, {
         x: startX + i * (this.currentSquareSize + this.currentSquareGap),
         y: dropY - i * 20,
       });
-      Matter.Body.setVelocity(sq, { x: 0, y: 0 });
-      Matter.Body.setAngularVelocity(sq, 0);
+      this.matter.Body.setVelocity(sq, { x: 0, y: 0 });
+      this.matter.Body.setAngularVelocity(sq, 0);
     });
 
     links.forEach((link, i) => {
       const currentSquareX = startX + i * (this.currentSquareSize + this.currentSquareGap);
       const circleX = currentSquareX + this.currentSquareSize + this.currentSquareGap / 2;
 
-      Matter.Body.setPosition(link, {
+      this.matter.Body.setPosition(link, {
         x: circleX,
         y: dropY - i * 20 - 10,
       });
-      Matter.Body.setVelocity(link, { x: 0, y: 0 });
-      Matter.Body.setAngularVelocity(link, 0);
+      this.matter.Body.setVelocity(link, { x: 0, y: 0 });
+      this.matter.Body.setAngularVelocity(link, 0);
     });
   }
 }

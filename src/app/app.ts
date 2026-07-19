@@ -25,7 +25,7 @@ import { RouteTransitionOverlay } from "./shared/components/route-transition-ove
   styleUrl: './app.css',
 })
 export class App implements OnInit {
-  protected readonly title = signal('mega-project');
+  protected readonly title = signal('mwgoods');
   protected readonly showPreloader = signal(true);
   private readonly preloaderReady = inject(PreLoaderReady);
 

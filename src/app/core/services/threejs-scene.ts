@@ -1,6 +1,6 @@
 // threejs-scene.service.ts
 import { Injectable, OnDestroy } from '@angular/core';
-import { SceneManager } from '../../layout/home/threejs-hero-scene/scene-manager';
+import type { SceneManager } from '../../layout/home/threejs-hero-scene/scene-manager';
 import type { Group } from 'three';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
@@ -10,6 +10,7 @@ import { BehaviorSubject, ReplaySubject } from 'rxjs';
 export class ThreejsSceneService implements OnDestroy {
   private sceneManager!: SceneManager;
   private isInitialized$ = new BehaviorSubject<boolean>(false);
+  private initializing = false;
   public canvasContainer!: HTMLElement;
 
   // Fires once the GLB has been parsed and is ready to clone. Pages that
@@ -19,14 +20,20 @@ export class ThreejsSceneService implements OnDestroy {
 
   /**
    * Called ONCE by the parent Home element to mount the canvas.
+   * Now async: SceneManager (and Three.js itself) load in their own chunk
+   * the first time this runs, instead of shipping inside main.js on every route.
    */
-  public initialize(canvasElement: HTMLCanvasElement, canvasContainer: HTMLElement): void {
-    if (this.isInitialized$.value) return;
+  public async initialize(canvasElement: HTMLCanvasElement, canvasContainer: HTMLElement): Promise<void> {
+    if (this.isInitialized$.value || this.initializing) return;
+    this.initializing = true;
+
+    const { SceneManager } = await import('../../layout/home/threejs-hero-scene/scene-manager');
 
     this.canvasContainer = canvasContainer;
     this.sceneManager = new SceneManager(canvasElement);
     this.sceneManager.initialize();
     this.isInitialized$.next(true);
+    this.initializing = false;
 
     this.sceneManager.onSourceReady(() => this.sourceReady$.next());
   }

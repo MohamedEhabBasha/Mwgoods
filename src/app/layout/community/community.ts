@@ -228,7 +228,7 @@ export class Community {
       },
     });
 
-    settleTl.to(vase.scale, { x: 3.4, y: 3.4, z: 3.4, duration: 0.8, ease: 'power1.inOut' }, 0)
+    settleTl.to(vase.scale, { x: 3.25, y: 3.25, z: 3.25, duration: 0.8, ease: 'power1.inOut' }, 0)
       .to(this.canvasService.canvasContainer, { zIndex: 1 }, '<');
 
     // Vase fades out in lockstep with section 4

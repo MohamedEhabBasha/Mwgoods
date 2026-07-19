@@ -9,7 +9,6 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { Application, Graphics } from 'pixi.js';
 
 @Component({
   selector: 'app-pixi-web',
@@ -26,81 +25,84 @@ export class PixiWeb {
   public squareSize = input<number>(80);
   public thickness = input<number>(0.8);
   public gridColor = input<string>('#e4e4e7');
-
   public backgroundColor = input<string>('transparent');
 
-  private pixiApp?: Application;
-  private gridGraphics?: Graphics;
+  private ctx?: CanvasRenderingContext2D;
+  private readonly dpr = Math.min(window.devicePixelRatio || 1, 2);
 
   constructor() {
     effect(() => {
       this.squareSize();
       this.thickness();
       this.gridColor();
-      if (this.pixiApp && this.gridGraphics) {
+      if (this.ctx) {
         this.drawGridNet();
       }
     });
 
-    afterNextRender(() => this.initPixiGrid());
+    afterNextRender(() => this.initGrid());
 
     this.destroyRef.onDestroy(() => this.cleanup());
   }
 
-  private async initPixiGrid(): Promise<void> {
-    const canvasElement = this.gridCanvas().nativeElement;
+  private initGrid(): void {
+    const canvas = this.gridCanvas().nativeElement;
+    this.ctx = canvas.getContext('2d') ?? undefined;
+    if (!this.ctx) return;
 
-    this.pixiApp = new Application();
-    await this.pixiApp.init({
-      canvas: canvasElement,
-      resizeTo: canvasElement.parentElement ?? window,
-      backgroundAlpha: 0, // canvas stays transparent; CSS owns the backdrop
-      antialias: true,
-    });
-
-    this.gridGraphics = new Graphics();
-    this.pixiApp.stage.addChild(this.gridGraphics);
+    this.resizeCanvas();
     this.drawGridNet();
 
     window.addEventListener('resize', this.onResize);
   }
 
+  private resizeCanvas(): void {
+    const canvas = this.gridCanvas().nativeElement;
+    const parent = canvas.parentElement;
+    const width = parent?.clientWidth ?? window.innerWidth;
+    const height = parent?.clientHeight ?? window.innerHeight;
+
+    canvas.width = width * this.dpr;
+    canvas.height = height * this.dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    this.ctx?.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+  }
+
   private drawGridNet(): void {
-    if (!this.pixiApp || !this.gridGraphics) return;
+    if (!this.ctx) return;
 
-    const width = this.pixiApp.screen.width;
-    const height = this.pixiApp.screen.height;
+    const canvas = this.gridCanvas().nativeElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
 
-    this.gridGraphics.clear();
-
-    const numericColor = parseInt(this.gridColor().replace('#', ''), 16);
-
-    this.gridGraphics.setStrokeStyle({
-      width: this.thickness(),
-      color: isNaN(numericColor) ? 0xe4e4e7 : numericColor,
-    });
+    this.ctx.clearRect(0, 0, width, height);
+    this.ctx.strokeStyle = this.gridColor();
+    this.ctx.lineWidth = this.thickness();
+    this.ctx.beginPath();
 
     for (let x = 0; x <= width; x += this.squareSize()) {
-      this.gridGraphics.moveTo(x, 0);
-      this.gridGraphics.lineTo(x, height);
+      this.ctx.moveTo(x, 0);
+      this.ctx.lineTo(x, height);
     }
 
     for (let y = 0; y <= height; y += this.squareSize()) {
-      this.gridGraphics.moveTo(0, y);
-      this.gridGraphics.lineTo(width, y);
+      this.ctx.moveTo(0, y);
+      this.ctx.lineTo(width, y);
     }
 
-    this.gridGraphics.stroke();
+    this.ctx.stroke();
   }
 
   private onResize = (): void => {
-    if (this.pixiApp && this.gridGraphics) {
+    if (this.ctx) {
+      this.resizeCanvas();
       this.drawGridNet();
     }
   };
 
   private cleanup(): void {
     window.removeEventListener('resize', this.onResize);
-    this.pixiApp?.destroy(true, { children: true, texture: true });
   }
 }

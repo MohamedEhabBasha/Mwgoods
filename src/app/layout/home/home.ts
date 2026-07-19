@@ -28,9 +28,9 @@ import { PreLoaderReady } from '../../core/services/pre-loader-ready';
 
 @Component({
   selector: 'app-home',
-  host: {
+/*   host: {
     '(window:resize)': 'onResize()',
-  },
+  }, */
   imports: [
     HomeIntro,
     HomeHero,
@@ -118,9 +118,9 @@ export class Home {
     });
   }
 
-  protected onResize(): void {
+/*   protected onResize(): void {
     this.screenWidth.set(window.innerWidth);
-  }
+  } */
 
   private initHome(vase: Group): void {
     this.ctx = gsap.context(() => {
@@ -172,7 +172,7 @@ export class Home {
         .to(this.canvasService.canvasContainer, { zIndex: 10 }, '<');
     }
 
-    tl.add(this.introSection().createIntroAnimationTimeline());
+    tl.add(this.introSection().createIntroAnimationTimeline(), 0);
 
     return tl;
   }
